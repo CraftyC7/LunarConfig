@@ -1,0 +1,9 @@
+C:\Users\craft\OneDrive\Desktop\LCDev\LunarConfig\bin\Debug\netstandard2.1\Crafty.LunarConfig.deps.json
+C:\Users\craft\OneDrive\Desktop\LCDev\LunarConfig\bin\Debug\netstandard2.1\Crafty.LunarConfig.dll
+C:\Users\craft\OneDrive\Desktop\LCDev\LunarConfig\obj\Debug\netstandard2.1\LunarConfig.csproj.AssemblyReference.cache
+C:\Users\craft\OneDrive\Desktop\LCDev\LunarConfig\obj\Debug\netstandard2.1\MyPluginInfo.cs
+C:\Users\craft\OneDrive\Desktop\LCDev\LunarConfig\obj\Debug\netstandard2.1\LunarConfig.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\craft\OneDrive\Desktop\LCDev\LunarConfig\obj\Debug\netstandard2.1\LunarConfig.AssemblyInfoInputs.cache
+C:\Users\craft\OneDrive\Desktop\LCDev\LunarConfig\obj\Debug\netstandard2.1\LunarConfig.AssemblyInfo.cs
+C:\Users\craft\OneDrive\Desktop\LCDev\LunarConfig\obj\Debug\netstandard2.1\LunarConfig.csproj.CoreCompileInputs.cache
+C:\Users\craft\OneDrive\Desktop\LCDev\LunarConfig\obj\Debug\netstandard2.1\Crafty.LunarConfig.dll
