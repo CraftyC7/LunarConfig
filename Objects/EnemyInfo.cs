@@ -17,6 +17,7 @@ namespace LunarConfig.Objects
         public int maxCount { get; set; }
         public float powerLevel { get; set; }
         public AnimationCurve probabilityCurve { get; set; }
+        public int enemyHP { get; set; }
 
         public EnemyInfo(EnemyType enemy) 
         {
@@ -30,6 +31,8 @@ namespace LunarConfig.Objects
             maxCount = enemy.MaxCount;
             powerLevel = enemy.PowerLevel;
             probabilityCurve = enemy.probabilityCurve;
+            EnemyAI ai = enemy.enemyPrefab.GetComponent<EnemyAI>();
+            enemyHP = ai.enemyHP;
         }
 
         public string getName()
