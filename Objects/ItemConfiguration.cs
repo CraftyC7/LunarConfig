@@ -20,11 +20,21 @@ namespace LunarConfig.Objects
         {
             itemConfig = entries;
         }
+
+        public void AddEntry(ItemEntry entry)
+        {
+            itemConfig += entry.configString + "\n\n";
+        }
+
+        public void AddEntry(String entry)
+        {
+            itemConfig += "\n\n" + entry;
+        }
     }
 
-    internal class parseConfiguration
+    internal static class parseConfiguration
     {
-        public List<ItemEntry> parseItemConfiguration(String configText) 
+        public static List<ItemEntry> parseItemConfiguration(String configText) 
         {
             List<ItemEntry> items = new List<ItemEntry>();
             foreach (var item in Regex.Split(configText, @"(?=\[.*?\])")) 

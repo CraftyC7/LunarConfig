@@ -6,6 +6,9 @@ using System.Text;
 using UnityEngine;
 using Unity.Netcode;
 using LunarConfig.Objects;
+using System.IO;
+using LunarConfig.Config_Entries;
+using Steamworks.Ugc;
 
 namespace LunarConfig.Patches
 {
@@ -19,9 +22,32 @@ namespace LunarConfig.Patches
             try
             {
                 NetworkManager manager = UnityEngine.Object.FindObjectOfType<NetworkManager>();
-                ConfigInfo configInfo = new ConfigInfo();
-
                 HashSet<string> registeredItems = new HashSet<string>();
+                ItemConfiguration itemConfig;
+
+                MiniLogger.LogInfo("Beginning Logging...");
+
+                if (File.Exists(LunarConfig.ITEM_FILE))
+                {
+                    itemConfig = new ItemConfiguration(File.ReadAllText(LunarConfig.ITEM_FILE));
+                    foreach (ItemEntry entry in Objects.parseConfiguration.parseItemConfiguration(itemConfig.itemConfig))
+                    {
+                        try
+                        {
+                            String NAME = Config_Entries.parseEntry.parseItemEntry(entry.configString).itemID;
+                            registeredItems.Add(NAME);
+                            MiniLogger.LogInfo($"Parsed {NAME}");
+                        }
+                        catch (Exception e)
+                        {
+                            MiniLogger.LogError($"Item Configuration File contains invalid entry, skipping entry!\n{e}");
+                        }
+                    }
+                }
+                else
+                {
+                    itemConfig = new ItemConfiguration("");
+                }
 
                 foreach (var item in Resources.FindObjectsOfTypeAll<Item>())
                 {
@@ -39,7 +65,8 @@ namespace LunarConfig.Patches
                     }
                     else
                     {
-                        configInfo.addItem(item);
+                        itemConfig.AddEntry(new ItemEntry(new ItemInfo(item)));
+                        MiniLogger.LogInfo($"Recorded {item.name}");
                         registeredItems.Add(item.name);
                     }
                 }
@@ -62,14 +89,12 @@ namespace LunarConfig.Patches
                     }
                     else
                     {
-                        configInfo.addEnemy(enemy);
                         registeredEnemies.Add(enemy.name);
                     }
                 }
 
-                MiniLogger.LogInfo("Beginning Logging...");
-
-                configInfo.writeItems(LunarConfig.ITEM_FILE);
+                Directory.CreateDirectory(Path.GetDirectoryName(LunarConfig.ITEM_FILE)!);
+                File.WriteAllText(LunarConfig.ITEM_FILE, itemConfig.itemConfig);
 
                 MiniLogger.LogInfo("Logged items!");
             }

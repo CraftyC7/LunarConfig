@@ -15,7 +15,7 @@ namespace LunarConfig.Config_Entries
         public ItemEntry(ItemInfo info)
         {
             configString =
-                $"[{info.getName()}]\n" +
+                $"[{info.itemID}]\n" +
                 "## Specifies the name that appears when scanning the item.\n" +
                 "# Setting type: String\n" +
                 $"Display Name = {info.displayName}\n\n" +
@@ -33,17 +33,17 @@ namespace LunarConfig.Config_Entries
                 $"Weight = {info.weight}\n\n" +
                 "## Specifies whether an item is conductive.\n" +
                 "# Setting type: Boolean\n" +
-                $"Conductivity = {info.conductive}\n\n" +
+                $"Conductivity = {info.conductive.ToString().ToLower()}\n\n" +
                 "## Specifies whether an item is two-handed.\n" +
                 "# Setting type: Boolean\n" +
-                $"Two-Handed = {info.twoHanded}\n\n" +
+                $"Two-Handed = {info.twoHanded.ToString().ToLower()}\n\n" +
                 "## Tags allocated to the item.\n" +
                 "## Separate tags with commas.\n" +
                 "# Setting type: String\n" +
-                $"Tags = {info.tags}\n\n" +
+                $"Tags = {string.Join(", ", info.tags)}\n\n" +
                 "## Specifies if an item is scrap or gear.\n" +
                 "# Setting type: Boolean\n" +
-                $"Is Scrap? = {info.isScrap}\n\n";
+                $"Is Scrap? = {info.isScrap.ToString().ToLower()}\n\n";
         }
 
         public ItemEntry(String info)
@@ -62,25 +62,15 @@ namespace LunarConfig.Config_Entries
                 return match.Success ? match.Groups[1].Value.Trim() : "";
             }
 
-            string ExtractID(string input)
-            {
-                var match = Regex.Match(input, @"\[(?:.*\((.*?)\)|([^\[\]()]+))\]");
-                return match.Success
-                    ? !string.IsNullOrEmpty(match.Groups[1].Value)
-                        ? match.Groups[1].Value
-                        : match.Groups[2].Value
-                    : "";
-            }
-
             ItemInfo info = new ItemInfo(
-                ExtractID(entry),
+                Regex.Match(entry, @"\[(.*?)\]").Groups[1].Value,
                 GetValue("Display Name"),
                 int.Parse(GetValue("Minimum Value")),
                 int.Parse(GetValue("Maximum Value")),
                 float.Parse(GetValue("Weight")),
                 bool.Parse(GetValue("Conductivity").ToLower()),
                 bool.Parse(GetValue("Two-Handed").ToLower()),
-                bool.Parse(GetValue("Is Scrap\\?")),
+                bool.Parse(GetValue(@"Is Scrap\?").ToLower()),
                 Regex.Split(GetValue("Tags"), @"[\s,]+").Where(tag => !string.IsNullOrWhiteSpace(tag)).ToList()
                 );
 

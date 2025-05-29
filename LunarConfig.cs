@@ -14,9 +14,9 @@ namespace LunarConfig
     public class LunarConfig : BaseUnityPlugin
     {
         // Based off of LethalQuantities see NOTICE
-        internal static readonly string EXPORT_DIRECTORY = Path.Combine(Paths.ConfigPath, MyPluginInfo.PLUGIN_NAME, "Values");
+        internal static readonly string EXPORT_DIRECTORY = Path.Combine(Paths.ConfigPath, MyPluginInfo.PLUGIN_NAME);
 
-        internal static readonly string ITEM_FILE_NAME = "Items.json";
+        internal static readonly string ITEM_FILE_NAME = "Items.cfg";
         internal static readonly string ITEM_FILE = Path.Combine(EXPORT_DIRECTORY, ITEM_FILE_NAME);
 
         internal static readonly string ENEMY_FILE_NAME = "Enemies.json";
