@@ -37,9 +37,12 @@ namespace LunarConfig.Objects
         public static List<ItemEntry> parseItemConfiguration(String configText) 
         {
             List<ItemEntry> items = new List<ItemEntry>();
-            foreach (var item in Regex.Split(configText, @"(?=\[.*?\])")) 
+            foreach (var item in Regex.Split(configText, @"(?=\[.*?\])"))
             {
-                items.Add(new ItemEntry(item));
+                if (!string.IsNullOrWhiteSpace(item))
+                {
+                    items.Add(new ItemEntry(item));
+                }
             }
             return items;
         }

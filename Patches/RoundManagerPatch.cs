@@ -24,9 +24,11 @@ namespace LunarConfig.Patches
                 NetworkManager manager = UnityEngine.Object.FindObjectOfType<NetworkManager>();
                 HashSet<string> registeredItems = new HashSet<string>();
                 ItemConfiguration itemConfig;
+                Dictionary<string, ItemInfo> configuredItems = new Dictionary<string, ItemInfo>();
 
                 MiniLogger.LogInfo("Beginning Logging...");
 
+                
                 if (File.Exists(LunarConfig.ITEM_FILE))
                 {
                     itemConfig = new ItemConfiguration(File.ReadAllText(LunarConfig.ITEM_FILE));
@@ -34,9 +36,9 @@ namespace LunarConfig.Patches
                     {
                         try
                         {
-                            String NAME = Config_Entries.parseEntry.parseItemEntry(entry.configString).itemID;
-                            registeredItems.Add(NAME);
-                            MiniLogger.LogInfo($"Parsed {NAME}");
+                            ItemInfo item = Config_Entries.parseEntry.parseItemEntry(entry.configString);
+                            registeredItems.Add(item.itemID);
+                            configuredItems.Add(item.itemID, item);
                         }
                         catch (Exception e)
                         {
@@ -61,7 +63,14 @@ namespace LunarConfig.Patches
                     }
                     else if (registeredItems.Contains(item.name))
                     {
-                        //Item was found twice!
+                        ItemInfo configuredItem = configuredItems[item.name];
+                        item.itemName = configuredItem.displayName;
+                        item.minValue = configuredItem.minValue;
+                        item.maxValue = configuredItem.maxValue;
+                        item.weight = configuredItem.weight;
+                        item.isConductiveMetal = configuredItem.conductive;
+                        item.twoHanded = configuredItem.twoHanded;
+                        item.isScrap = configuredItem.isScrap;
                     }
                     else
                     {
@@ -100,7 +109,7 @@ namespace LunarConfig.Patches
             }
             catch (Exception e) 
             {
-                MiniLogger.LogError($"An error occured, please report this! {e}");
+                MiniLogger.LogError($"An error occured, please report this!\n{e}");
             }
         }
     }

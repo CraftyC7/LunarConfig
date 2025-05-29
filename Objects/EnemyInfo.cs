@@ -35,6 +35,21 @@ namespace LunarConfig.Objects
             enemyHP = ai.enemyHP;
         }
 
+        public EnemyInfo(string enemyID, string displayName, bool canSeeThroughFog, float doorSpeedMultiplier, bool isDaytimeEnemy, bool isOutsideEnemy, float loudnessMultiplier, int maxCount, float powerLevel, AnimationCurve probabilityCurve, EnemyAI ai)
+        {
+            this.enemyID = enemyID;
+            this.displayName = displayName;
+            this.canSeeThroughFog = canSeeThroughFog;
+            this.doorSpeedMultiplier = doorSpeedMultiplier;
+            this.isDaytimeEnemy = isDaytimeEnemy;
+            this.isOutsideEnemy = isOutsideEnemy;
+            this.loudnessMultiplier = loudnessMultiplier;
+            this.maxCount = maxCount;
+            this.powerLevel = powerLevel;
+            this.probabilityCurve = probabilityCurve;
+            enemyHP = ai.enemyHP;
+        }
+
         public string getName()
         {
             if (displayName != enemyID)

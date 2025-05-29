@@ -42,6 +42,7 @@ namespace LunarConfig.Config_Entries
                 "# Setting type: String\n" +
                 $"Tags = {string.Join(", ", info.tags)}\n\n" +
                 "## Specifies if an item is scrap or gear.\n" +
+                "## This decides whether an item can be sold to the company for credits.\n" +
                 "# Setting type: Boolean\n" +
                 $"Is Scrap? = {info.isScrap.ToString().ToLower()}\n\n";
         }
