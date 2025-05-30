@@ -19,6 +19,7 @@ namespace LunarConfig.Objects
         public AnimationCurve probabilityCurve { get; set; }
         public int enemyHP { get; set; }
         public List<string> tags { get; set; }
+        public List<string> blacklistTags { get; set; }
 
         public EnemyInfo(EnemyType enemy) 
         {
@@ -35,9 +36,10 @@ namespace LunarConfig.Objects
             EnemyAI ai = enemy.enemyPrefab.GetComponent<EnemyAI>();
             enemyHP = ai.enemyHP;
             tags = new List<string>();
+            blacklistTags = new List<string>();
         }
 
-        public EnemyInfo(string enemyID, string displayName, bool canSeeThroughFog, float doorSpeedMultiplier, bool isDaytimeEnemy, bool isOutsideEnemy, float loudnessMultiplier, int maxCount, float powerLevel, AnimationCurve probabilityCurve, int enemyHP, List<string> tags)
+        public EnemyInfo(string enemyID, string displayName, bool canSeeThroughFog, float doorSpeedMultiplier, bool isDaytimeEnemy, bool isOutsideEnemy, float loudnessMultiplier, int maxCount, float powerLevel, AnimationCurve probabilityCurve, int enemyHP, List<string> tags, List<string> blacklistTags)
         {
             this.enemyID = enemyID;
             this.displayName = displayName;
@@ -51,6 +53,7 @@ namespace LunarConfig.Objects
             this.probabilityCurve = probabilityCurve;
             this.enemyHP = enemyHP;
             this.tags = tags;
+            this.blacklistTags = blacklistTags;
         }
 
         public string getName()

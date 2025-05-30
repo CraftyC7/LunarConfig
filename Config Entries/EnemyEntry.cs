@@ -52,7 +52,11 @@ namespace LunarConfig.Config_Entries
                 "## Tags allocated to the enemy.\n" +
                 "## Separate tags with commas.\n" +
                 "# Setting type: String\n" +
-                $"Tags = {string.Join(", ", info.tags)}\n\n";
+                $"Tags = {string.Join(", ", info.tags)}\n\n" +
+                "## Tags tihe enemy is blacklisted from.\n" +
+                "## Separate tags with commas.\n" +
+                "# Setting type: String\n" +
+                $"Tags = {string.Join(", ", info.blacklistTags)}\n\n";
         }
 
         public EnemyEntry(String info)
@@ -100,7 +104,8 @@ namespace LunarConfig.Config_Entries
                 float.Parse(GetValue("Power Level")),
                 ParseCurve(GetValue("Probability Curve")),
                 int.Parse(GetValue("Enemy HP")),
-                Regex.Split(GetValue("Tags"), @"[\s,]+").Where(tag => !string.IsNullOrWhiteSpace(tag)).ToList()
+                Regex.Split(GetValue("Tags"), @"[\s,]+").Where(tag => !string.IsNullOrWhiteSpace(tag)).ToList(),
+                Regex.Split(GetValue("Blacklist Tags"), @"[\s,]+").Where(tag => !string.IsNullOrWhiteSpace(tag)).ToList()
                 );
 
             return info;
