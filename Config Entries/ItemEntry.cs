@@ -53,9 +53,9 @@ namespace LunarConfig.Config_Entries
         }
     }
 
-    internal static class parseEntry
+    internal static class parseItemEntry
     {
-        public static ItemInfo parseItemEntry(String entry)
+        public static ItemInfo parseEntry(String entry)
         {
             string GetValue(string key)
             {

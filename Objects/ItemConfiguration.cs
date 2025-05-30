@@ -32,9 +32,9 @@ namespace LunarConfig.Objects
         }
     }
 
-    internal static class parseConfiguration
+    internal static class parseItemConfiguration
     {
-        public static List<ItemEntry> parseItemConfiguration(String configText) 
+        public static List<ItemEntry> parseConfiguration(String configText) 
         {
             List<ItemEntry> items = new List<ItemEntry>();
             foreach (var item in Regex.Split(configText, @"(?=\[.*?\])"))

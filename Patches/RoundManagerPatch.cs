@@ -32,11 +32,11 @@ namespace LunarConfig.Patches
                 if (File.Exists(LunarConfig.ITEM_FILE))
                 {
                     itemConfig = new ItemConfiguration(File.ReadAllText(LunarConfig.ITEM_FILE));
-                    foreach (ItemEntry entry in Objects.parseConfiguration.parseItemConfiguration(itemConfig.itemConfig))
+                    foreach (ItemEntry entry in Objects.parseItemConfiguration.parseConfiguration(itemConfig.itemConfig))
                     {
                         try
                         {
-                            ItemInfo item = Config_Entries.parseEntry.parseItemEntry(entry.configString);
+                            ItemInfo item = Config_Entries.parseItemEntry.parseEntry(entry.configString);
                             registeredItems.Add(item.itemID);
                             configuredItems.Add(item.itemID, item);
                         }
@@ -81,6 +81,30 @@ namespace LunarConfig.Patches
                 }
 
                 HashSet<string> registeredEnemies = new HashSet<string>();
+                EnemyConfiguration enemyConfig;
+                Dictionary<string, EnemyInfo> configuredEnemies = new Dictionary<string, EnemyInfo>();
+
+                if (File.Exists(LunarConfig.ENEMY_FILE))
+                {
+                    enemyConfig = new EnemyConfiguration(File.ReadAllText(LunarConfig.ENEMY_FILE));
+                    foreach (EnemyEntry entry in Objects.parseEnemyConfiguration.parseConfiguration(enemyConfig.enemyConfig))
+                    {
+                        try
+                        {
+                            EnemyInfo enemy = Config_Entries.parseEnemyEntry.parseEntry(entry.configString);
+                            registeredEnemies.Add(enemy.enemyID);
+                            configuredEnemies.Add(enemy.enemyID, enemy);
+                        }
+                        catch (Exception e)
+                        {
+                            MiniLogger.LogError($"Enemy Configuration File contains invalid entry, skipping entry!\n{e}");
+                        }
+                    }
+                }
+                else
+                {
+                    enemyConfig = new EnemyConfiguration("");
+                }
 
                 foreach (var enemy in Resources.FindObjectsOfTypeAll<EnemyType>())
                 {
@@ -94,16 +118,29 @@ namespace LunarConfig.Patches
                     }
                     else if (registeredEnemies.Contains(enemy.name))
                     {
-                        //Item was found twice!
+                        EnemyInfo configuredEnemy = configuredEnemies[enemy.name];
+                        enemy.enemyName = configuredEnemy.displayName;
+                        enemy.canSeeThroughFog = configuredEnemy.canSeeThroughFog;
+                        enemy.doorSpeedMultiplier = configuredEnemy.doorSpeedMultiplier;
+                        enemy.isDaytimeEnemy = configuredEnemy.isDaytimeEnemy;
+                        enemy.isOutsideEnemy = configuredEnemy.isOutsideEnemy;
+                        enemy.loudnessMultiplier = configuredEnemy.loudnessMultiplier;
+                        enemy.MaxCount = configuredEnemy.maxCount;
+                        enemy.PowerLevel = configuredEnemy.powerLevel;
+                        enemy.probabilityCurve = configuredEnemy.probabilityCurve;
+                        enemy.enemyPrefab.GetComponent<EnemyAI>().enemyHP = configuredEnemy.enemyHP;
                     }
                     else
                     {
+                        enemyConfig.AddEntry(new EnemyEntry(new EnemyInfo(enemy)));
+                        MiniLogger.LogInfo($"Recorded {enemy.name}");
                         registeredEnemies.Add(enemy.name);
                     }
                 }
 
                 Directory.CreateDirectory(Path.GetDirectoryName(LunarConfig.ITEM_FILE)!);
                 File.WriteAllText(LunarConfig.ITEM_FILE, itemConfig.itemConfig);
+                File.WriteAllText(LunarConfig.ENEMY_FILE, enemyConfig.enemyConfig);
 
                 MiniLogger.LogInfo("Logged items!");
             }
