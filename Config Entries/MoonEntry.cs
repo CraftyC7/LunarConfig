@@ -30,9 +30,6 @@ namespace LunarConfig.Config_Entries
                 "## Does not modify terminal commands/output.\n" +
                 "# Setting type: String\n" +
                 $"Description = {info.description.Replace("\n", ";")}\n\n" +
-                "## Whether a moon will spawn scrap and enemies.\n" +
-                "# Setting type: Boolean\n" +
-                $"Spawn Enemies And Scrap? = {info.spawnEnemiesAndScrap.ToString().ToLower()}\n\n" +
                 "## Defines whether a moon has time.\n" +
                 "# Setting type: Boolean\n" +
                 $"Has Time? = {info.hasTime.ToString().ToLower()}\n\n" +
@@ -121,7 +118,6 @@ namespace LunarConfig.Config_Entries
                 GetValue("Display Name"),
                 GetValue("Risk Level"),
                 GetValue("Description").Replace(";", "\n"),
-                bool.Parse(GetValue(@"Spawn Enemies And Scrap\?").ToLower()),
                 bool.Parse(GetValue(@"Has Time\?").ToLower()),
                 float.Parse(GetValue("Time Multiplier")),
                 float.Parse(GetValue("Daytime Probability Range")),

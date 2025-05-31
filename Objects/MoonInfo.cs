@@ -12,7 +12,6 @@ namespace LunarConfig.Objects
         public string displayName { get; set; }
         public string risk {  get; set; }
         public string description { get; set; }
-        public bool spawnEnemiesAndScrap { get; set; }
         public bool hasTime { get; set; }
         public float timeMultiplier { get; set; }
         public float daytimeProbabilityRange { get; set; }
@@ -34,7 +33,6 @@ namespace LunarConfig.Objects
             displayName = level.PlanetName;
             risk = level.riskLevel;
             description = level.LevelDescription;
-            spawnEnemiesAndScrap = level.spawnEnemiesAndScrap;
 
             hasTime = level.planetHasTime;
             timeMultiplier = level.DaySpeedMultiplier;
@@ -58,13 +56,12 @@ namespace LunarConfig.Objects
             tags = new List<String>();
         }
 
-        public MoonInfo(string moonID, string displayName, string risk, string description, bool spawnEnemeiesAndScrap, bool hasTime, float timeMultiplier, float daytimeProbabilityRange, AnimationCurve daytimeCurve, int maxDaytimePower, float interiorProbabilityRange, AnimationCurve interiorCurve, int maxInteriorPower, AnimationCurve outsideCurve, int maxOutsidePower, int minScrap, int maxScrap, float interiorSizeMultiplier, List<string> tags)
+        public MoonInfo(string moonID, string displayName, string risk, string description, bool hasTime, float timeMultiplier, float daytimeProbabilityRange, AnimationCurve daytimeCurve, int maxDaytimePower, float interiorProbabilityRange, AnimationCurve interiorCurve, int maxInteriorPower, AnimationCurve outsideCurve, int maxOutsidePower, int minScrap, int maxScrap, float interiorSizeMultiplier, List<string> tags)
         {
             this.moonID = moonID;
             this.displayName = displayName;
             this.risk = risk;
             this.description = description;
-            this.spawnEnemiesAndScrap = spawnEnemiesAndScrap;
             this.hasTime = hasTime;
             this.timeMultiplier = timeMultiplier;
             this.daytimeProbabilityRange = daytimeProbabilityRange;

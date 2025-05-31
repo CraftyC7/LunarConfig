@@ -9,6 +9,7 @@ using LunarConfig.Objects;
 using System.IO;
 using LunarConfig.Config_Entries;
 using Steamworks.Ugc;
+using MonoMod.RuntimeDetour;
 
 namespace LunarConfig.Patches
 {
@@ -138,6 +139,7 @@ namespace LunarConfig.Patches
                     }
                 }
 
+                
                 HashSet<string> registeredMoons = new HashSet<string>();
                 MoonConfiguration moonConfig;
                 Dictionary<string, MoonInfo> configuredMoons = new Dictionary<string, MoonInfo>();
@@ -172,7 +174,6 @@ namespace LunarConfig.Patches
                         moon.PlanetName = configuredMoon.displayName;
                         moon.riskLevel = configuredMoon.risk;
                         moon.LevelDescription = configuredMoon.description;
-                        moon.spawnEnemiesAndScrap = configuredMoon.spawnEnemiesAndScrap;
                         moon.planetHasTime = configuredMoon.hasTime;
                         moon.DaySpeedMultiplier = configuredMoon.timeMultiplier;
                         moon.daytimeEnemiesProbabilityRange = configuredMoon.daytimeProbabilityRange;
@@ -186,6 +187,7 @@ namespace LunarConfig.Patches
                         moon.minScrap = configuredMoon.minScrap;
                         moon.maxScrap = configuredMoon.maxScrap;
                         moon.factorySizeMultiplier = configuredMoon.interiorSizeMultiplier;
+                        
                     }
                     else
                     {
