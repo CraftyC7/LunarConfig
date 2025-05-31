@@ -22,6 +22,9 @@ namespace LunarConfig
         internal static readonly string ENEMY_FILE_NAME = "Enemies.cfg";
         internal static readonly string ENEMY_FILE = Path.Combine(EXPORT_DIRECTORY, ENEMY_FILE_NAME);
 
+        internal static readonly string MOON_FILE_NAME = "Moons.cfg";
+        internal static readonly string MOON_FILE = Path.Combine(EXPORT_DIRECTORY, MOON_FILE_NAME);
+
         public static LunarConfig Instance { get; private set; } = null!;
         internal new static ManualLogSource Logger { get; private set; } = null!;
         internal static Harmony? Harmony { get; set; }

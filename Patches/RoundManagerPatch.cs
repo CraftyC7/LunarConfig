@@ -110,11 +110,11 @@ namespace LunarConfig.Patches
                 {
                     if (enemy.enemyPrefab == null)
                     {
-                        //Item is missing prefab!
+                        //Enemy is missing prefab!
                     }
                     else if (!manager.NetworkConfig.Prefabs.Contains(enemy.enemyPrefab))
                     {
-                        //Item not a real item!
+                        //Enemy not a real enemy!
                     }
                     else if (registeredEnemies.Contains(enemy.name))
                     {
@@ -138,9 +138,67 @@ namespace LunarConfig.Patches
                     }
                 }
 
+                HashSet<string> registeredMoons = new HashSet<string>();
+                MoonConfiguration moonConfig;
+                Dictionary<string, MoonInfo> configuredMoons = new Dictionary<string, MoonInfo>();
+
+                if (File.Exists(LunarConfig.MOON_FILE))
+                {
+                    moonConfig = new MoonConfiguration(File.ReadAllText(LunarConfig.MOON_FILE));
+                    foreach (MoonEntry entry in Objects.parseMoonConfiguration.parseConfiguration(moonConfig.moonConfig))
+                    {
+                        try
+                        {
+                            MoonInfo moon = Config_Entries.parseMoonEntry.parseEntry(entry.configString);
+                            registeredMoons.Add(moon.moonID);
+                            configuredMoons.Add(moon.moonID, moon);
+                        }
+                        catch (Exception e)
+                        {
+                            MiniLogger.LogError($"Moon Configuration File contains invalid entry, skipping entry!\n{e}");
+                        }
+                    }
+                }
+                else
+                {
+                    moonConfig = new MoonConfiguration("");
+                }
+
+                foreach (var moon in Resources.FindObjectsOfTypeAll<SelectableLevel>())
+                {
+                    if (registeredMoons.Contains(moon.name))
+                    {
+                        MoonInfo configuredMoon = configuredMoons[moon.name];
+                        moon.PlanetName = configuredMoon.displayName;
+                        moon.riskLevel = configuredMoon.risk;
+                        moon.LevelDescription = configuredMoon.description;
+                        moon.spawnEnemiesAndScrap = configuredMoon.spawnEnemiesAndScrap;
+                        moon.planetHasTime = configuredMoon.hasTime;
+                        moon.DaySpeedMultiplier = configuredMoon.timeMultiplier;
+                        moon.daytimeEnemiesProbabilityRange = configuredMoon.daytimeProbabilityRange;
+                        moon.daytimeEnemySpawnChanceThroughDay = configuredMoon.daytimeCurve;
+                        moon.maxDaytimeEnemyPowerCount = configuredMoon.maxDaytimePower;
+                        moon.spawnProbabilityRange = configuredMoon.interiorProbabilityRange;
+                        moon.enemySpawnChanceThroughoutDay = configuredMoon.interiorCurve;
+                        moon.maxEnemyPowerCount = configuredMoon.maxInteriorPower;
+                        moon.outsideEnemySpawnChanceThroughDay = configuredMoon.outsideCurve;
+                        moon.maxOutsideEnemyPowerCount = configuredMoon.maxOutsidePower;
+                        moon.minScrap = configuredMoon.minScrap;
+                        moon.maxScrap = configuredMoon.maxScrap;
+                        moon.factorySizeMultiplier = configuredMoon.interiorSizeMultiplier;
+                    }
+                    else
+                    {
+                        moonConfig.AddEntry(new MoonEntry(new MoonInfo(moon)));
+                        MiniLogger.LogInfo($"Recorded {moon.name}");
+                        registeredMoons.Add(moon.name);
+                    }
+                }
+
                 Directory.CreateDirectory(Path.GetDirectoryName(LunarConfig.ITEM_FILE)!);
                 File.WriteAllText(LunarConfig.ITEM_FILE, itemConfig.itemConfig);
                 File.WriteAllText(LunarConfig.ENEMY_FILE, enemyConfig.enemyConfig);
+                File.WriteAllText(LunarConfig.MOON_FILE, moonConfig.moonConfig);
 
                 MiniLogger.LogInfo("Logged items!");
             }

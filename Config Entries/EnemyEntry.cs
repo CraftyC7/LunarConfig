@@ -24,7 +24,7 @@ namespace LunarConfig.Config_Entries
                 "# Setting type: Boolean\n" +
                 $"Can See Through Fog? = {info.canSeeThroughFog.ToString().ToLower()}\n\n" +
                 "## Decides the speed at which enemies can open doors.\n" +
-
+                "## Calculated with: 1 / x = time to open door in seconds.\n" +
                 "# Setting type: Float\n" +
                 $"Door Speed Multiplier = {info.doorSpeedMultiplier}\n\n" +
                 "## Whether an enemy is a daytime enemy.\n" +
@@ -56,7 +56,7 @@ namespace LunarConfig.Config_Entries
                 "## Tags tihe enemy is blacklisted from.\n" +
                 "## Separate tags with commas.\n" +
                 "# Setting type: String\n" +
-                $"Tags = {string.Join(", ", info.blacklistTags)}\n\n";
+                $"Blacklist Tags = {string.Join(", ", info.blacklistTags)}\n\n";
         }
 
         public EnemyEntry(String info)

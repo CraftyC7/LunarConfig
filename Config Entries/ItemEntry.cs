@@ -28,7 +28,7 @@ namespace LunarConfig.Config_Entries
                 "# Setting type: Integer\n" +
                 $"Maximum Value = {info.maxValue}\n\n" +
                 "## Specifies the weight of an item.\n" +
-                "## Calculated with: (x - 1) * 100 = weight in pounds.\n" +
+                "## Calculated with: (x - 1) * 105 = weight in pounds.\n" +
                 "# Setting type: Float\n" +
                 $"Weight = {info.weight}\n\n" +
                 "## Specifies whether an item is conductive.\n" +
