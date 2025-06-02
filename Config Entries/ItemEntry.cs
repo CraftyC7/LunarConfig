@@ -21,10 +21,12 @@ namespace LunarConfig.Config_Entries
                 $"Display Name = {info.displayName}\n\n" +
                 "## The minimum scrap value the item can have.\n" +
                 "## Typically multiplied by 0.4, setting not applicable to non-scrap.\n" +
+                "## Does not work on items like Apparatus and items from enemies (Hives, Double-barrel).\n" +
                 "# Setting type: Integer\n" +
                 $"Minimum Value = {info.minValue}\n\n" +
                 "## The maximum scrap value the item can have.\n" +
                 "## Typically multiplied by 0.4, setting not applicable to non-scrap.\n" +
+                "## Does not work on items like Apparatus and items from enemies (Hives, Double-barrel).\n" +
                 "# Setting type: Integer\n" +
                 $"Maximum Value = {info.maxValue}\n\n" +
                 "## Specifies the weight of an item.\n" +

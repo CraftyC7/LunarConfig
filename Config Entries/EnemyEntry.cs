@@ -42,13 +42,38 @@ namespace LunarConfig.Config_Entries
                 "## The power level an enemy occupies.\n" +
                 "# Setting type: Float\n" +
                 $"Power Level = {info.powerLevel}\n\n" +
-                "## Decides how an enemy's weight changes after it's been spawned.\n" +
+                "## Multiplies enemy spawn weight depending on time of day.\n" +
                 "## Keyframes x,y separated by semicolons.\n" +
                 "# Setting type: String\n" +
                 $"Probability Curve = {string.Join("; ", info.probabilityCurve.keys.Select(k => $"{k.time},{k.value}"))}\n\n" +
+                "## Whether or not to use the falloff curve.\n" +
+                "# Setting type: Boolean\n" +
+                $"Use Falloff? = {info.useFalloff.ToString().ToLower()}\n\n" +
+                "## Multiplier to enemy spawn weight depending on how many already spawned.\n" +
+                "## Keyframes x,y separated by semicolons.\n" +
+                "# Setting type: String\n" +
+                $"Falloff Curve = {string.Join("; ", info.probabilityCurve.keys.Select(k => $"{k.time},{k.value}"))}\n\n" +
                 "## The amount of HP an enemy has.\n" +
                 "# Setting type: Integer\n" +
                 $"Enemy HP = {info.enemyHP}\n\n" +
+                "## Whether or not an enemy can die.\n" +
+                "# Setting type: Boolean\n" +
+                $"Can Die? = {info.canDie.ToString().ToLower()}\n\n" +
+                "## Whether or not an enemy is destroyed on death.\n" +
+                "# Setting type: Boolean\n" +
+                $"Destroy On Death? = {info.destroyOnDeath.ToString().ToLower()}\n\n" +
+                "## Whether or not an enemy can be destroyed.\n" +
+                "# Setting type: Boolean\n" +
+                $"Can Destroy? = {info.canDestroy.ToString().ToLower()}\n\n" +
+                "## Whether or not an enemy can be stunned.\n" +
+                "# Setting type: Boolean\n" +
+                $"Can Stun? = {info.canStun.ToString().ToLower()}\n\n" +
+                "## I don't really know.\n" +
+                "# Setting type: Float\n" +
+                $"Stun Difficulty = {info.stunDifficulty}\n\n" +
+                "## I don't really know.\n" +
+                "# Setting type: Float\n" +
+                $"Stun Time = {info.stunTime}\n\n" +
                 "## Tags allocated to the enemy.\n" +
                 "## Separate tags with commas.\n" +
                 "# Setting type: String\n" +
@@ -103,7 +128,15 @@ namespace LunarConfig.Config_Entries
                 int.Parse(GetValue("Max Count")),
                 float.Parse(GetValue("Power Level")),
                 ParseCurve(GetValue("Probability Curve")),
+                bool.Parse(GetValue(@"Use Falloff\?").ToLower()),
+                ParseCurve(GetValue("Falloff Curve")),
                 int.Parse(GetValue("Enemy HP")),
+                bool.Parse(GetValue(@"Can Die\?").ToLower()),
+                bool.Parse(GetValue(@"Destroy On Death\?").ToLower()),
+                bool.Parse(GetValue(@"Can Destroy\?").ToLower()),
+                bool.Parse(GetValue(@"Can Stun\?").ToLower()),
+                float.Parse(GetValue("Stun Difficulty")),
+                float.Parse(GetValue("Stun Time")),
                 Regex.Split(GetValue("Tags"), @"[\s,]+").Where(tag => !string.IsNullOrWhiteSpace(tag)).ToList(),
                 Regex.Split(GetValue("Blacklist Tags"), @"[\s,]+").Where(tag => !string.IsNullOrWhiteSpace(tag)).ToList()
                 );

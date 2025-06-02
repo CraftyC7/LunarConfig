@@ -12,7 +12,8 @@
           "BepInEx.Analyzers": "1.0.8",
           "BepInEx.Core": "5.4.21",
           "BepInEx.PluginInfoProps": "2.1.0",
-          "LethalCompany.GameLibs.Steam": "69.0.1-ngd.0",
+          "Evaisa.LethalLib": "1.1.0",
+          "LethalCompany.GameLibs.Steam": "70.0.0-ngd.0",
           "TeamBMX.LobbyCompatibility": "1.5.1",
           "UnityEngine.Modules": "2022.3.9"
         },
@@ -36,6 +37,17 @@
         }
       },
       "BepInEx.PluginInfoProps/2.1.0": {},
+      "Evaisa.LethalLib/1.1.0": {
+        "dependencies": {
+          "BepInEx.Core": "5.4.21"
+        },
+        "runtime": {
+          "lib/netstandard2.1/LethalLib.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.1.0.0"
+          }
+        }
+      },
       "HarmonyX/2.7.0": {
         "dependencies": {
           "MonoMod.RuntimeDetour": "21.12.13.1",
@@ -48,7 +60,7 @@
           }
         }
       },
-      "LethalCompany.GameLibs.Steam/69.0.1-ngd.0": {
+      "LethalCompany.GameLibs.Steam/70.0.0-ngd.0": {
         "dependencies": {
           "Newtonsoft.Json": "13.0.3",
           "UnityEngine.Modules": "2022.3.9"
@@ -412,6 +424,13 @@
       "path": "bepinex.plugininfoprops/2.1.0",
       "hashPath": "bepinex.plugininfoprops.2.1.0.nupkg.sha512"
     },
+    "Evaisa.LethalLib/1.1.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-hFU/+YjDSYgyzeBclQj10OIyLIji4eaJHzFf231eLwCeDxnNqfVXkq09VXXttuLPRP+Hk+J+oFheaXS0tdCeUQ==",
+      "path": "evaisa.lethallib/1.1.0",
+      "hashPath": "evaisa.lethallib.1.1.0.nupkg.sha512"
+    },
     "HarmonyX/2.7.0": {
       "type": "package",
       "serviceable": true,
@@ -419,12 +438,12 @@
       "path": "harmonyx/2.7.0",
       "hashPath": "harmonyx.2.7.0.nupkg.sha512"
     },
-    "LethalCompany.GameLibs.Steam/69.0.1-ngd.0": {
+    "LethalCompany.GameLibs.Steam/70.0.0-ngd.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-Lg4qFz1k0mxj82BDlw9Nxr9MvnyFQo4FDl1Gs80p3qWPU2KS60mc210RX5KSONtiMOnZXeckxNCaPfy2meVHYg==",
-      "path": "lethalcompany.gamelibs.steam/69.0.1-ngd.0",
-      "hashPath": "lethalcompany.gamelibs.steam.69.0.1-ngd.0.nupkg.sha512"
+      "sha512": "sha512-i2Iqz1Q8fbF5J5tM39r7hHsTtuiPS0SvFFz7qFL7NVSPj/kJJ1R5eI6xaApLFTWvIOzq1ZbVny6CUcU5wgLfxA==",
+      "path": "lethalcompany.gamelibs.steam/70.0.0-ngd.0",
+      "hashPath": "lethalcompany.gamelibs.steam.70.0.0-ngd.0.nupkg.sha512"
     },
     "Microsoft.NETCore.Platforms/1.1.0": {
       "type": "package",

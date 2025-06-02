@@ -36,6 +36,22 @@
           "build/BepInEx.PluginInfoProps.props": {}
         }
       },
+      "Evaisa.LethalLib/1.1.0": {
+        "type": "package",
+        "dependencies": {
+          "BepInEx.Core": "5.4.21"
+        },
+        "compile": {
+          "lib/netstandard2.1/LethalLib.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.1/LethalLib.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "HarmonyX/2.7.0": {
         "type": "package",
         "dependencies": {
@@ -53,7 +69,7 @@
           }
         }
       },
-      "LethalCompany.GameLibs.Steam/69.0.1-ngd.0": {
+      "LethalCompany.GameLibs.Steam/70.0.0-ngd.0": {
         "type": "package",
         "dependencies": {
           "Newtonsoft.JSON": "13.0.3",
@@ -65,6 +81,7 @@
           "ref/netstandard2.1/Assembly-CSharp.dll": {},
           "ref/netstandard2.1/ClientNetworkTransform.dll": {},
           "ref/netstandard2.1/DissonanceVoip.dll": {},
+          "ref/netstandard2.1/EasyTextEffects.dll": {},
           "ref/netstandard2.1/Facepunch Transport for Netcode for GameObjects.dll": {},
           "ref/netstandard2.1/Facepunch.Steamworks.Win64.dll": {},
           "ref/netstandard2.1/Unity.AI.Navigation.dll": {},
@@ -121,7 +138,8 @@
           "ref/netstandard2.1/Unity.VisualEffectGraph.Runtime.dll": {},
           "ref/netstandard2.1/UnityEngine.ARModule.dll": {},
           "ref/netstandard2.1/UnityEngine.NVIDIAModule.dll": {},
-          "ref/netstandard2.1/UnityEngine.UI.dll": {}
+          "ref/netstandard2.1/UnityEngine.UI.dll": {},
+          "ref/netstandard2.1/com.olegknyazev.softmask.dll": {}
         }
       },
       "Microsoft.NETCore.Platforms/1.1.0": {
@@ -773,6 +791,20 @@
         "build/BepInEx.PluginInfoProps.props"
       ]
     },
+    "Evaisa.LethalLib/1.1.0": {
+      "sha512": "hFU/+YjDSYgyzeBclQj10OIyLIji4eaJHzFf231eLwCeDxnNqfVXkq09VXXttuLPRP+Hk+J+oFheaXS0tdCeUQ==",
+      "type": "package",
+      "path": "evaisa.lethallib/1.1.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "evaisa.lethallib.1.1.0.nupkg.sha512",
+        "evaisa.lethallib.nuspec",
+        "lib/netstandard2.1/LethalLib.dll",
+        "lib/netstandard2.1/LethalLib.xml"
+      ]
+    },
     "HarmonyX/2.7.0": {
       "sha512": "lec/SkduQspMa3Pi/nM/NSvA84Za8HCCWA8ybdToKiTqnBZa+JC5g6rxoFQCg/1vNuYcvjy77edePZzIEsRmvw==",
       "type": "package",
@@ -792,20 +824,21 @@
         "logo_mini.png"
       ]
     },
-    "LethalCompany.GameLibs.Steam/69.0.1-ngd.0": {
-      "sha512": "Lg4qFz1k0mxj82BDlw9Nxr9MvnyFQo4FDl1Gs80p3qWPU2KS60mc210RX5KSONtiMOnZXeckxNCaPfy2meVHYg==",
+    "LethalCompany.GameLibs.Steam/70.0.0-ngd.0": {
+      "sha512": "i2Iqz1Q8fbF5J5tM39r7hHsTtuiPS0SvFFz7qFL7NVSPj/kJJ1R5eI6xaApLFTWvIOzq1ZbVny6CUcU5wgLfxA==",
       "type": "package",
-      "path": "lethalcompany.gamelibs.steam/69.0.1-ngd.0",
+      "path": "lethalcompany.gamelibs.steam/70.0.0-ngd.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "lethalcompany.gamelibs.steam.69.0.1-ngd.0.nupkg.sha512",
+        "lethalcompany.gamelibs.steam.70.0.0-ngd.0.nupkg.sha512",
         "lethalcompany.gamelibs.steam.nuspec",
         "ref/netstandard2.1/AmazingAssets.TerrainToMesh.dll",
         "ref/netstandard2.1/Assembly-CSharp-firstpass.dll",
         "ref/netstandard2.1/Assembly-CSharp.dll",
         "ref/netstandard2.1/ClientNetworkTransform.dll",
         "ref/netstandard2.1/DissonanceVoip.dll",
+        "ref/netstandard2.1/EasyTextEffects.dll",
         "ref/netstandard2.1/Facepunch Transport for Netcode for GameObjects.dll",
         "ref/netstandard2.1/Facepunch.Steamworks.Win64.dll",
         "ref/netstandard2.1/Unity.AI.Navigation.dll",
@@ -862,7 +895,8 @@
         "ref/netstandard2.1/Unity.VisualEffectGraph.Runtime.dll",
         "ref/netstandard2.1/UnityEngine.ARModule.dll",
         "ref/netstandard2.1/UnityEngine.NVIDIAModule.dll",
-        "ref/netstandard2.1/UnityEngine.UI.dll"
+        "ref/netstandard2.1/UnityEngine.UI.dll",
+        "ref/netstandard2.1/com.olegknyazev.softmask.dll"
       ]
     },
     "Microsoft.NETCore.Platforms/1.1.0": {
@@ -2892,6 +2926,7 @@
       "BepInEx.Analyzers >= 1.*",
       "BepInEx.Core >= 5.*",
       "BepInEx.PluginInfoProps >= 2.*",
+      "Evaisa.LethalLib >= 1.*",
       "LethalCompany.GameLibs.Steam >= *-*",
       "TeamBMX.LobbyCompatibility >= 1.*",
       "UnityEngine.Modules >= 2022.3.9"
@@ -2963,6 +2998,11 @@
             "suppressParent": "All",
             "target": "Package",
             "version": "[2.*, )"
+          },
+          "Evaisa.LethalLib": {
+            "suppressParent": "All",
+            "target": "Package",
+            "version": "[1.*, )"
           },
           "LethalCompany.GameLibs.Steam": {
             "suppressParent": "All",

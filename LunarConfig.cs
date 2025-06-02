@@ -25,6 +25,15 @@ namespace LunarConfig
         internal static readonly string MOON_FILE_NAME = "Moons.cfg";
         internal static readonly string MOON_FILE = Path.Combine(EXPORT_DIRECTORY, MOON_FILE_NAME);
 
+        internal static readonly string MAP_OBJECT_FILE_NAME = "MapObjects.cfg";
+        internal static readonly string MAP_OBJECT_FILE = Path.Combine(EXPORT_DIRECTORY, MAP_OBJECT_FILE_NAME);
+
+        //internal static readonly string OUTSIDE_MAP_OBJECT_FILE_NAME = "OutsideMapObjects.cfg";
+        //internal static readonly string OUTSIDE_MAP_OBJECT_FILE = Path.Combine(EXPORT_DIRECTORY, OUTSIDE_MAP_OBJECT_FILE_NAME);
+
+        internal static readonly string DUNGEON_FILE_NAME = "Dungeons.cfg";
+        internal static readonly string DUNGEON_FILE = Path.Combine(EXPORT_DIRECTORY, DUNGEON_FILE_NAME);
+
         public static LunarConfig Instance { get; private set; } = null!;
         internal new static ManualLogSource Logger { get; private set; } = null!;
         internal static Harmony? Harmony { get; set; }
