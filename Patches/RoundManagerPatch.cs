@@ -7,13 +7,14 @@ using UnityEngine;
 using Unity.Netcode;
 using LunarConfig.Objects;
 using System.IO;
-using LunarConfig.Config_Entries;
 using Steamworks.Ugc;
 using MonoMod.RuntimeDetour;
 using DunGen.Graph;
 using static UnityEngine.Rendering.HighDefinition.ScalableSettingLevelParameter;
 using System.ComponentModel;
 using System.Reflection;
+using LunarConfig.Configuration.Entries;
+using LunarConfig.Configuration;
 
 namespace LunarConfig.Patches
 {
@@ -27,6 +28,19 @@ namespace LunarConfig.Patches
             try
             {
                 NetworkManager manager = UnityEngine.Object.FindObjectOfType<NetworkManager>();
+                
+                CentralConfiguration central;
+
+                if (File.Exists(LunarConfig.CENTRAL_FILE))
+                {
+                    central = new CentralConfiguration(File.ReadAllText(LunarConfig.CENTRAL_FILE));
+                }
+                else
+                {
+                    central = new CentralConfiguration();
+                    central.CreateConfiguration(central);
+                }
+
                 HashSet<string> registeredItems = new HashSet<string>();
                 ItemConfiguration itemConfig;
                 Dictionary<string, ItemInfo> configuredItems = new Dictionary<string, ItemInfo>();
@@ -37,11 +51,11 @@ namespace LunarConfig.Patches
                 if (File.Exists(LunarConfig.ITEM_FILE))
                 {
                     itemConfig = new ItemConfiguration(File.ReadAllText(LunarConfig.ITEM_FILE));
-                    foreach (ItemEntry entry in Objects.parseItemConfiguration.parseConfiguration(itemConfig.itemConfig))
+                    foreach (ItemEntry entry in Configuration.parseItemConfiguration.parseConfiguration(itemConfig.itemConfig))
                     {
                         try
                         {
-                            ItemInfo item = Config_Entries.parseItemEntry.parseEntry(entry.configString);
+                            ItemInfo item = Configuration.Entries.parseItemEntry.parseEntry(entry.configString);
                             registeredItems.Add(item.itemID);
                             configuredItems.Add(item.itemID, item);
                         }
@@ -92,11 +106,11 @@ namespace LunarConfig.Patches
                 if (File.Exists(LunarConfig.ENEMY_FILE))
                 {
                     enemyConfig = new EnemyConfiguration(File.ReadAllText(LunarConfig.ENEMY_FILE));
-                    foreach (EnemyEntry entry in Objects.parseEnemyConfiguration.parseConfiguration(enemyConfig.enemyConfig))
+                    foreach (EnemyEntry entry in Configuration.parseEnemyConfiguration.parseConfiguration(enemyConfig.enemyConfig))
                     {
                         try
                         {
-                            EnemyInfo enemy = Config_Entries.parseEnemyEntry.parseEntry(entry.configString);
+                            EnemyInfo enemy = Configuration.Entries.parseEnemyEntry.parseEntry(entry.configString);
                             registeredEnemies.Add(enemy.enemyID);
                             configuredEnemies.Add(enemy.enemyID, enemy);
                         }
@@ -156,11 +170,11 @@ namespace LunarConfig.Patches
                 if (File.Exists(LunarConfig.MOON_FILE))
                 {
                     moonConfig = new MoonConfiguration(File.ReadAllText(LunarConfig.MOON_FILE));
-                    foreach (MoonEntry entry in Objects.parseMoonConfiguration.parseConfiguration(moonConfig.moonConfig))
+                    foreach (MoonEntry entry in Configuration.parseMoonConfiguration.parseConfiguration(moonConfig.moonConfig))
                     {
                         try
                         {
-                            MoonInfo moon = Config_Entries.parseMoonEntry.parseEntry(entry.configString);
+                            MoonInfo moon = Configuration.Entries.parseMoonEntry.parseEntry(entry.configString);
                             registeredMoons.Add(moon.moonID);
                             configuredMoons.Add(moon.moonID, moon);
                         }
@@ -178,11 +192,11 @@ namespace LunarConfig.Patches
                 if (File.Exists(LunarConfig.MAP_OBJECT_FILE))
                 {
                     mapObjectConfig = new MapObjectConfiguration(File.ReadAllText(LunarConfig.MAP_OBJECT_FILE));
-                    foreach (MapObjectEntry entry in Objects.parseMapObjectConfiguration.parseConfiguration(mapObjectConfig.mapObjectConfig))
+                    foreach (MapObjectEntry entry in Configuration.parseMapObjectConfiguration.parseConfiguration(mapObjectConfig.mapObjectConfig))
                     {
                         try
                         {
-                            MapObjectInfo mapObject = Config_Entries.parseMapObjectEntry.parseEntry(entry.configString);
+                            MapObjectInfo mapObject = Configuration.Entries.parseMapObjectEntry.parseEntry(entry.configString);
                             registeredMapObjects.Add(mapObject.objID);
                             configuredMapObjects.Add(mapObject.objID, mapObject);
                         }
@@ -306,11 +320,11 @@ namespace LunarConfig.Patches
                 if (File.Exists(LunarConfig.DUNGEON_FILE))
                 {
                     dungeonConfig = new DungeonConfiguration(File.ReadAllText(LunarConfig.DUNGEON_FILE));
-                    foreach (DungeonEntry entry in Objects.parseDungeonConfiguration.parseConfiguration(dungeonConfig.dungeonConfig))
+                    foreach (DungeonEntry entry in Configuration.parseDungeonConfiguration.parseConfiguration(dungeonConfig.dungeonConfig))
                     {
                         try
                         {
-                            DungeonInfo dungeon = Config_Entries.parseDungeonEntry.parseEntry(entry.configString);
+                            DungeonInfo dungeon = Configuration.Entries.parseDungeonEntry.parseEntry(entry.configString);
                             registeredDungeons.Add(dungeon.dungeonID);
                             configuredDungeons.Add(dungeon.dungeonID, dungeon);
                         }
@@ -346,6 +360,7 @@ namespace LunarConfig.Patches
                 File.WriteAllText(LunarConfig.MAP_OBJECT_FILE, mapObjectConfig.mapObjectConfig);
                 //File.WriteAllText(LunarConfig.OUTSIDE_MAP_OBJECT_FILE, outsideMapObjectConfig.outsideMapObjectConfig);
                 File.WriteAllText(LunarConfig.DUNGEON_FILE, dungeonConfig.dungeonConfig);
+                File.WriteAllText(LunarConfig.CENTRAL_FILE, central.CreateConfiguration(central));
 
                 MiniLogger.LogInfo("Logging complete!");
             }

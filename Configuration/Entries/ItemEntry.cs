@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using static UnityEngine.InputSystem.InputControlScheme.MatchResult;
 
-namespace LunarConfig.Config_Entries
+namespace LunarConfig.Configuration.Entries
 {
     internal class ItemEntry
     {
@@ -39,17 +39,17 @@ namespace LunarConfig.Config_Entries
                 "## Specifies whether an item is two-handed.\n" +
                 "# Setting type: Boolean\n" +
                 $"Two-Handed = {info.twoHanded.ToString().ToLower()}\n\n" +
-                "## Tags allocated to the item.\n" +
-                "## Separate tags with commas.\n" +
-                "# Setting type: String\n" +
-                $"Tags = {string.Join(", ", info.tags)}\n\n" +
                 "## Specifies if an item is scrap or gear.\n" +
                 "## This decides whether an item can be sold to the company for credits.\n" +
                 "# Setting type: Boolean\n" +
-                $"Is Scrap? = {info.isScrap.ToString().ToLower()}\n\n";
+                $"Is Scrap? = {info.isScrap.ToString().ToLower()}\n\n" +
+                "## Tags allocated to the item.\n" +
+                "## Separate tags with commas.\n" +
+                "# Setting type: String\n" +
+                $"(LunarConfig) Tags = {string.Join(", ", info.tags)}\n\n";
         }
 
-        public ItemEntry(String info)
+        public ItemEntry(string info)
         {
             configString = info;
         }
@@ -57,7 +57,7 @@ namespace LunarConfig.Config_Entries
 
     internal static class parseItemEntry
     {
-        public static ItemInfo parseEntry(String entry)
+        public static ItemInfo parseEntry(string entry)
         {
             string GetValue(string key)
             {

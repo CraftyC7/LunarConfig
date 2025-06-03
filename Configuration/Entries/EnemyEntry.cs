@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using static UnityEngine.InputSystem.InputControlScheme.MatchResult;
 
-namespace LunarConfig.Config_Entries
+namespace LunarConfig.Configuration.Entries
 {
     internal class EnemyEntry
     {
@@ -77,14 +77,14 @@ namespace LunarConfig.Config_Entries
                 "## Tags allocated to the enemy.\n" +
                 "## Separate tags with commas.\n" +
                 "# Setting type: String\n" +
-                $"Tags = {string.Join(", ", info.tags)}\n\n" +
+                $"(LunarConfig) Tags = {string.Join(", ", info.tags)}\n\n" +
                 "## Tags tihe enemy is blacklisted from.\n" +
                 "## Separate tags with commas.\n" +
                 "# Setting type: String\n" +
-                $"Blacklist Tags = {string.Join(", ", info.blacklistTags)}\n\n";
+                $"(LunarConfig) Blacklist Tags = {string.Join(", ", info.blacklistTags)}\n\n";
         }
 
-        public EnemyEntry(String info)
+        public EnemyEntry(string info)
         {
             configString = info;
         }
@@ -92,7 +92,7 @@ namespace LunarConfig.Config_Entries
 
     internal static class parseEnemyEntry
     {
-        public static EnemyInfo parseEntry(String entry)
+        public static EnemyInfo parseEntry(string entry)
         {
             string GetValue(string key)
             {

@@ -1,22 +1,22 @@
-﻿using LunarConfig.Config_Entries;
+﻿using LunarConfig.Configuration.Entries;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace LunarConfig.Objects
+namespace LunarConfig.Configuration
 {
     internal class ItemConfiguration
     {
-        public String itemConfig { get; set; }
+        public string itemConfig { get; set; }
 
-        public ItemConfiguration(List<ItemEntry> entries) 
+        public ItemConfiguration(List<ItemEntry> entries)
         {
             itemConfig = string.Join("\n\n", entries);
         }
 
-        public ItemConfiguration(String entries)
+        public ItemConfiguration(string entries)
         {
             itemConfig = entries;
         }
@@ -26,7 +26,7 @@ namespace LunarConfig.Objects
             itemConfig += entry.configString + "\n\n";
         }
 
-        public void AddEntry(String entry)
+        public void AddEntry(string entry)
         {
             itemConfig += "\n\n" + entry;
         }
@@ -34,7 +34,7 @@ namespace LunarConfig.Objects
 
     internal static class parseItemConfiguration
     {
-        public static List<ItemEntry> parseConfiguration(String configText) 
+        public static List<ItemEntry> parseConfiguration(string configText)
         {
             List<ItemEntry> items = new List<ItemEntry>();
             foreach (var item in Regex.Split(configText, @"(?=\[.*?\])"))

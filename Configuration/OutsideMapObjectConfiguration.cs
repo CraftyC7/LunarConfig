@@ -1,22 +1,22 @@
-﻿using LunarConfig.Config_Entries;
+﻿using LunarConfig.Configuration.Entries;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace LunarConfig.Objects
+namespace LunarConfig.Configuration
 {
     internal class OutsideMapObjectConfiguration
     {
-        public String outsideMapObjectConfig { get; set; }
+        public string outsideMapObjectConfig { get; set; }
 
-        public OutsideMapObjectConfiguration(List<OutsideMapObjectEntry> entries) 
+        public OutsideMapObjectConfiguration(List<OutsideMapObjectEntry> entries)
         {
             outsideMapObjectConfig = string.Join("\n\n", entries);
         }
 
-        public OutsideMapObjectConfiguration(String entries)
+        public OutsideMapObjectConfiguration(string entries)
         {
             outsideMapObjectConfig = entries;
         }
@@ -26,7 +26,7 @@ namespace LunarConfig.Objects
             outsideMapObjectConfig += entry.configString + "\n\n";
         }
 
-        public void AddEntry(String entry)
+        public void AddEntry(string entry)
         {
             outsideMapObjectConfig += "\n\n" + entry;
         }
@@ -34,7 +34,7 @@ namespace LunarConfig.Objects
 
     internal static class parseOutsideMapObjectConfiguration
     {
-        public static List<OutsideMapObjectEntry> parseConfiguration(String configText) 
+        public static List<OutsideMapObjectEntry> parseConfiguration(string configText)
         {
             List<OutsideMapObjectEntry> mapObjects = new List<OutsideMapObjectEntry>();
             foreach (var mapObject in Regex.Split(configText, @"(?=\[.*?\])"))

@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using static UnityEngine.InputSystem.InputControlScheme.MatchResult;
 
-namespace LunarConfig.Config_Entries
+namespace LunarConfig.Configuration.Entries
 {
     internal class MoonEntry
     {
@@ -80,7 +80,7 @@ namespace LunarConfig.Config_Entries
                 $"Tags = {string.Join(", ", info.tags)}\n\n";
         }
 
-        public MoonEntry(String info)
+        public MoonEntry(string info)
         {
             configString = info;
         }
@@ -88,7 +88,7 @@ namespace LunarConfig.Config_Entries
 
     internal static class parseMoonEntry
     {
-        public static MoonInfo parseEntry(String entry)
+        public static MoonInfo parseEntry(string entry)
         {
             string GetValue(string key)
             {

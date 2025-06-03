@@ -1,22 +1,22 @@
-﻿using LunarConfig.Config_Entries;
+﻿using LunarConfig.Configuration.Entries;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace LunarConfig.Objects
+namespace LunarConfig.Configuration
 {
     internal class DungeonConfiguration
     {
-        public String dungeonConfig { get; set; }
+        public string dungeonConfig { get; set; }
 
-        public DungeonConfiguration(List<DungeonEntry> entries) 
+        public DungeonConfiguration(List<DungeonEntry> entries)
         {
             dungeonConfig = string.Join("\n\n", entries);
         }
 
-        public DungeonConfiguration(String entries)
+        public DungeonConfiguration(string entries)
         {
             dungeonConfig = entries;
         }
@@ -26,7 +26,7 @@ namespace LunarConfig.Objects
             dungeonConfig += entry.configString + "\n\n";
         }
 
-        public void AddEntry(String entry)
+        public void AddEntry(string entry)
         {
             dungeonConfig += "\n\n" + entry;
         }
@@ -34,7 +34,7 @@ namespace LunarConfig.Objects
 
     internal static class parseDungeonConfiguration
     {
-        public static List<DungeonEntry> parseConfiguration(String configText) 
+        public static List<DungeonEntry> parseConfiguration(string configText)
         {
             List<DungeonEntry> dungeons = new List<DungeonEntry>();
             foreach (var dungeon in Regex.Split(configText, @"(?=\[.*?\])"))

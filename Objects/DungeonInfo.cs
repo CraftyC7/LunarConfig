@@ -8,15 +8,15 @@ namespace LunarConfig.Objects
     internal class DungeonInfo
     {
         public string dungeonID {  get; set; }
-        public List<String> tags { get; set; }
+        public Dictionary<String, int> tags { get; set; }
 
         public DungeonInfo(DungeonFlow dungeon) 
         {
             dungeonID = dungeon.name;
-            tags = new List<String>();
+            tags = new Dictionary<String, int>();
         }
 
-        public DungeonInfo(string dungeonID, List<String> tags)
+        public DungeonInfo(string dungeonID, Dictionary<String, int> tags)
         {
             this.dungeonID = dungeonID;
             this.tags = tags;

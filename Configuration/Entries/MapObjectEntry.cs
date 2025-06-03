@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using static UnityEngine.InputSystem.InputControlScheme.MatchResult;
 
-namespace LunarConfig.Config_Entries
+namespace LunarConfig.Configuration.Entries
 {
     internal class MapObjectEntry
     {
@@ -38,10 +38,10 @@ namespace LunarConfig.Config_Entries
                 "## The base animation curve of an object.\n" +
                 "## Keyframes x,y separated by semicolons.\n" +
                 "# Setting type: String\n" +
-                $"Base Curve = {string.Join("; ", info.baseCurve.keys.Select(k => $"{k.time},{k.value}"))}\n\n";
+                $"(LunarConfig) Base Curve = {string.Join("; ", info.baseCurve.keys.Select(k => $"{k.time},{k.value}"))}\n\n";
         }
 
-        public MapObjectEntry(String info)
+        public MapObjectEntry(string info)
         {
             configString = info;
         }
@@ -49,7 +49,7 @@ namespace LunarConfig.Config_Entries
 
     internal static class parseMapObjectEntry
     {
-        public static MapObjectInfo parseEntry(String entry)
+        public static MapObjectInfo parseEntry(string entry)
         {
             string GetValue(string key)
             {

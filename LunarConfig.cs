@@ -34,6 +34,9 @@ namespace LunarConfig
         internal static readonly string DUNGEON_FILE_NAME = "Dungeons.cfg";
         internal static readonly string DUNGEON_FILE = Path.Combine(EXPORT_DIRECTORY, DUNGEON_FILE_NAME);
 
+        internal static readonly string CENTRAL_FILE_NAME = "LunarConfig.cfg";
+        internal static readonly string CENTRAL_FILE = Path.Combine(Paths.ConfigPath, CENTRAL_FILE_NAME);
+
         public static LunarConfig Instance { get; private set; } = null!;
         internal new static ManualLogSource Logger { get; private set; } = null!;
         internal static Harmony? Harmony { get; set; }
