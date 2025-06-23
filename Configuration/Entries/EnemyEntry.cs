@@ -78,7 +78,7 @@ namespace LunarConfig.Configuration.Entries
                 "## Separate tags with commas.\n" +
                 "# Setting type: String\n" +
                 $"(LunarConfig) Tags = {string.Join(", ", info.tags)}\n\n" +
-                "## Tags tihe enemy is blacklisted from.\n" +
+                "## Tags the enemy is blacklisted from.\n" +
                 "## Separate tags with commas.\n" +
                 "# Setting type: String\n" +
                 $"(LunarConfig) Blacklist Tags = {string.Join(", ", info.blacklistTags)}\n\n";

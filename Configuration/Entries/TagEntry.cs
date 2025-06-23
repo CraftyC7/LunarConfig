@@ -21,6 +21,7 @@ namespace LunarConfig.Configuration.Entries
                 "# Setting type: Float\n" +
                 $"Map Object Peak Multiplier = {info.mapObjectPeakMultiplier}\n";
             
+            /*
             foreach (var multi in info.mapObjectMultipliers)
             {
                 configString +=
@@ -28,6 +29,7 @@ namespace LunarConfig.Configuration.Entries
                     "# Setting type: Float\n" +
                     $"Map Object Multiplier - {multi.Key} = {multi.Value}\n";
             }
+            */
 
             foreach (var multi in info.itemPoolMultipliers)
             {
@@ -72,22 +74,24 @@ namespace LunarConfig.Configuration.Entries
                 return match.Success ? match.Groups[1].Value.Trim() : "";
             }
 
-            var mapObjectMultipliers = new Dictionary<string, float>();
+            //var mapObjectMultipliers = new Dictionary<string, float>();
             var itemPoolMultipliers = new Dictionary<string, float>();
             var enemyPoolMultipliers = new Dictionary<string, float>();
             var dungeonMultipliers = new Dictionary<string, float>();
 
-            var mapObjectRegex = new Regex(@"^Map Object Multiplier\s*-\s*(\w+)\s*=\s*([\d.]+)", RegexOptions.Multiline);
+            //var mapObjectRegex = new Regex(@"^Map Object Multiplier\s*-\s*(\w+)\s*=\s*([\d.]+)", RegexOptions.Multiline);
             var itemPoolRegex = new Regex(@"^Item Pool Multiplier\s*-\s*(\w+)\s*=\s*([\d.]+)", RegexOptions.Multiline);
             var enemyPoolRegex = new Regex(@"^Enemy Pool Multiplier\s*-\s*(\w+)\s*=\s*([\d.]+)", RegexOptions.Multiline);
             var dungeonRegex = new Regex(@"^Dungeon Multiplier\s*-\s*(\w+)\s*=\s*([\d.]+)", RegexOptions.Multiline);
 
+            /*
             foreach (Match match in mapObjectRegex.Matches(entry))
             {
                 string key = match.Groups[1].Value;
                 float value = float.Parse(match.Groups[2].Value);
                 mapObjectMultipliers[key] = value;
             }
+            */
 
             foreach (Match match in itemPoolRegex.Matches(entry))
             {
@@ -113,7 +117,7 @@ namespace LunarConfig.Configuration.Entries
             TagInfo info = new TagInfo(
                 Regex.Match(entry, @"\[(.*?)\]").Groups[1].Value,
                 float.Parse(GetValue("Map Object Peak Multiplier")),
-                mapObjectMultipliers,
+                //mapObjectMultipliers,
                 itemPoolMultipliers,
                 enemyPoolMultipliers,
                 dungeonMultipliers

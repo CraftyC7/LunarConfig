@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using static UnityEngine.InputSystem.InputControlScheme.MatchResult;
+using Match = System.Text.RegularExpressions.Match;
 
 namespace LunarConfig.Configuration.Entries
 {
@@ -19,7 +20,17 @@ namespace LunarConfig.Configuration.Entries
                 "## Tags allocated to this dungeon.\n" +
                 "## Separate tags with commas.\n" +
                 "# Setting type: String\n" +
-                $"(LunarConfig) Tags = {string.Join(", ", info.tags)}\n\n";
+                $"(LunarConfig) Tags = {string.Join(", ", info.tags)}\n";
+
+            foreach (var multi in info.mapObjectMultipliers)
+            {
+                configString +=
+                    "## The multiplier on the object curve of the trap.\n" +
+                    "# Setting type: Float\n" +
+                    $"Map Object Multiplier - {multi.Key} = {multi.Value}\n";
+            }
+
+            configString += "\n";
         }
 
         public DungeonEntry(string info)
@@ -38,29 +49,20 @@ namespace LunarConfig.Configuration.Entries
                 return match.Success ? match.Groups[1].Value.Trim() : "";
             }
 
-            Dictionary<string, int> ParseList(string input)
+            var mapObjectMultipliers = new Dictionary<string, float>();
+            var mapObjectRegex = new Regex(@"^Map Object Multiplier\s*-\s*(\w+)\s*=\s*([\d.]+)", RegexOptions.Multiline);
+
+            foreach (Match match in mapObjectRegex.Matches(entry))
             {
-                Dictionary<string, int> result = new();
-
-                foreach (string pair in input.Split(','))
-                {
-                    string[] parts = pair.Split(':');
-                    if (parts.Length == 2)
-                    {
-                        string key = parts[0].Trim();
-                        if (int.TryParse(parts[1].Trim(), out int value))
-                        {
-                            result[key] = value;
-                        }
-                    }
-                }
-
-                return result;
+                string key = match.Groups[1].Value;
+                float value = float.Parse(match.Groups[2].Value);
+                mapObjectMultipliers[key] = value;
             }
 
             DungeonInfo info = new DungeonInfo(
                 Regex.Match(entry, @"\[(.*?)\]").Groups[1].Value,
-                ParseList(GetValue("Tags"))
+                Regex.Split(GetValue("Tags"), @"[\s,]+").Where(tag => !string.IsNullOrWhiteSpace(tag)).ToList(),
+                mapObjectMultipliers
                 );
 
             return info;
