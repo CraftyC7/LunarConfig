@@ -16,8 +16,8 @@ namespace LunarConfig.Configuration.Entries
         {
             configString =
                 $"[{info.dungeonID}]\n" +
-                "## Tags with weights allocated to this dungeon.\n" +
-                "## Represented as tag : weight.\n" +
+                "## Tags allocated to this dungeon.\n" +
+                "## Separate tags with commas.\n" +
                 "# Setting type: String\n" +
                 $"(LunarConfig) Tags = {string.Join(", ", info.tags)}\n\n";
         }
