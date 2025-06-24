@@ -24,6 +24,8 @@ namespace LunarConfig.Objects
         public int maxOutsidePower { get; set; }
         public int minScrap { get; set; }
         public int maxScrap { get; set; }
+        public float valueMultiplier { get; set; }
+        public float amountMultiplier { get; set; }
         public float interiorSizeMultiplier { get; set; }
         public List<String> tags { get; set; }
 
@@ -51,12 +53,15 @@ namespace LunarConfig.Objects
             minScrap = level.minScrap;
             maxScrap = level.maxScrap;
 
+            valueMultiplier = 0.4f;
+            amountMultiplier = 1f;
+
             interiorSizeMultiplier = level.factorySizeMultiplier;
             
             tags = new List<String>();
         }
 
-        public MoonInfo(string moonID, string displayName, string risk, string description, bool hasTime, float timeMultiplier, float daytimeProbabilityRange, AnimationCurve daytimeCurve, int maxDaytimePower, float interiorProbabilityRange, AnimationCurve interiorCurve, int maxInteriorPower, AnimationCurve outsideCurve, int maxOutsidePower, int minScrap, int maxScrap, float interiorSizeMultiplier, List<string> tags)
+        public MoonInfo(string moonID, string displayName, string risk, string description, bool hasTime, float timeMultiplier, float daytimeProbabilityRange, AnimationCurve daytimeCurve, int maxDaytimePower, float interiorProbabilityRange, AnimationCurve interiorCurve, int maxInteriorPower, AnimationCurve outsideCurve, int maxOutsidePower, int minScrap, int maxScrap, float valueMultiplier, float amountMultiplier, float interiorSizeMultiplier, List<string> tags)
         {
             this.moonID = moonID;
             this.displayName = displayName;
@@ -74,6 +79,8 @@ namespace LunarConfig.Objects
             this.maxOutsidePower = maxOutsidePower;
             this.minScrap = minScrap;
             this.maxScrap = maxScrap;
+            this.valueMultiplier = valueMultiplier;
+            this.amountMultiplier = amountMultiplier;
             this.interiorSizeMultiplier = interiorSizeMultiplier;
             this.tags = tags;
         }

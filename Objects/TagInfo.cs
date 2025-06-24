@@ -7,8 +7,8 @@ namespace LunarConfig.Objects
 {
     internal class TagInfo
     {
-        public string tagID;
-        public float mapObjectPeakMultiplier;
+        public string tagID { get; set; }
+        public float mapObjectPeakMultiplier { get; set; }
         //public Dictionary<string, float> mapObjectMultipliers = new Dictionary<string, float>();
         public Dictionary<string, float> itemPoolMultipliers = new Dictionary<string, float>();
         public Dictionary<string, float> enemyPoolMultipliers = new Dictionary<string, float>();

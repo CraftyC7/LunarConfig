@@ -15,7 +15,6 @@ namespace LunarConfig.Configuration
         public bool clearDungeons = false;
         public bool clearTraps = false;
         public bool useTrapCurves = false;
-        public int interiorThreshold = 3;
         public List<string> tags = new List<string>();
         public List<string> itemPools = new List<string>();
         public List<string> enemyPools = new List<string>();
@@ -43,9 +42,6 @@ namespace LunarConfig.Configuration
                 "## May cause issues if not all base curves are set.\n" +
                 "# Setting type: Boolean\n" +
                 $"Use Trap Curves? = {config.useTrapCurves.ToString().ToLower()}\n" +
-                "## Under what weight should interiors be disregarded.\n" +
-                "# Setting type: Integer\n" +
-                $"Interior Threshold = {config.interiorThreshold}\n" +
                 "## Tags registered with LunarConfig.\n" +
                 "## Separate tags with commas.\n" +
                 "# Setting type: String\n" +
@@ -64,21 +60,47 @@ namespace LunarConfig.Configuration
 
         public CentralConfiguration(string configString)
         {
+            var lines = configString.Split('\n')
+                                    .Select(l => l.Trim())
+                                    .Where(l => !string.IsNullOrWhiteSpace(l) && !l.StartsWith("#"))
+                                    .ToList();
+
             string GetValue(string key)
             {
-                var match = Regex.Match(configString, $@"{key}\s*=\s*(.+)");
-                return match.Success ? match.Groups[1].Value.Trim() : "";
+                foreach (var line in lines)
+                {
+                    if (line.StartsWith(key + " ="))
+                    {
+                        var parts = line.Split(new[] { '=' }, 2);
+                        return parts.Length > 1 ? parts[1].Trim() : "";
+                    }
+                }
+                return "";
             }
 
-            this.clearItems = bool.Parse(GetValue(@"Clear Scrap\?").ToLower());
-            this.clearEnemies = bool.Parse(GetValue(@"Clear Enemies\?").ToLower());
-            this.clearDungeons = bool.Parse(GetValue(@"Clear Dungeons\?").ToLower());
-            this.clearTraps = bool.Parse(GetValue(@"Clear Traps\?").ToLower());
-            this.useTrapCurves = bool.Parse(GetValue(@"Use Trap Curves\?").ToLower());
-            this.interiorThreshold = int.Parse(GetValue("Interior Threshold"));
-            this.tags = Regex.Split(GetValue("Tags"), @"[\s,]+").Where(tag => !string.IsNullOrWhiteSpace(tag)).ToList();
-            this.itemPools = Regex.Split(GetValue("Item Pools"), @"[\s,]+").Where(tag => !string.IsNullOrWhiteSpace(tag)).ToList();
-            this.enemyPools = Regex.Split(GetValue("Enemy Pools"), @"[\s,]+").Where(tag => !string.IsNullOrWhiteSpace(tag)).ToList();
+            bool TryParseBool(string value) =>
+                value.Equals("true", StringComparison.OrdinalIgnoreCase);
+
+            this.clearItems = TryParseBool(GetValue("Clear Scrap?"));
+            this.clearEnemies = TryParseBool(GetValue("Clear Enemies?"));
+            this.clearDungeons = TryParseBool(GetValue("Clear Dungeons?"));
+            this.clearTraps = TryParseBool(GetValue("Clear Traps?"));
+            this.useTrapCurves = TryParseBool(GetValue("Use Trap Curves?"));
+
+            string tagLine = GetValue("Tags");
+            this.tags = string.IsNullOrWhiteSpace(tagLine)
+                ? new List<string>()
+                : Regex.Split(tagLine, @"[\s,]+").Where(tag => !string.IsNullOrWhiteSpace(tag)).ToList();
+
+            string itemLine = GetValue("Item Pools");
+            this.itemPools = string.IsNullOrWhiteSpace(itemLine)
+                ? new List<string>()
+                : Regex.Split(itemLine, @"[\s,]+").Where(tag => !string.IsNullOrWhiteSpace(tag)).ToList();
+
+            string enemyLine = GetValue("Enemy Pools");
+            this.enemyPools = string.IsNullOrWhiteSpace(enemyLine)
+                ? new List<string>()
+                : Regex.Split(enemyLine, @"[\s,]+").Where(tag => !string.IsNullOrWhiteSpace(tag)).ToList();
         }
     }
 }

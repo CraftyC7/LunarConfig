@@ -71,6 +71,12 @@ namespace LunarConfig.Configuration.Entries
                 "## The maximum amount of scrap items that can spawn on a moon.\n" +
                 "# Setting type: Integer\n" +
                 $"Max Scrap = {info.maxScrap}\n\n" +
+                "## The multiplier applied to the value of a moon.\n" +
+                "# Setting type: Float\n" +
+                $"Value Multiplier = {info.valueMultiplier}\n\n" +
+                "## The multiplier applied to the amount of scrap on a moon.\n" +
+                "# Setting type: Float\n" +
+                $"Amount Multiplier = {info.amountMultiplier}\n\n" +
                 "## Changes the size of the interior generated.\n" +
                 "# Setting type: Float\n" +
                 $"Interior Multiplier = {info.interiorSizeMultiplier}\n\n" +
@@ -130,6 +136,8 @@ namespace LunarConfig.Configuration.Entries
                 int.Parse(GetValue("Max Outside Power")),
                 int.Parse(GetValue("Min Scrap")),
                 int.Parse(GetValue("Max Scrap")),
+                float.Parse(GetValue("Value Multiplier")),
+                float.Parse(GetValue("Amount Multiplier")),
                 float.Parse(GetValue("Interior Multiplier")),
                 Regex.Split(GetValue("Tags"), @"[\s,]+").Where(tag => !string.IsNullOrWhiteSpace(tag)).ToList()
                 );
