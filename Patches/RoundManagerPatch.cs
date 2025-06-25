@@ -373,7 +373,9 @@ namespace LunarConfig.Patches
                             TagInfo tag = parseTagEntry.parseEntry(entry.configString);
                             //List<string> mapObjects = tag.mapObjectMultipliers.Keys.ToList();
                             List<string> itemPools = tag.itemPoolMultipliers.Keys.ToList();
-                            List<string> enemyPools = tag.enemyPoolMultipliers.Keys.ToList();
+                            List<string> interiorEnemyPools = tag.interiorEnemyPoolMultipliers.Keys.ToList();
+                            List<string> exteriorEnemyPools = tag.exteriorEnemyPoolMultipliers.Keys.ToList();
+                            List<string> daytimeEnemyPools = tag.daytimeEnemyPoolMultipliers.Keys.ToList();
                             List<string> dungeons = tag.dungeonMultipliers.Keys.ToList();
 
                             /*
@@ -402,15 +404,39 @@ namespace LunarConfig.Patches
                                 }
                             }
 
-                            foreach (var obj in central.enemyPools)
+                            foreach (var obj in central.interiorEnemyPools)
                             {
-                                if (enemyPools.Contains(obj))
+                                if (interiorEnemyPools.Contains(obj))
                                 {
                                     continue;
                                 }
                                 else
                                 {
-                                    tag.enemyPoolMultipliers.Add(obj, 1);
+                                    tag.interiorEnemyPoolMultipliers.Add(obj, 1);
+                                }
+                            }
+
+                            foreach (var obj in central.exteriorEnemyPools)
+                            {
+                                if (exteriorEnemyPools.Contains(obj))
+                                {
+                                    continue;
+                                }
+                                else
+                                {
+                                    tag.exteriorEnemyPoolMultipliers.Add(obj, 1);
+                                }
+                            }
+
+                            foreach (var obj in central.daytimeEnemyPools)
+                            {
+                                if (daytimeEnemyPools.Contains(obj))
+                                {
+                                    continue;
+                                }
+                                else
+                                {
+                                    tag.daytimeEnemyPoolMultipliers.Add(obj, 1);
                                 }
                             }
 
@@ -460,7 +486,9 @@ namespace LunarConfig.Patches
                             1, 
                             //registeredMapObjects.ToDictionary(k => k, v => 1f),
                             central.itemPools.ToDictionary(k => k, v => 1f),
-                            central.enemyPools.ToDictionary(k => k, v => 1f),
+                            central.interiorEnemyPools.ToDictionary(k => k, v => 1f),
+                            central.exteriorEnemyPools.ToDictionary(k => k, v => 1f),
+                            central.daytimeEnemyPools.ToDictionary(k => k, v => 1f),
                             registeredDungeons.ToDictionary(k => k, v => 1f)
                             ));
                         tagConfig.AddEntry(tagEntry);
@@ -630,6 +658,23 @@ namespace LunarConfig.Patches
                         flowNameToIndex[__instance.dungeonFlowTypes[i].dungeonFlow.name] = i;
                     }
 
+                    Dictionary<string, float> poolMultipliers = new();
+
+                    foreach (var tag in tagSet)
+                    {
+                        foreach (var multi in registeredTags[tag].dungeonMultipliers)
+                        {
+                            if (poolMultipliers.Keys.Contains(multi.Key))
+                            {
+                                poolMultipliers[multi.Key] *= multi.Value;
+                            }
+                            else
+                            {
+                                poolMultipliers[multi.Key] = multi.Value;
+                            }
+                        }
+                    }
+
                     Dictionary<int, int> newDungeonWeights = new();
 
                     foreach (var dungeon in registeredDungeons.Values)
@@ -659,24 +704,21 @@ namespace LunarConfig.Patches
                         rarity.rarity += weight;
                     }
 
-                    Dictionary<string, float> tagMultipliers = new();
-                    foreach (var tag in registeredTags.Values)
-                    {
-                        if (tagSet.Contains(tag.tagID))
-                        {
-                            foreach (var (flowName, multiplier) in tag.dungeonMultipliers)
-                            {
-                                tagMultipliers[flowName] = multiplier;
-                            }
-                        }
-                    }
-
                     foreach (var dungeon in currentDungeonWeights.Values)
                     {
                         var flowName = __instance.dungeonFlowTypes[dungeon.id].dungeonFlow.name;
-                        if (tagMultipliers.TryGetValue(flowName, out float mult))
+                        if (poolMultipliers.TryGetValue(flowName, out float mult))
                         {
                             dungeon.rarity = (int)Math.Ceiling(dungeon.rarity * mult);
+                        }
+                    }
+
+                    if (central.logPools)
+                    {
+                        MiniLogger.LogInfo($"Starting {newLevel.name} with the following dungeon weights:");
+                        foreach (var dungeon in currentDungeonWeights.Values)
+                        {
+                            MiniLogger.LogInfo($"{__instance.dungeonFlowTypes[dungeon.id].dungeonFlow.name}: {dungeon.rarity}");
                         }
                     }
 
@@ -802,6 +844,11 @@ namespace LunarConfig.Patches
                         if (tag == currentDungeon)
                             { continue; }
 
+                        foreach (var reg in registeredTags.Values)
+                        {
+                            MiniLogger.LogInfo(reg.tagID);
+                        }
+
                         foreach (var multi in registeredTags[tag].itemPoolMultipliers)
                         {
                             if (poolMultipliers.Keys.Contains(multi.Key))
@@ -855,9 +902,181 @@ namespace LunarConfig.Patches
                         }
                     }
 
+                    if (central.logPools)
+                    {
+                        MiniLogger.LogInfo($"Starting {level} with the following scrap weights:");
+                        foreach (var scrap in currentScrapWeights)
+                        {
+                            MiniLogger.LogInfo($"{scrap.Key}: {scrap.Value.rarity}");
+                        }
+                    }
+
                     level.spawnableScrap = currentScrapWeights.Values.ToList();
 
                     MiniLogger.LogInfo("Item Pools Set!");
+
+                    MiniLogger.LogInfo("Setting Enemy Pools...");
+
+                    Dictionary<string, float> interiorEnemyPoolMultipliers = new();
+                    Dictionary<string, float> exteriorEnemyPoolMultipliers = new();
+                    Dictionary<string, float> daytimeEnemyPoolMultipliers = new();
+
+                    foreach (var tag in tagSet)
+                    {
+                        if (tag == currentDungeon)
+                        { continue; }
+
+                        foreach (var multi in registeredTags[tag].interiorEnemyPoolMultipliers)
+                        {
+                            if (interiorEnemyPoolMultipliers.Keys.Contains(multi.Key))
+                            {
+                                interiorEnemyPoolMultipliers[multi.Key] *= multi.Value;
+                            }
+                            else
+                            {
+                                interiorEnemyPoolMultipliers[multi.Key] = multi.Value;
+                            }
+                        }
+
+                        foreach (var multi in registeredTags[tag].exteriorEnemyPoolMultipliers)
+                        {
+                            if (exteriorEnemyPoolMultipliers.Keys.Contains(multi.Key))
+                            {
+                                exteriorEnemyPoolMultipliers[multi.Key] *= multi.Value;
+                            }
+                            else
+                            {
+                                exteriorEnemyPoolMultipliers[multi.Key] = multi.Value;
+                            }
+                        }
+
+                        foreach (var multi in registeredTags[tag].daytimeEnemyPoolMultipliers)
+                        {
+                            if (daytimeEnemyPoolMultipliers.Keys.Contains(multi.Key))
+                            {
+                                daytimeEnemyPoolMultipliers[multi.Key] *= multi.Value;
+                            }
+                            else
+                            {
+                                daytimeEnemyPoolMultipliers[multi.Key] = multi.Value;
+                            }
+                        }
+                    }
+
+                    List<(EnemyInfo, int)> compatibleInteriorEnemies = new();
+                    List<(EnemyInfo, int)> compatibleExteriorEnemies = new();
+                    List<(EnemyInfo, int)> compatibleDaytimeEnemies = new();
+
+                    foreach (var enemy in registeredEnemies.Values)
+                    {
+                        List<(string, string)> splitTags = new();
+                        List<string> matchTags = new();
+
+                        MiniLogger.LogInfo($"{enemy.enemyID} : {string.Join(",", enemy.tags)}");
+
+                        foreach (var tag in enemy.tags)
+                        {
+                            var parts = tag.Split("_");
+                            MiniLogger.LogInfo($"{tag} : {parts.Length}");
+                            splitTags.Add((parts[0], parts[1]));
+                            matchTags.Add(parts[0]);
+
+                            if (parts[0] == currentDungeon)
+                            {
+                                compatibleInteriorEnemies.Add((enemy, (int)Math.Ceiling(100 * interiorEnemyPoolMultipliers[parts[1]])));
+                            }
+                            else if (tagSet.Contains(parts[0]))
+                            {
+                                if (parts.Length > 2)
+                                {
+                                    compatibleDaytimeEnemies.Add((enemy, (int)Math.Ceiling(100 * daytimeEnemyPoolMultipliers[parts[1]])));
+                                }
+                                else
+                                {
+                                    compatibleExteriorEnemies.Add((enemy, (int)Math.Ceiling(100 * exteriorEnemyPoolMultipliers[parts[1]])));
+                                }
+                            }
+                        }
+                    }
+
+                    Dictionary<string, SpawnableEnemyWithRarity> currentInteriorEnemyWeights = level.Enemies.ToDictionary(k => k.enemyType.name);
+                    Dictionary<string, SpawnableEnemyWithRarity> currentExteriorEnemyWeights = level.OutsideEnemies.ToDictionary(k => k.enemyType.name);
+                    Dictionary<string, SpawnableEnemyWithRarity> currentDaytimeEnemyWeights = level.DaytimeEnemies.ToDictionary(k => k.enemyType.name);
+
+                    if (central.clearEnemies)
+                    {
+                        foreach (var enemy in currentInteriorEnemyWeights.Values)
+                            enemy.rarity = 0;
+
+                        foreach (var enemy in currentExteriorEnemyWeights.Values)
+                            enemy.rarity = 0;
+
+                        foreach (var enemy in currentDaytimeEnemyWeights.Values)
+                            enemy.rarity = 0;
+                    }
+
+                    foreach (var (enemy, weight) in compatibleInteriorEnemies)
+                    {
+                        if (currentInteriorEnemyWeights.ContainsKey(enemy.enemyID))
+                        {
+                            currentInteriorEnemyWeights[enemy.enemyID].rarity += weight;
+                        }
+                        else
+                        {
+                            currentInteriorEnemyWeights[enemy.enemyID] = new SpawnableEnemyWithRarity { enemyType = objects.enemies[enemy.enemyID], rarity = weight };
+                        }
+                    }
+
+                    foreach (var (enemy, weight) in compatibleExteriorEnemies)
+                    {
+                        if (currentExteriorEnemyWeights.ContainsKey(enemy.enemyID))
+                        {
+                            currentExteriorEnemyWeights[enemy.enemyID].rarity += weight;
+                        }
+                        else
+                        {
+                            currentExteriorEnemyWeights[enemy.enemyID] = new SpawnableEnemyWithRarity { enemyType = objects.enemies[enemy.enemyID], rarity = weight };
+                        }
+                    }
+
+                    foreach (var (enemy, weight) in compatibleDaytimeEnemies)
+                    {
+                        if (currentDaytimeEnemyWeights.ContainsKey(enemy.enemyID))
+                        {
+                            currentDaytimeEnemyWeights[enemy.enemyID].rarity += weight;
+                        }
+                        else
+                        {
+                            currentDaytimeEnemyWeights[enemy.enemyID] = new SpawnableEnemyWithRarity { enemyType = objects.enemies[enemy.enemyID], rarity = weight };
+                        }
+                    }
+
+                    if (central.logPools)
+                    {
+                        MiniLogger.LogInfo($"Starting {level} with the following interior enemy weights:");
+                        foreach (var enemy in currentInteriorEnemyWeights)
+                        {
+                            MiniLogger.LogInfo($"{enemy.Key}: {enemy.Value.rarity}");
+                        }
+
+                        MiniLogger.LogInfo($"Starting {level} with the following exterior enemy weights:");
+                        foreach (var enemy in currentExteriorEnemyWeights)
+                        {
+                            MiniLogger.LogInfo($"{enemy.Key}: {enemy.Value.rarity}");
+                        }
+
+                        MiniLogger.LogInfo($"Starting {level} with the following daytime enemy weights:");
+                        foreach (var enemy in currentDaytimeEnemyWeights)
+                        {
+                            MiniLogger.LogInfo($"{enemy.Key}: {enemy.Value.rarity}");
+                        }
+                    }
+
+                    level.Enemies = currentInteriorEnemyWeights.Values.ToList();
+                    level.OutsideEnemies = currentExteriorEnemyWeights.Values.ToList();
+                    level.DaytimeEnemies = currentDaytimeEnemyWeights.Values.ToList();
+
+                    MiniLogger.LogInfo("Enemy Pools Set!");
                 }
                 catch (Exception e)
                 {

@@ -39,12 +39,28 @@ namespace LunarConfig.Configuration.Entries
                     $"Item Pool Multiplier - {multi.Key} = {multi.Value}\n";
             }
 
-            foreach (var multi in info.enemyPoolMultipliers)
+            foreach (var multi in info.interiorEnemyPoolMultipliers)
             {
                 configString +=
                     "## The multiplier on the weight of enemies in the pool.\n" +
                     "# Setting type: Float\n" +
-                    $"Enemy Pool Multiplier - {multi.Key} = {multi.Value}\n";
+                    $"Interior Enemy Pool Multiplier - {multi.Key} = {multi.Value}\n";
+            }
+
+            foreach (var multi in info.exteriorEnemyPoolMultipliers)
+            {
+                configString +=
+                    "## The multiplier on the weight of enemies in the pool.\n" +
+                    "# Setting type: Float\n" +
+                    $"Exterior Enemy Pool Multiplier - {multi.Key} = {multi.Value}\n";
+            }
+
+            foreach (var multi in info.daytimeEnemyPoolMultipliers)
+            {
+                configString +=
+                    "## The multiplier on the weight of enemies in the pool.\n" +
+                    "# Setting type: Float\n" +
+                    $"Daytime Enemy Pool Multiplier - {multi.Key} = {multi.Value}\n";
             }
 
             foreach (var multi in info.dungeonMultipliers)
@@ -76,12 +92,16 @@ namespace LunarConfig.Configuration.Entries
 
             //var mapObjectMultipliers = new Dictionary<string, float>();
             var itemPoolMultipliers = new Dictionary<string, float>();
-            var enemyPoolMultipliers = new Dictionary<string, float>();
+            var interiorEnemyPoolMultipliers = new Dictionary<string, float>();
+            var exteriorEnemyPoolMultipliers = new Dictionary<string, float>();
+            var daytimeEnemyPoolMultipliers = new Dictionary<string, float>();
             var dungeonMultipliers = new Dictionary<string, float>();
 
             //var mapObjectRegex = new Regex(@"^Map Object Multiplier\s*-\s*(\w+)\s*=\s*([\d.]+)", RegexOptions.Multiline);
             var itemPoolRegex = new Regex(@"^Item Pool Multiplier\s*-\s*(\w+)\s*=\s*([\d.]+)", RegexOptions.Multiline);
-            var enemyPoolRegex = new Regex(@"^Enemy Pool Multiplier\s*-\s*(\w+)\s*=\s*([\d.]+)", RegexOptions.Multiline);
+            var interiorEnemyPoolRegex = new Regex(@"^Interior Enemy Pool Multiplier\s*-\s*(\w+)\s*=\s*([\d.]+)", RegexOptions.Multiline);
+            var exteriorEnemyPoolRegex = new Regex(@"^Exterior Enemy Pool Multiplier\s*-\s*(\w+)\s*=\s*([\d.]+)", RegexOptions.Multiline);
+            var daytimeEnemyPoolRegex = new Regex(@"^Daytime Enemy Pool Multiplier\s*-\s*(\w+)\s*=\s*([\d.]+)", RegexOptions.Multiline);
             var dungeonRegex = new Regex(@"^Dungeon Multiplier\s*-\s*(\w+)\s*=\s*([\d.]+)", RegexOptions.Multiline);
 
             /*
@@ -100,11 +120,25 @@ namespace LunarConfig.Configuration.Entries
                 itemPoolMultipliers[key] = value;
             }
 
-            foreach (Match match in enemyPoolRegex.Matches(entry))
+            foreach (Match match in interiorEnemyPoolRegex.Matches(entry))
             {
                 string key = match.Groups[1].Value;
                 float value = float.Parse(match.Groups[2].Value);
-                enemyPoolMultipliers[key] = value;
+                interiorEnemyPoolMultipliers[key] = value;
+            }
+
+            foreach (Match match in exteriorEnemyPoolRegex.Matches(entry))
+            {
+                string key = match.Groups[1].Value;
+                float value = float.Parse(match.Groups[2].Value);
+                exteriorEnemyPoolMultipliers[key] = value;
+            }
+
+            foreach (Match match in daytimeEnemyPoolRegex.Matches(entry))
+            {
+                string key = match.Groups[1].Value;
+                float value = float.Parse(match.Groups[2].Value);
+                daytimeEnemyPoolMultipliers[key] = value;
             }
 
             foreach (Match match in dungeonRegex.Matches(entry))
@@ -119,7 +153,9 @@ namespace LunarConfig.Configuration.Entries
                 float.Parse(GetValue("Map Object Peak Multiplier")),
                 //mapObjectMultipliers,
                 itemPoolMultipliers,
-                enemyPoolMultipliers,
+                interiorEnemyPoolMultipliers,
+                exteriorEnemyPoolMultipliers,
+                daytimeEnemyPoolMultipliers,
                 dungeonMultipliers
                 );
 

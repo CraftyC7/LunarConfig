@@ -100,6 +100,22 @@ namespace LunarConfig.Configuration.Entries
                 return match.Success ? match.Groups[1].Value.Trim() : "";
             }
 
+            string GetTagValue(string key)
+            {
+                foreach (string line in entry.Split(new[] { '\r', '\n' }, StringSplitOptions.None))
+                {
+                    var trimmedLine = line.TrimStart();
+
+                    if (trimmedLine.StartsWith(key))
+                    {
+                        var match = Regex.Match(trimmedLine, $@"^{Regex.Escape(key)}\s*=\s*(.*)$");
+                        if (match.Success)
+                            return match.Groups[1].Value.Trim();
+                    }
+                }
+                return "";
+            }
+
             AnimationCurve ParseCurve(string input)
             {
                 var curve = new AnimationCurve();
@@ -137,8 +153,14 @@ namespace LunarConfig.Configuration.Entries
                 bool.Parse(GetValue(@"Can Stun\?").ToLower()),
                 float.Parse(GetValue("Stun Difficulty")),
                 float.Parse(GetValue("Stun Time")),
-                Regex.Split(GetValue("Tags"), @"[\s,]+").Where(tag => !string.IsNullOrWhiteSpace(tag)).ToList(),
-                Regex.Split(GetValue("Blacklist Tags"), @"[\s,]+").Where(tag => !string.IsNullOrWhiteSpace(tag)).ToList()
+                Regex
+                    .Split(GetTagValue("(LunarConfig) Tags"), @"[\s,]+")
+                    .Where(tag => !string.IsNullOrWhiteSpace(tag))
+                    .ToList(),
+                Regex
+                    .Split(GetTagValue("(LunarConfig) Blacklist Tags"), @"[\s,]+")
+                    .Where(tag => !string.IsNullOrWhiteSpace(tag))
+                    .ToList()
                 );
 
             return info;

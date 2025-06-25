@@ -14,10 +14,13 @@ namespace LunarConfig.Configuration
         public bool clearEnemies = false;
         public bool clearDungeons = false;
         public bool clearTraps = false;
+        public bool logPools = false;
         public bool useTrapCurves = false;
         public List<string> tags = new List<string>();
         public List<string> itemPools = new List<string>();
-        public List<string> enemyPools = new List<string>();
+        public List<string> interiorEnemyPools = new List<string>();
+        public List<string> exteriorEnemyPools = new List<string>();
+        public List<string> daytimeEnemyPools = new List<string>();
 
         public CentralConfiguration() { }
 
@@ -38,6 +41,10 @@ namespace LunarConfig.Configuration
                 "# Setting type: Boolean\n" +
                 $"Clear Traps? = {config.clearTraps.ToString().ToLower()}\n" +
                 "[Tag Configuration]\n" +
+                "## Log all modified pools.\n" +
+                "## Preferably for use only when debugging.\n" +
+                "# Setting type: Boolean\n" +
+                $"Log Pools? = {config.logPools.ToString().ToLower()}\n" +
                 "## Allows use of LunarConfig's trap curves.\n" +
                 "## May cause issues if not all base curves are set.\n" +
                 "# Setting type: Boolean\n" +
@@ -50,10 +57,18 @@ namespace LunarConfig.Configuration
                 "## Separate pools with commas.\n" +
                 "# Setting type: String\n" +
                 $"Item Pools = {string.Join(", ", config.itemPools)}\n" +
-                "## Enemy pools registered with LunarConfig.\n" +
+                "## Interior Enemy pools registered with LunarConfig.\n" +
                 "## Separate pools with commas.\n" +
                 "# Setting type: String\n" +
-                $"Enemy Pools = {string.Join(", ", config.enemyPools)}\n";
+                $"Interior Enemy Pools = {string.Join(", ", config.interiorEnemyPools)}\n" +
+                "## Exterior Enemy pools registered with LunarConfig.\n" +
+                "## Separate pools with commas.\n" +
+                "# Setting type: String\n" +
+                $"Exterior Enemy Pools = {string.Join(", ", config.exteriorEnemyPools)}\n" +
+                "## Daytime Enemy pools registered with LunarConfig.\n" +
+                "## Separate pools with commas.\n" +
+                "# Setting type: String\n" +
+                $"Daytime Enemy Pools = {string.Join(", ", config.daytimeEnemyPools)}\n";
 
             return configString;
         }
@@ -85,6 +100,7 @@ namespace LunarConfig.Configuration
             this.clearEnemies = TryParseBool(GetValue("Clear Enemies?"));
             this.clearDungeons = TryParseBool(GetValue("Clear Dungeons?"));
             this.clearTraps = TryParseBool(GetValue("Clear Traps?"));
+            this.logPools = TryParseBool(GetValue("Log Pools?"));
             this.useTrapCurves = TryParseBool(GetValue("Use Trap Curves?"));
 
             string tagLine = GetValue("Tags");
@@ -97,10 +113,20 @@ namespace LunarConfig.Configuration
                 ? new List<string>()
                 : Regex.Split(itemLine, @"[\s,]+").Where(tag => !string.IsNullOrWhiteSpace(tag)).ToList();
 
-            string enemyLine = GetValue("Enemy Pools");
-            this.enemyPools = string.IsNullOrWhiteSpace(enemyLine)
+            string interiorEnemyLine = GetValue("Interior Enemy Pools");
+            this.interiorEnemyPools = string.IsNullOrWhiteSpace(interiorEnemyLine)
                 ? new List<string>()
-                : Regex.Split(enemyLine, @"[\s,]+").Where(tag => !string.IsNullOrWhiteSpace(tag)).ToList();
+                : Regex.Split(interiorEnemyLine, @"[\s,]+").Where(tag => !string.IsNullOrWhiteSpace(tag)).ToList();
+
+            string exteriorEnemyLine = GetValue("Exterior Enemy Pools");
+            this.exteriorEnemyPools = string.IsNullOrWhiteSpace(exteriorEnemyLine)
+                ? new List<string>()
+                : Regex.Split(exteriorEnemyLine, @"[\s,]+").Where(tag => !string.IsNullOrWhiteSpace(tag)).ToList();
+
+            string daytimeEnemyLine = GetValue("Daytime Enemy Pools");
+            this.daytimeEnemyPools = string.IsNullOrWhiteSpace(daytimeEnemyLine)
+                ? new List<string>()
+                : Regex.Split(daytimeEnemyLine, @"[\s,]+").Where(tag => !string.IsNullOrWhiteSpace(tag)).ToList();
         }
     }
 }
