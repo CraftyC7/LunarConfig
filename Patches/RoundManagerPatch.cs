@@ -696,6 +696,9 @@ namespace LunarConfig.Patches
         [HarmonyPostfix]
         private static void onGenerateNewFloorPostfix(RoundManager __instance)
         {
+            NetworkManager manager = UnityEngine.Object.FindObjectOfType<NetworkManager>();
+            SpawnableObjectKeeper objects = new SpawnableObjectKeeper(manager);
+
             string currentDungeon = __instance.dungeonFlowTypes[__instance.currentDungeonType].dungeonFlow.name;
             SelectableLevel level = __instance.currentLevel;
 
@@ -751,7 +754,7 @@ namespace LunarConfig.Patches
                 }
             }
 
-            if (moonSettings != null && dungeonInfo != null)
+            if (moonSettings != null && dungeonInfo != null && central != null)
             {
                 try
                 {
@@ -786,7 +789,75 @@ namespace LunarConfig.Patches
 
                 try
                 {
-                    // Add Items, Enemies, MapObjects
+                    MiniLogger.LogInfo("Setting Item Pools...");
+
+                    var tags = moonSettings.tags;
+                    tags.Add(currentDungeon);
+                    var tagSet = new HashSet<string>(tags);
+
+                    Dictionary<string, float> poolMultipliers = new();
+
+                    foreach (var tag in tagSet)
+                    {
+                        if (tag == currentDungeon)
+                            { continue; }
+
+                        foreach (var multi in registeredTags[tag].itemPoolMultipliers)
+                        {
+                            if (poolMultipliers.Keys.Contains(multi.Key))
+                            {
+                                poolMultipliers[multi.Key] *= multi.Value;
+                            }
+                            else
+                            {
+                                poolMultipliers[multi.Key] = multi.Value;
+                            }
+                        }
+                    }
+
+                    List<(ItemInfo, int)> compatibleTagItems = new();
+
+                    foreach (var item in registeredItems.Values)
+                    {
+                        List<(string, string)> splitTags = new();
+                        List<string> matchTags = new();
+                        
+                        foreach (var tag in item.tags)
+                        {
+                            var parts = tag.Split("_");
+                            splitTags.Add((parts[0], parts[1]));
+                            matchTags.Add(parts[0]);
+
+                            if (tagSet.Contains(parts[0]))
+                            {
+                                compatibleTagItems.Add((item, (int)Math.Ceiling(100 * poolMultipliers[parts[1]])));
+                            }
+                        }
+                    }
+
+                    Dictionary<string, SpawnableItemWithRarity> currentScrapWeights = level.spawnableScrap.ToDictionary(k => k.spawnableItem.name);
+
+                    if (central.clearItems)
+                    {
+                        foreach (var item in currentScrapWeights.Values)
+                            item.rarity = 0;
+                    }
+
+                    foreach (var (item, weight) in compatibleTagItems)
+                    {
+                        if (currentScrapWeights.ContainsKey(item.itemID))
+                        {
+                            currentScrapWeights[item.itemID].rarity += weight;
+                        }
+                        else
+                        {
+                            currentScrapWeights[item.itemID] = new SpawnableItemWithRarity { spawnableItem = objects.items[item.itemID], rarity = weight };
+                        }
+                    }
+
+                    level.spawnableScrap = currentScrapWeights.Values.ToList();
+
+                    MiniLogger.LogInfo("Item Pools Set!");
                 }
                 catch (Exception e)
                 {
