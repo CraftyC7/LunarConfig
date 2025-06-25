@@ -13,7 +13,6 @@ namespace LunarConfig.Configuration
         public bool clearItems = false;
         public bool clearEnemies = false;
         public bool clearDungeons = false;
-        public bool clearTraps = false;
         public bool logPools = false;
         public bool useTrapCurves = false;
         public List<string> tags = new List<string>();
@@ -37,9 +36,6 @@ namespace LunarConfig.Configuration
                 "## Clears all interiors on all moons.\n" +
                 "# Setting type: Boolean\n" +
                 $"Clear Dungeons? = {config.clearDungeons.ToString().ToLower()}\n" +
-                "## Clears all traps on all moons.\n" +
-                "# Setting type: Boolean\n" +
-                $"Clear Traps? = {config.clearTraps.ToString().ToLower()}\n" +
                 "[Tag Configuration]\n" +
                 "## Log all modified pools.\n" +
                 "## Preferably for use only when debugging.\n" +
@@ -99,7 +95,6 @@ namespace LunarConfig.Configuration
             this.clearItems = TryParseBool(GetValue("Clear Scrap?"));
             this.clearEnemies = TryParseBool(GetValue("Clear Enemies?"));
             this.clearDungeons = TryParseBool(GetValue("Clear Dungeons?"));
-            this.clearTraps = TryParseBool(GetValue("Clear Traps?"));
             this.logPools = TryParseBool(GetValue("Log Pools?"));
             this.useTrapCurves = TryParseBool(GetValue("Use Trap Curves?"));
 

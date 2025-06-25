@@ -17,6 +17,7 @@ using LunarConfig.Configuration.Entries;
 using LunarConfig.Configuration;
 using LethalLib;
 using System.Collections;
+using static UnityEngine.UI.Image;
 
 namespace LunarConfig.Patches
 {
@@ -844,11 +845,6 @@ namespace LunarConfig.Patches
                         if (tag == currentDungeon)
                             { continue; }
 
-                        foreach (var reg in registeredTags.Values)
-                        {
-                            MiniLogger.LogInfo(reg.tagID);
-                        }
-
                         foreach (var multi in registeredTags[tag].itemPoolMultipliers)
                         {
                             if (poolMultipliers.Keys.Contains(multi.Key))
@@ -972,12 +968,9 @@ namespace LunarConfig.Patches
                         List<(string, string)> splitTags = new();
                         List<string> matchTags = new();
 
-                        MiniLogger.LogInfo($"{enemy.enemyID} : {string.Join(",", enemy.tags)}");
-
                         foreach (var tag in enemy.tags)
                         {
                             var parts = tag.Split("_");
-                            MiniLogger.LogInfo($"{tag} : {parts.Length}");
                             splitTags.Add((parts[0], parts[1]));
                             matchTags.Add(parts[0]);
 
@@ -987,7 +980,7 @@ namespace LunarConfig.Patches
                             }
                             else if (tagSet.Contains(parts[0]))
                             {
-                                if (parts.Length > 2)
+                                if (parts.Length > 2 && !enemy.blacklistTags.Intersect(tagSet).Any())
                                 {
                                     compatibleDaytimeEnemies.Add((enemy, (int)Math.Ceiling(100 * daytimeEnemyPoolMultipliers[parts[1]])));
                                 }
@@ -1077,6 +1070,57 @@ namespace LunarConfig.Patches
                     level.DaytimeEnemies = currentDaytimeEnemyWeights.Values.ToList();
 
                     MiniLogger.LogInfo("Enemy Pools Set!");
+
+                    MiniLogger.LogInfo("Setting Trap Curves...");
+
+                    float trapDifficultyMultiplier = 1;
+                    Dictionary<string, float> trapCurveMultipliers = new();
+
+                    foreach (var tag in tagSet)
+                    {
+                        if (tag == currentDungeon)
+                        { continue; }
+
+                        trapDifficultyMultiplier *= registeredTags[tag].mapObjectPeakMultiplier;
+                    }
+
+                    Dictionary<string, SpawnableMapObject> currentMapObjects = level.spawnableMapObjects.ToDictionary(k => k.prefabToSpawn.name);
+
+                    if (central.useTrapCurves)
+                    {
+                        foreach (var trap in currentMapObjects)
+                            trap.Value.numberToSpawn = registeredMapObjects[trap.Key].baseCurve;
+                    }
+
+                    foreach (var (id, trap) in currentMapObjects)
+                    {
+                        AnimationCurve curve = trap.numberToSpawn;
+
+                        float multiplier = dungeonInfo.mapObjectMultipliers[id];
+
+                        Keyframe[] newCurve = new Keyframe[curve.length];
+
+                        for (int i = 0; i < curve.length; i++)
+                        {
+                            Keyframe key = curve[i];
+                            key.value *= multiplier;
+                            key.inTangent *= multiplier;
+                            key.outTangent *= multiplier;
+                            if (i == curve.length - 1)
+                            {
+                                key.value *= trapDifficultyMultiplier;
+                                key.inTangent *= trapDifficultyMultiplier;
+                                key.outTangent *= trapDifficultyMultiplier;
+                            }
+                            newCurve[i] = key;
+                        }
+
+                        trap.numberToSpawn = new AnimationCurve(newCurve);
+                    }
+
+                    level.spawnableMapObjects = currentMapObjects.Values.ToArray();
+
+                    MiniLogger.LogInfo("Trap Curves Set!");
                 }
                 catch (Exception e)
                 {
