@@ -772,451 +772,450 @@ namespace LunarConfig.Patches
             Dictionary<string, MapObjectInfo> registeredMapObjects = new Dictionary<string, MapObjectInfo>();
             Dictionary<string, TagInfo> registeredTags = new Dictionary<string, TagInfo>();
 
-            CentralConfiguration central = null;
-            MoonInfo moonSettings = null;
-            DungeonInfo dungeonInfo = null;
-
-            if (File.Exists(LunarConfig.CENTRAL_FILE))
+            if (registeredTags.Any())
             {
-                central = new CentralConfiguration(File.ReadAllText(LunarConfig.CENTRAL_FILE));
-            }
 
-            if (File.Exists(LunarConfig.MOON_FILE))
-            {
-                foreach (MoonEntry entry in parseMoonConfiguration.parseConfiguration(new MoonConfiguration(File.ReadAllText(LunarConfig.MOON_FILE)).moonConfig))
+                CentralConfiguration central = null;
+                MoonInfo moonSettings = null;
+                DungeonInfo dungeonInfo = null;
+
+                if (File.Exists(LunarConfig.CENTRAL_FILE))
+                {
+                    central = new CentralConfiguration(File.ReadAllText(LunarConfig.CENTRAL_FILE));
+                }
+
+                if (File.Exists(LunarConfig.MOON_FILE))
+                {
+                    foreach (MoonEntry entry in parseMoonConfiguration.parseConfiguration(new MoonConfiguration(File.ReadAllText(LunarConfig.MOON_FILE)).moonConfig))
+                    {
+                        try
+                        {
+                            MoonInfo moon = parseMoonEntry.parseEntry(entry.configString);
+                            if (moon.moonID == level.name)
+                            {
+                                moonSettings = moon;
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            MiniLogger.LogError($"Moon Configuration File contains invalid entry, skipping entry!\n{e}");
+                        }
+                    }
+                }
+
+                if (File.Exists(LunarConfig.DUNGEON_FILE))
+                {
+                    foreach (DungeonEntry entry in parseDungeonConfiguration.parseConfiguration(new DungeonConfiguration(File.ReadAllText(LunarConfig.DUNGEON_FILE)).dungeonConfig))
+                    {
+                        try
+                        {
+                            DungeonInfo dungeon = parseDungeonEntry.parseEntry(entry.configString);
+                            if (dungeon.dungeonID == currentDungeon)
+                            {
+                                dungeonInfo = dungeon;
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            MiniLogger.LogError($"Dungeon Configuration File contains invalid entry, skipping entry!\n{e}");
+                        }
+                    }
+                }
+
+                if (moonSettings != null && dungeonInfo != null && central != null)
                 {
                     try
                     {
-                        MoonInfo moon = parseMoonEntry.parseEntry(entry.configString);
-                        if (moon.moonID == level.name)
+                        foreach (var entry in parseItemConfiguration.parseConfiguration(File.ReadAllText(LunarConfig.ITEM_FILE)))
                         {
-                            moonSettings = moon;
+                            ItemInfo info = parseItemEntry.parseEntry(entry.configString);
+                            registeredItems.Add(info.itemID, info);
+                        }
+
+                        foreach (var entry in parseEnemyConfiguration.parseConfiguration(File.ReadAllText(LunarConfig.ENEMY_FILE)))
+                        {
+                            EnemyInfo info = parseEnemyEntry.parseEntry(entry.configString);
+                            registeredEnemies.Add(info.enemyID, info);
+                        }
+
+                        foreach (var entry in parseMapObjectConfiguration.parseConfiguration(File.ReadAllText(LunarConfig.MAP_OBJECT_FILE)))
+                        {
+                            MapObjectInfo info = parseMapObjectEntry.parseEntry(entry.configString);
+                            registeredMapObjects.Add(info.objID, info);
+                        }
+
+                        foreach (var entry in parseTagConfiguration.parseConfiguration(File.ReadAllText(LunarConfig.TAG_FILE)))
+                        {
+                            TagInfo info = parseTagEntry.parseEntry(entry.configString);
+                            registeredTags.Add(info.tagID, info);
                         }
                     }
                     catch (Exception e)
                     {
-                        MiniLogger.LogError($"Moon Configuration File contains invalid entry, skipping entry!\n{e}");
+                        MiniLogger.LogError($"An error occured while fetching pool values!\nPlease report this: {e}");
                     }
-                }
-            }
 
-            if (File.Exists(LunarConfig.DUNGEON_FILE))
-            {
-                foreach (DungeonEntry entry in parseDungeonConfiguration.parseConfiguration(new DungeonConfiguration(File.ReadAllText(LunarConfig.DUNGEON_FILE)).dungeonConfig))
-                {
                     try
                     {
-                        DungeonInfo dungeon = parseDungeonEntry.parseEntry(entry.configString);
-                        if (dungeon.dungeonID == currentDungeon)
+                        MiniLogger.LogInfo("Setting Item Pools...");
+
+                        var tags = moonSettings.tags;
+                        tags.Add(currentDungeon);
+                        var tagSet = new HashSet<string>(tags);
+
+                        Dictionary<string, float> poolMultipliers = new();
+
+                        foreach (var tag in tagSet)
                         {
-                            dungeonInfo = dungeon;
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        MiniLogger.LogError($"Dungeon Configuration File contains invalid entry, skipping entry!\n{e}");
-                    }
-                }
-            }
-
-            if (moonSettings != null && dungeonInfo != null && central != null)
-            {
-                try
-                {
-                    foreach (var entry in parseItemConfiguration.parseConfiguration(File.ReadAllText(LunarConfig.ITEM_FILE)))
-                    {
-                        ItemInfo info = parseItemEntry.parseEntry(entry.configString);
-                        registeredItems.Add(info.itemID, info);
-                    }
-
-                    foreach (var entry in parseEnemyConfiguration.parseConfiguration(File.ReadAllText(LunarConfig.ENEMY_FILE)))
-                    {
-                        EnemyInfo info = parseEnemyEntry.parseEntry(entry.configString);
-                        registeredEnemies.Add(info.enemyID, info);
-                    }
-
-                    foreach (var entry in parseMapObjectConfiguration.parseConfiguration(File.ReadAllText(LunarConfig.MAP_OBJECT_FILE)))
-                    {
-                        MapObjectInfo info = parseMapObjectEntry.parseEntry(entry.configString);
-                        registeredMapObjects.Add(info.objID, info);
-                    }
-
-                    foreach (var entry in parseTagConfiguration.parseConfiguration(File.ReadAllText(LunarConfig.TAG_FILE)))
-                    {
-                        TagInfo info = parseTagEntry.parseEntry(entry.configString);
-                        registeredTags.Add(info.tagID, info);
-                    }
-                }
-                catch (Exception e)
-                {
-                    MiniLogger.LogError($"An error occured while fetching pool values!\nPlease report this: {e}");
-                }
-
-                try
-                {
-                    MiniLogger.LogInfo("Setting Item Pools...");
-
-                    var tags = moonSettings.tags;
-                    tags.Add(currentDungeon);
-                    var tagSet = new HashSet<string>(tags);
-
-                    Dictionary<string, float> poolMultipliers = new();
-
-                    foreach (var tag in tagSet)
-                    {
-                        if (tag == currentDungeon)
+                            if (tag == currentDungeon)
                             { continue; }
 
-                        foreach (var multi in registeredTags[tag].itemPoolMultipliers)
-                        {
-                            if (poolMultipliers.Keys.Contains(multi.Key))
+                            foreach (var multi in registeredTags[tag].itemPoolMultipliers)
                             {
-                                poolMultipliers[multi.Key] *= multi.Value;
-                            }
-                            else
-                            {
-                                poolMultipliers[multi.Key] = multi.Value;
-                            }
-                        }
-                    }
-
-                    List<(ItemInfo, int)> compatibleTagItems = new();
-
-                    foreach (var item in registeredItems.Values)
-                    {
-                        List<(string, string)> splitTags = new();
-                        List<string> matchTags = new();
-                        
-                        foreach (var tag in item.tags)
-                        {
-                            var parts = tag.Split("_");
-                            splitTags.Add((parts[0], parts[1]));
-                            matchTags.Add(parts[0]);
-
-                            if (tagSet.Contains(parts[0]))
-                            {
-                                compatibleTagItems.Add((item, (int)Math.Ceiling(100 * poolMultipliers[parts[1]])));
-                            }
-                        }
-                    }
-
-                    Dictionary<string, SpawnableItemWithRarity> currentScrapWeights = new();
-
-                    foreach (var k in level.spawnableScrap)
-                    {
-                        string name = k.spawnableItem.name;
-
-                        if (currentScrapWeights.TryGetValue(name, out var existing))
-                        {
-                            existing.rarity += k.rarity;
-                        }
-                        else
-                        {
-                            currentScrapWeights[name] = new SpawnableItemWithRarity { spawnableItem = k.spawnableItem, rarity = k.rarity };
-                        }
-                    }
-
-                    if (central.clearItems)
-                    {
-                        foreach (var item in currentScrapWeights.Values)
-                            item.rarity = 0;
-                    }
-
-                    foreach (var (item, weight) in compatibleTagItems)
-                    {
-                        if (currentScrapWeights.ContainsKey(item.itemID))
-                        {
-                            currentScrapWeights[item.itemID].rarity += weight;
-                        }
-                        else
-                        {
-                            currentScrapWeights[item.itemID] = new SpawnableItemWithRarity { spawnableItem = objects.items[item.itemID], rarity = weight };
-                        }
-                    }
-
-                    if (central.logPools)
-                    {
-                        MiniLogger.LogInfo($"Starting {level} with the following scrap weights:");
-                        foreach (var scrap in currentScrapWeights)
-                        {
-                            MiniLogger.LogInfo($"{scrap.Key}: {scrap.Value.rarity}");
-                        }
-                    }
-
-                    level.spawnableScrap = currentScrapWeights.Values.ToList();
-
-                    MiniLogger.LogInfo("Item Pools Set!");
-
-                    MiniLogger.LogInfo("Setting Enemy Pools...");
-
-                    Dictionary<string, float> interiorEnemyPoolMultipliers = new();
-                    Dictionary<string, float> exteriorEnemyPoolMultipliers = new();
-                    Dictionary<string, float> daytimeEnemyPoolMultipliers = new();
-
-                    foreach (var tag in tagSet)
-                    {
-                        if (tag == currentDungeon)
-                        { continue; }
-
-                        foreach (var multi in registeredTags[tag].interiorEnemyPoolMultipliers)
-                        {
-                            if (interiorEnemyPoolMultipliers.Keys.Contains(multi.Key))
-                            {
-                                interiorEnemyPoolMultipliers[multi.Key] *= multi.Value;
-                            }
-                            else
-                            {
-                                interiorEnemyPoolMultipliers[multi.Key] = multi.Value;
-                            }
-                        }
-
-                        foreach (var multi in registeredTags[tag].exteriorEnemyPoolMultipliers)
-                        {
-                            if (exteriorEnemyPoolMultipliers.Keys.Contains(multi.Key))
-                            {
-                                exteriorEnemyPoolMultipliers[multi.Key] *= multi.Value;
-                            }
-                            else
-                            {
-                                exteriorEnemyPoolMultipliers[multi.Key] = multi.Value;
-                            }
-                        }
-
-                        foreach (var multi in registeredTags[tag].daytimeEnemyPoolMultipliers)
-                        {
-                            if (daytimeEnemyPoolMultipliers.Keys.Contains(multi.Key))
-                            {
-                                daytimeEnemyPoolMultipliers[multi.Key] *= multi.Value;
-                            }
-                            else
-                            {
-                                daytimeEnemyPoolMultipliers[multi.Key] = multi.Value;
-                            }
-                        }
-                    }
-
-                    List<(EnemyInfo, int)> compatibleInteriorEnemies = new();
-                    List<(EnemyInfo, int)> compatibleExteriorEnemies = new();
-                    List<(EnemyInfo, int)> compatibleDaytimeEnemies = new();
-
-                    foreach (var enemy in registeredEnemies.Values)
-                    {
-                        List<(string, string)> splitTags = new();
-                        List<string> matchTags = new();
-
-                        foreach (var tag in enemy.tags)
-                        {
-                            var parts = tag.Split("_");
-                            splitTags.Add((parts[0], parts[1]));
-                            matchTags.Add(parts[0]);
-
-                            if (parts[0] == currentDungeon)
-                            {
-                                compatibleInteriorEnemies.Add((enemy, (int)Math.Ceiling(100 * interiorEnemyPoolMultipliers[parts[1]])));
-                            }
-                            else if (tagSet.Contains(parts[0]))
-                            {
-                                if (parts.Length > 2 && !enemy.blacklistTags.Intersect(tagSet).Any())
+                                if (poolMultipliers.Keys.Contains(multi.Key))
                                 {
-                                    compatibleDaytimeEnemies.Add((enemy, (int)Math.Ceiling(100 * daytimeEnemyPoolMultipliers[parts[1]])));
+                                    poolMultipliers[multi.Key] *= multi.Value;
                                 }
                                 else
                                 {
-                                    compatibleExteriorEnemies.Add((enemy, (int)Math.Ceiling(100 * exteriorEnemyPoolMultipliers[parts[1]])));
+                                    poolMultipliers[multi.Key] = multi.Value;
                                 }
                             }
                         }
-                    }
-                    
-                    Dictionary<string, SpawnableEnemyWithRarity> currentInteriorEnemyWeights = new();
-                    Dictionary<string, SpawnableEnemyWithRarity> currentExteriorEnemyWeights = new();
-                    Dictionary<string, SpawnableEnemyWithRarity> currentDaytimeEnemyWeights = new();
 
-                    foreach (var k in level.Enemies)
-                    {
-                        string name = k.enemyType.name;
+                        List<(ItemInfo, int)> compatibleTagItems = new();
 
-                        if (currentInteriorEnemyWeights.TryGetValue(name, out var existing))
+                        foreach (var item in registeredItems.Values)
                         {
-                            existing.rarity += k.rarity;
-                        }
-                        else
-                        {
-                            currentInteriorEnemyWeights[name] = new SpawnableEnemyWithRarity { enemyType = k.enemyType, rarity = k.rarity };
-                        }
-                    }
+                            List<(string, string)> splitTags = new();
+                            List<string> matchTags = new();
 
-                    foreach (var k in level.OutsideEnemies)
-                    {
-                        string name = k.enemyType.name;
-
-                        if (currentExteriorEnemyWeights.TryGetValue(name, out var existing))
-                        {
-                            existing.rarity += k.rarity;
-                        }
-                        else
-                        {
-                            currentExteriorEnemyWeights[name] = new SpawnableEnemyWithRarity { enemyType = k.enemyType, rarity = k.rarity };
-                        }
-                    }
-
-                    foreach (var k in level.DaytimeEnemies)
-                    {
-                        string name = k.enemyType.name;
-
-                        if (currentDaytimeEnemyWeights.TryGetValue(name, out var existing))
-                        {
-                            existing.rarity += k.rarity;
-                        }
-                        else
-                        {
-                            currentDaytimeEnemyWeights[name] = new SpawnableEnemyWithRarity { enemyType = k.enemyType, rarity = k.rarity };
-                        }
-                    }
-
-                    if (central.clearEnemies)
-                    {
-                        foreach (var enemy in currentInteriorEnemyWeights.Values)
-                            enemy.rarity = 0;
-
-                        foreach (var enemy in currentExteriorEnemyWeights.Values)
-                            enemy.rarity = 0;
-
-                        foreach (var enemy in currentDaytimeEnemyWeights.Values)
-                            enemy.rarity = 0;
-                    }
-
-                    foreach (var (enemy, weight) in compatibleInteriorEnemies)
-                    {
-                        if (currentInteriorEnemyWeights.ContainsKey(enemy.enemyID))
-                        {
-                            currentInteriorEnemyWeights[enemy.enemyID].rarity += weight;
-                        }
-                        else
-                        {
-                            currentInteriorEnemyWeights[enemy.enemyID] = new SpawnableEnemyWithRarity { enemyType = objects.enemies[enemy.enemyID], rarity = weight };
-                        }
-                    }
-
-                    foreach (var (enemy, weight) in compatibleExteriorEnemies)
-                    {
-                        if (currentExteriorEnemyWeights.ContainsKey(enemy.enemyID))
-                        {
-                            currentExteriorEnemyWeights[enemy.enemyID].rarity += weight;
-                        }
-                        else
-                        {
-                            currentExteriorEnemyWeights[enemy.enemyID] = new SpawnableEnemyWithRarity { enemyType = objects.enemies[enemy.enemyID], rarity = weight };
-                        }
-                    }
-
-                    foreach (var (enemy, weight) in compatibleDaytimeEnemies)
-                    {
-                        if (currentDaytimeEnemyWeights.ContainsKey(enemy.enemyID))
-                        {
-                            currentDaytimeEnemyWeights[enemy.enemyID].rarity += weight;
-                        }
-                        else
-                        {
-                            currentDaytimeEnemyWeights[enemy.enemyID] = new SpawnableEnemyWithRarity { enemyType = objects.enemies[enemy.enemyID], rarity = weight };
-                        }
-                    }
-
-                    if (central.logPools)
-                    {
-                        MiniLogger.LogInfo($"Starting {level} with the following interior enemy weights:");
-                        foreach (var enemy in currentInteriorEnemyWeights)
-                        {
-                            MiniLogger.LogInfo($"{enemy.Key}: {enemy.Value.rarity}");
-                        }
-
-                        MiniLogger.LogInfo($"Starting {level} with the following exterior enemy weights:");
-                        foreach (var enemy in currentExteriorEnemyWeights)
-                        {
-                            MiniLogger.LogInfo($"{enemy.Key}: {enemy.Value.rarity}");
-                        }
-
-                        MiniLogger.LogInfo($"Starting {level} with the following daytime enemy weights:");
-                        foreach (var enemy in currentDaytimeEnemyWeights)
-                        {
-                            MiniLogger.LogInfo($"{enemy.Key}: {enemy.Value.rarity}");
-                        }
-                    }
-
-                    level.Enemies = currentInteriorEnemyWeights.Values.ToList();
-                    level.OutsideEnemies = currentExteriorEnemyWeights.Values.ToList();
-                    level.DaytimeEnemies = currentDaytimeEnemyWeights.Values.ToList();
-
-                    MiniLogger.LogInfo("Enemy Pools Set!");
-
-                    MiniLogger.LogInfo("Setting Trap Curves...");
-
-                    float trapDifficultyMultiplier = 1;
-                    Dictionary<string, float> trapCurveMultipliers = new();
-
-                    foreach (var tag in tagSet)
-                    {
-                        if (tag == currentDungeon)
-                        { continue; }
-
-                        trapDifficultyMultiplier *= registeredTags[tag].mapObjectPeakMultiplier;
-                    }
-
-                    Dictionary<string, SpawnableMapObject> currentMapObjects = level.spawnableMapObjects.ToDictionary(k => k.prefabToSpawn.name);
-                    HashSet<string> presentTraps = currentMapObjects.Keys.ToHashSet();
-
-                    foreach (var obj in level.spawnableOutsideObjects)
-                    {
-                        MiniLogger.LogInfo(obj.spawnableObject.name);
-                    }
-
-                    foreach (var (id, trap) in registeredMapObjects)
-                    {
-                        if (!presentTraps.Contains(id))
-                        {
-                            currentMapObjects.Add(id, objects.mapObjects[id]);
-                        }
-                    }
-
-                    if (central.useTrapCurves)
-                    {
-                        foreach (var trap in currentMapObjects)
-                            trap.Value.numberToSpawn = registeredMapObjects[trap.Key].baseCurve;
-                    }
-
-                    foreach (var (id, trap) in currentMapObjects)
-                    {
-                        AnimationCurve curve = trap.numberToSpawn;
-
-                        float multiplier = dungeonInfo.mapObjectMultipliers[id];
-
-                        Keyframe[] newCurve = new Keyframe[curve.length];
-
-                        for (int i = 0; i < curve.length; i++)
-                        {
-                            Keyframe key = curve[i];
-                            key.value *= multiplier;
-                            key.inTangent *= multiplier;
-                            key.outTangent *= multiplier;
-                            if (i == curve.length - 1)
+                            foreach (var tag in item.tags)
                             {
-                                key.value *= trapDifficultyMultiplier;
-                                key.inTangent *= trapDifficultyMultiplier;
-                                key.outTangent *= trapDifficultyMultiplier;
+                                var parts = tag.Split("_");
+                                splitTags.Add((parts[0], parts[1]));
+                                matchTags.Add(parts[0]);
+
+                                if (tagSet.Contains(parts[0]))
+                                {
+                                    compatibleTagItems.Add((item, (int)Math.Ceiling(100 * poolMultipliers[parts[1]])));
+                                }
                             }
-                            newCurve[i] = key;
                         }
 
-                        trap.numberToSpawn = new AnimationCurve(newCurve);
+                        Dictionary<string, SpawnableItemWithRarity> currentScrapWeights = new();
+
+                        foreach (var k in level.spawnableScrap)
+                        {
+                            string name = k.spawnableItem.name;
+
+                            if (currentScrapWeights.TryGetValue(name, out var existing))
+                            {
+                                existing.rarity += k.rarity;
+                            }
+                            else
+                            {
+                                currentScrapWeights[name] = new SpawnableItemWithRarity { spawnableItem = k.spawnableItem, rarity = k.rarity };
+                            }
+                        }
+
+                        if (central.clearItems)
+                        {
+                            foreach (var item in currentScrapWeights.Values)
+                                item.rarity = 0;
+                        }
+
+                        foreach (var (item, weight) in compatibleTagItems)
+                        {
+                            if (currentScrapWeights.ContainsKey(item.itemID))
+                            {
+                                currentScrapWeights[item.itemID].rarity += weight;
+                            }
+                            else
+                            {
+                                currentScrapWeights[item.itemID] = new SpawnableItemWithRarity { spawnableItem = objects.items[item.itemID], rarity = weight };
+                            }
+                        }
+
+                        if (central.logPools)
+                        {
+                            MiniLogger.LogInfo($"Starting {level} with the following scrap weights:");
+                            foreach (var scrap in currentScrapWeights)
+                            {
+                                MiniLogger.LogInfo($"{scrap.Key}: {scrap.Value.rarity}");
+                            }
+                        }
+
+                        level.spawnableScrap = currentScrapWeights.Values.ToList();
+
+                        MiniLogger.LogInfo("Item Pools Set!");
+
+                        MiniLogger.LogInfo("Setting Enemy Pools...");
+
+                        Dictionary<string, float> interiorEnemyPoolMultipliers = new();
+                        Dictionary<string, float> exteriorEnemyPoolMultipliers = new();
+                        Dictionary<string, float> daytimeEnemyPoolMultipliers = new();
+
+                        foreach (var tag in tagSet)
+                        {
+                            if (tag == currentDungeon)
+                            { continue; }
+
+                            foreach (var multi in registeredTags[tag].interiorEnemyPoolMultipliers)
+                            {
+                                if (interiorEnemyPoolMultipliers.Keys.Contains(multi.Key))
+                                {
+                                    interiorEnemyPoolMultipliers[multi.Key] *= multi.Value;
+                                }
+                                else
+                                {
+                                    interiorEnemyPoolMultipliers[multi.Key] = multi.Value;
+                                }
+                            }
+
+                            foreach (var multi in registeredTags[tag].exteriorEnemyPoolMultipliers)
+                            {
+                                if (exteriorEnemyPoolMultipliers.Keys.Contains(multi.Key))
+                                {
+                                    exteriorEnemyPoolMultipliers[multi.Key] *= multi.Value;
+                                }
+                                else
+                                {
+                                    exteriorEnemyPoolMultipliers[multi.Key] = multi.Value;
+                                }
+                            }
+
+                            foreach (var multi in registeredTags[tag].daytimeEnemyPoolMultipliers)
+                            {
+                                if (daytimeEnemyPoolMultipliers.Keys.Contains(multi.Key))
+                                {
+                                    daytimeEnemyPoolMultipliers[multi.Key] *= multi.Value;
+                                }
+                                else
+                                {
+                                    daytimeEnemyPoolMultipliers[multi.Key] = multi.Value;
+                                }
+                            }
+                        }
+
+                        List<(EnemyInfo, int)> compatibleInteriorEnemies = new();
+                        List<(EnemyInfo, int)> compatibleExteriorEnemies = new();
+                        List<(EnemyInfo, int)> compatibleDaytimeEnemies = new();
+
+                        foreach (var enemy in registeredEnemies.Values)
+                        {
+                            List<(string, string)> splitTags = new();
+                            List<string> matchTags = new();
+
+                            foreach (var tag in enemy.tags)
+                            {
+                                var parts = tag.Split("_");
+                                splitTags.Add((parts[0], parts[1]));
+                                matchTags.Add(parts[0]);
+
+                                if (parts[0] == currentDungeon)
+                                {
+                                    compatibleInteriorEnemies.Add((enemy, (int)Math.Ceiling(100 * interiorEnemyPoolMultipliers[parts[1]])));
+                                }
+                                else if (tagSet.Contains(parts[0]))
+                                {
+                                    if (parts.Length > 2 && !enemy.blacklistTags.Intersect(tagSet).Any())
+                                    {
+                                        compatibleDaytimeEnemies.Add((enemy, (int)Math.Ceiling(100 * daytimeEnemyPoolMultipliers[parts[1]])));
+                                    }
+                                    else
+                                    {
+                                        compatibleExteriorEnemies.Add((enemy, (int)Math.Ceiling(100 * exteriorEnemyPoolMultipliers[parts[1]])));
+                                    }
+                                }
+                            }
+                        }
+
+                        Dictionary<string, SpawnableEnemyWithRarity> currentInteriorEnemyWeights = new();
+                        Dictionary<string, SpawnableEnemyWithRarity> currentExteriorEnemyWeights = new();
+                        Dictionary<string, SpawnableEnemyWithRarity> currentDaytimeEnemyWeights = new();
+
+                        foreach (var k in level.Enemies)
+                        {
+                            string name = k.enemyType.name;
+
+                            if (currentInteriorEnemyWeights.TryGetValue(name, out var existing))
+                            {
+                                existing.rarity += k.rarity;
+                            }
+                            else
+                            {
+                                currentInteriorEnemyWeights[name] = new SpawnableEnemyWithRarity { enemyType = k.enemyType, rarity = k.rarity };
+                            }
+                        }
+
+                        foreach (var k in level.OutsideEnemies)
+                        {
+                            string name = k.enemyType.name;
+
+                            if (currentExteriorEnemyWeights.TryGetValue(name, out var existing))
+                            {
+                                existing.rarity += k.rarity;
+                            }
+                            else
+                            {
+                                currentExteriorEnemyWeights[name] = new SpawnableEnemyWithRarity { enemyType = k.enemyType, rarity = k.rarity };
+                            }
+                        }
+
+                        foreach (var k in level.DaytimeEnemies)
+                        {
+                            string name = k.enemyType.name;
+
+                            if (currentDaytimeEnemyWeights.TryGetValue(name, out var existing))
+                            {
+                                existing.rarity += k.rarity;
+                            }
+                            else
+                            {
+                                currentDaytimeEnemyWeights[name] = new SpawnableEnemyWithRarity { enemyType = k.enemyType, rarity = k.rarity };
+                            }
+                        }
+
+                        if (central.clearEnemies)
+                        {
+                            foreach (var enemy in currentInteriorEnemyWeights.Values)
+                                enemy.rarity = 0;
+
+                            foreach (var enemy in currentExteriorEnemyWeights.Values)
+                                enemy.rarity = 0;
+
+                            foreach (var enemy in currentDaytimeEnemyWeights.Values)
+                                enemy.rarity = 0;
+                        }
+
+                        foreach (var (enemy, weight) in compatibleInteriorEnemies)
+                        {
+                            if (currentInteriorEnemyWeights.ContainsKey(enemy.enemyID))
+                            {
+                                currentInteriorEnemyWeights[enemy.enemyID].rarity += weight;
+                            }
+                            else
+                            {
+                                currentInteriorEnemyWeights[enemy.enemyID] = new SpawnableEnemyWithRarity { enemyType = objects.enemies[enemy.enemyID], rarity = weight };
+                            }
+                        }
+
+                        foreach (var (enemy, weight) in compatibleExteriorEnemies)
+                        {
+                            if (currentExteriorEnemyWeights.ContainsKey(enemy.enemyID))
+                            {
+                                currentExteriorEnemyWeights[enemy.enemyID].rarity += weight;
+                            }
+                            else
+                            {
+                                currentExteriorEnemyWeights[enemy.enemyID] = new SpawnableEnemyWithRarity { enemyType = objects.enemies[enemy.enemyID], rarity = weight };
+                            }
+                        }
+
+                        foreach (var (enemy, weight) in compatibleDaytimeEnemies)
+                        {
+                            if (currentDaytimeEnemyWeights.ContainsKey(enemy.enemyID))
+                            {
+                                currentDaytimeEnemyWeights[enemy.enemyID].rarity += weight;
+                            }
+                            else
+                            {
+                                currentDaytimeEnemyWeights[enemy.enemyID] = new SpawnableEnemyWithRarity { enemyType = objects.enemies[enemy.enemyID], rarity = weight };
+                            }
+                        }
+
+                        if (central.logPools)
+                        {
+                            MiniLogger.LogInfo($"Starting {level} with the following interior enemy weights:");
+                            foreach (var enemy in currentInteriorEnemyWeights)
+                            {
+                                MiniLogger.LogInfo($"{enemy.Key}: {enemy.Value.rarity}");
+                            }
+
+                            MiniLogger.LogInfo($"Starting {level} with the following exterior enemy weights:");
+                            foreach (var enemy in currentExteriorEnemyWeights)
+                            {
+                                MiniLogger.LogInfo($"{enemy.Key}: {enemy.Value.rarity}");
+                            }
+
+                            MiniLogger.LogInfo($"Starting {level} with the following daytime enemy weights:");
+                            foreach (var enemy in currentDaytimeEnemyWeights)
+                            {
+                                MiniLogger.LogInfo($"{enemy.Key}: {enemy.Value.rarity}");
+                            }
+                        }
+
+                        level.Enemies = currentInteriorEnemyWeights.Values.ToList();
+                        level.OutsideEnemies = currentExteriorEnemyWeights.Values.ToList();
+                        level.DaytimeEnemies = currentDaytimeEnemyWeights.Values.ToList();
+
+                        MiniLogger.LogInfo("Enemy Pools Set!");
+
+                        MiniLogger.LogInfo("Setting Trap Curves...");
+
+                        float trapDifficultyMultiplier = 1;
+                        Dictionary<string, float> trapCurveMultipliers = new();
+
+                        foreach (var tag in tagSet)
+                        {
+                            if (tag == currentDungeon)
+                            { continue; }
+
+                            trapDifficultyMultiplier *= registeredTags[tag].mapObjectPeakMultiplier;
+                        }
+
+                        Dictionary<string, SpawnableMapObject> currentMapObjects = level.spawnableMapObjects.ToDictionary(k => k.prefabToSpawn.name);
+                        HashSet<string> presentTraps = currentMapObjects.Keys.ToHashSet();
+
+                        foreach (var (id, trap) in registeredMapObjects)
+                        {
+                            if (!presentTraps.Contains(id))
+                            {
+                                currentMapObjects.Add(id, objects.mapObjects[id]);
+                            }
+                        }
+
+                        if (central.useTrapCurves)
+                        {
+                            foreach (var trap in currentMapObjects)
+                                trap.Value.numberToSpawn = registeredMapObjects[trap.Key].baseCurve;
+                        }
+
+                        foreach (var (id, trap) in currentMapObjects)
+                        {
+                            AnimationCurve curve = trap.numberToSpawn;
+
+                            float multiplier = dungeonInfo.mapObjectMultipliers[id];
+
+                            Keyframe[] newCurve = new Keyframe[curve.length];
+
+                            for (int i = 0; i < curve.length; i++)
+                            {
+                                Keyframe key = curve[i];
+                                key.value *= multiplier;
+                                key.inTangent *= multiplier;
+                                key.outTangent *= multiplier;
+                                if (i == curve.length - 1)
+                                {
+                                    key.value *= trapDifficultyMultiplier;
+                                    key.inTangent *= trapDifficultyMultiplier;
+                                    key.outTangent *= trapDifficultyMultiplier;
+                                }
+                                newCurve[i] = key;
+                            }
+
+                            trap.numberToSpawn = new AnimationCurve(newCurve);
+                        }
+
+                        level.spawnableMapObjects = currentMapObjects.Values.ToArray();
+
+                        MiniLogger.LogInfo("Trap Curves Set!");
                     }
-
-                    level.spawnableMapObjects = currentMapObjects.Values.ToArray();
-
-                    MiniLogger.LogInfo("Trap Curves Set!");
-                }
-                catch (Exception e)
-                {
-                    MiniLogger.LogError($"An error occured while modifying pool values!\nPlease report this: {e}");
+                    catch (Exception e)
+                    {
+                        MiniLogger.LogError($"An error occured while modifying pool values!\nPlease report this: {e}");
+                    }
                 }
             }
         }
