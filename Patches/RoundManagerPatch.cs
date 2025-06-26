@@ -326,11 +326,27 @@ namespace LunarConfig.Patches
                 if (File.Exists(LunarConfig.DUNGEON_FILE))
                 {
                     dungeonConfig = new DungeonConfiguration(File.ReadAllText(LunarConfig.DUNGEON_FILE));
+                    string newDungeonConfigString = "";
                     foreach (DungeonEntry entry in parseDungeonConfiguration.parseConfiguration(dungeonConfig.dungeonConfig))
                     {
                         try
                         {
                             DungeonInfo dungeon = parseDungeonEntry.parseEntry(entry.configString);
+                            List<string> mapObjects = dungeon.mapObjectMultipliers.Keys.ToList();
+
+                            foreach (var obj in registeredMapObjects)
+                            {
+                                if (mapObjects.Contains(obj))
+                                {
+                                    continue;
+                                }
+                                else
+                                {
+                                    dungeon.mapObjectMultipliers.Add(obj, 1);
+                                }
+                            }
+
+                            newDungeonConfigString += new DungeonEntry(dungeon).configString;
                             registeredDungeons.Add(dungeon.dungeonID);
                             configuredDungeons.Add(dungeon.dungeonID, dungeon);
                         }
@@ -338,6 +354,12 @@ namespace LunarConfig.Patches
                         {
                             MiniLogger.LogError($"Dungeon Configuration File contains invalid entry, skipping entry!\n{e}");
                         }
+                    }
+
+                    if (newDungeonConfigString != dungeonConfig.dungeonConfig)
+                    {
+                        dungeonConfig.dungeonConfig = newDungeonConfigString;
+                        MiniLogger.LogInfo("Dungeon Configuration Updated!");
                     }
                 }
                 else
@@ -878,7 +900,21 @@ namespace LunarConfig.Patches
                         }
                     }
 
-                    Dictionary<string, SpawnableItemWithRarity> currentScrapWeights = level.spawnableScrap.ToDictionary(k => k.spawnableItem.name);
+                    Dictionary<string, SpawnableItemWithRarity> currentScrapWeights = new();
+
+                    foreach (var k in level.spawnableScrap)
+                    {
+                        string name = k.spawnableItem.name;
+
+                        if (currentScrapWeights.TryGetValue(name, out var existing))
+                        {
+                            existing.rarity += k.rarity;
+                        }
+                        else
+                        {
+                            currentScrapWeights[name] = new SpawnableItemWithRarity { spawnableItem = k.spawnableItem, rarity = k.rarity };
+                        }
+                    }
 
                     if (central.clearItems)
                     {
@@ -991,10 +1027,52 @@ namespace LunarConfig.Patches
                             }
                         }
                     }
+                    
+                    Dictionary<string, SpawnableEnemyWithRarity> currentInteriorEnemyWeights = new();
+                    Dictionary<string, SpawnableEnemyWithRarity> currentExteriorEnemyWeights = new();
+                    Dictionary<string, SpawnableEnemyWithRarity> currentDaytimeEnemyWeights = new();
 
-                    Dictionary<string, SpawnableEnemyWithRarity> currentInteriorEnemyWeights = level.Enemies.ToDictionary(k => k.enemyType.name);
-                    Dictionary<string, SpawnableEnemyWithRarity> currentExteriorEnemyWeights = level.OutsideEnemies.ToDictionary(k => k.enemyType.name);
-                    Dictionary<string, SpawnableEnemyWithRarity> currentDaytimeEnemyWeights = level.DaytimeEnemies.ToDictionary(k => k.enemyType.name);
+                    foreach (var k in level.Enemies)
+                    {
+                        string name = k.enemyType.name;
+
+                        if (currentInteriorEnemyWeights.TryGetValue(name, out var existing))
+                        {
+                            existing.rarity += k.rarity;
+                        }
+                        else
+                        {
+                            currentInteriorEnemyWeights[name] = new SpawnableEnemyWithRarity { enemyType = k.enemyType, rarity = k.rarity };
+                        }
+                    }
+
+                    foreach (var k in level.OutsideEnemies)
+                    {
+                        string name = k.enemyType.name;
+
+                        if (currentExteriorEnemyWeights.TryGetValue(name, out var existing))
+                        {
+                            existing.rarity += k.rarity;
+                        }
+                        else
+                        {
+                            currentExteriorEnemyWeights[name] = new SpawnableEnemyWithRarity { enemyType = k.enemyType, rarity = k.rarity };
+                        }
+                    }
+
+                    foreach (var k in level.DaytimeEnemies)
+                    {
+                        string name = k.enemyType.name;
+
+                        if (currentDaytimeEnemyWeights.TryGetValue(name, out var existing))
+                        {
+                            existing.rarity += k.rarity;
+                        }
+                        else
+                        {
+                            currentDaytimeEnemyWeights[name] = new SpawnableEnemyWithRarity { enemyType = k.enemyType, rarity = k.rarity };
+                        }
+                    }
 
                     if (central.clearEnemies)
                     {
@@ -1085,6 +1163,20 @@ namespace LunarConfig.Patches
                     }
 
                     Dictionary<string, SpawnableMapObject> currentMapObjects = level.spawnableMapObjects.ToDictionary(k => k.prefabToSpawn.name);
+                    HashSet<string> presentTraps = currentMapObjects.Keys.ToHashSet();
+
+                    foreach (var obj in level.spawnableOutsideObjects)
+                    {
+                        MiniLogger.LogInfo(obj.spawnableObject.name);
+                    }
+
+                    foreach (var (id, trap) in registeredMapObjects)
+                    {
+                        if (!presentTraps.Contains(id))
+                        {
+                            currentMapObjects.Add(id, objects.mapObjects[id]);
+                        }
+                    }
 
                     if (central.useTrapCurves)
                     {

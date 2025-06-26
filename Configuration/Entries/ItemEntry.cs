@@ -65,6 +65,22 @@ namespace LunarConfig.Configuration.Entries
                 return match.Success ? match.Groups[1].Value.Trim() : "";
             }
 
+            string GetTagValue(string key)
+            {
+                foreach (string line in entry.Split(new[] { '\r', '\n' }, StringSplitOptions.None))
+                {
+                    var trimmedLine = line.TrimStart();
+
+                    if (trimmedLine.StartsWith(key))
+                    {
+                        var match = Regex.Match(trimmedLine, $@"^{Regex.Escape(key)}\s*=\s*(.*)$");
+                        if (match.Success)
+                            return match.Groups[1].Value.Trim();
+                    }
+                }
+                return "";
+            }
+
             ItemInfo info = new ItemInfo(
                 Regex.Match(entry, @"\[(.*?)\]").Groups[1].Value,
                 GetValue("Display Name"),
@@ -74,7 +90,10 @@ namespace LunarConfig.Configuration.Entries
                 bool.Parse(GetValue("Conductivity").ToLower()),
                 bool.Parse(GetValue("Two-Handed").ToLower()),
                 bool.Parse(GetValue(@"Is Scrap\?").ToLower()),
-                Regex.Split(GetValue("Tags"), @"[\s,]+").Where(tag => !string.IsNullOrWhiteSpace(tag)).ToList()
+                Regex
+                    .Split(GetTagValue("(LunarConfig) Tags"), @"[\s,]+")
+                    .Where(tag => !string.IsNullOrWhiteSpace(tag))
+                    .ToList()
                 );
 
             return info;

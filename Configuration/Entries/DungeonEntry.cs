@@ -49,6 +49,22 @@ namespace LunarConfig.Configuration.Entries
                 return match.Success ? match.Groups[1].Value.Trim() : "";
             }
 
+            string GetTagValue(string key)
+            {
+                foreach (string line in entry.Split(new[] { '\r', '\n' }, StringSplitOptions.None))
+                {
+                    var trimmedLine = line.TrimStart();
+
+                    if (trimmedLine.StartsWith(key))
+                    {
+                        var match = Regex.Match(trimmedLine, $@"^{Regex.Escape(key)}\s*=\s*(.*)$");
+                        if (match.Success)
+                            return match.Groups[1].Value.Trim();
+                    }
+                }
+                return "";
+            }
+
             var mapObjectMultipliers = new Dictionary<string, float>();
             var mapObjectRegex = new Regex(@"^Map Object Multiplier\s*-\s*(\w+)\s*=\s*([\d.]+)", RegexOptions.Multiline);
 
@@ -61,7 +77,10 @@ namespace LunarConfig.Configuration.Entries
 
             DungeonInfo info = new DungeonInfo(
                 Regex.Match(entry, @"\[(.*?)\]").Groups[1].Value,
-                Regex.Split(GetValue("Tags"), @"[\s,]+").Where(tag => !string.IsNullOrWhiteSpace(tag)).ToList(),
+                Regex
+                    .Split(GetTagValue("(LunarConfig) Tags"), @"[\s,]+")
+                    .Where(tag => !string.IsNullOrWhiteSpace(tag))
+                    .ToList(),
                 mapObjectMultipliers
                 );
 
