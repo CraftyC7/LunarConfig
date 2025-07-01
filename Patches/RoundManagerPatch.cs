@@ -2,27 +2,32 @@
 using HarmonyLib;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using UnityEngine;
 using Unity.Netcode;
 using LunarConfig.Objects;
 using System.IO;
-using Steamworks.Ugc;
-using MonoMod.RuntimeDetour;
 using DunGen.Graph;
-using static UnityEngine.Rendering.HighDefinition.ScalableSettingLevelParameter;
-using System.ComponentModel;
-using System.Reflection;
-using LunarConfig.Configuration.Entries;
-using LunarConfig.Configuration;
-using LethalLib;
-using System.Collections;
-using static UnityEngine.UI.Image;
+using LunarConfig.Objects.Info;
+using LunarConfig.Objects.Entries;
+using LunarConfig.Objects.Configuration;
 
 namespace LunarConfig.Patches
 {
     internal class RoundManagerPatch
     {
+        private static Dictionary<string, MoonDifficultyInfo> GetDefaultDictionary()
+        {
+            Dictionary<string, MoonDifficultyInfo> defaultDictionary = new Dictionary<string, MoonDifficultyInfo>();
+            foreach (var moon in Resources.FindObjectsOfTypeAll<SelectableLevel>())
+            {
+                defaultDictionary.Add(moon.name, new MoonDifficultyInfo());
+            }
+            return defaultDictionary;
+        }
+
+        public static string lastLevel = "";
+        public static bool shouldIncrement = false;
+
         [HarmonyPatch(typeof(RoundManager), "Awake")]
         [HarmonyPriority(400)]
         [HarmonyPostfix]
@@ -43,13 +48,12 @@ namespace LunarConfig.Patches
                     central = new CentralConfiguration();
                     central.CreateConfiguration(central);
                 }
-
+                
                 HashSet<string> registeredItems = new HashSet<string>();
                 ItemConfiguration itemConfig;
                 Dictionary<string, ItemInfo> configuredItems = new Dictionary<string, ItemInfo>();
 
                 MiniLogger.LogInfo("Beginning Logging...");
-
                 
                 if (File.Exists(LunarConfig.ITEM_FILE))
                 {
@@ -319,6 +323,8 @@ namespace LunarConfig.Patches
                     */
                 }
 
+                
+
                 HashSet<string> registeredDungeons = new HashSet<string>();
                 DungeonConfiguration dungeonConfig;
                 Dictionary<string, DungeonInfo> configuredDungeons = new Dictionary<string, DungeonInfo>();
@@ -541,7 +547,7 @@ namespace LunarConfig.Patches
         [HarmonyPatch(typeof(RoundManager), nameof(RoundManager.LoadNewLevel))]
         [HarmonyPriority(0)]
         [HarmonyPrefix]
-        private static void loadNewLevelPrefix(RoundManager __instance, ref SelectableLevel newLevel)
+        private static void onLoadNewLevelPrefix(RoundManager __instance, ref SelectableLevel newLevel)
         {
             MoonInfo moonSettings = null;
 
@@ -612,9 +618,35 @@ namespace LunarConfig.Patches
             CentralConfiguration central = null;
             MoonInfo moonSettings = null;
             SelectableLevel newLevel = __instance.currentLevel;
+            shouldIncrement = true;
 
             Dictionary<string, DungeonInfo> registeredDungeons = new Dictionary<string, DungeonInfo>();
             Dictionary<string, TagInfo> registeredTags = new Dictionary<string, TagInfo>();
+            MoonDifficultyInfo moonDifficultyInfo = null;
+
+            try
+            {
+                string save = GameNetworkManager.Instance.currentSaveFileName;
+                Dictionary<string, MoonDifficultyInfo> loadedData = ES3.Load("Lunar_Data", save, defaultValue: GetDefaultDictionary());
+
+                foreach (var data in loadedData)
+                {
+                    MiniLogger.LogInfo($"{data.Key} : {data.Value.heat}");
+                }
+
+                if (loadedData.Keys.Contains(newLevel.name))
+                {
+                    moonDifficultyInfo = loadedData[newLevel.name];
+                }
+                else
+                {
+                    moonDifficultyInfo = new MoonDifficultyInfo();
+                }
+            }
+            catch (Exception e)
+            {
+                MiniLogger.LogError($"Error occured while fetching moon difficulty values, please report this!\n{e}");
+            }
 
             try
             {
@@ -647,7 +679,7 @@ namespace LunarConfig.Patches
                 MiniLogger.LogError($"An error occured while fetching level values!\nPlease report this: {e}");
             }
 
-            if (moonSettings != null && central != null)
+            if (moonSettings != null && central != null && moonDifficultyInfo != null)
             {
                 try
                 {
@@ -766,95 +798,115 @@ namespace LunarConfig.Patches
 
             string currentDungeon = __instance.dungeonFlowTypes[__instance.currentDungeonType].dungeonFlow.name;
             SelectableLevel level = __instance.currentLevel;
+            lastLevel = level.name;
 
             Dictionary<string, ItemInfo> registeredItems = new Dictionary<string, ItemInfo>();
             Dictionary<string, EnemyInfo> registeredEnemies = new Dictionary<string, EnemyInfo>();
             Dictionary<string, MapObjectInfo> registeredMapObjects = new Dictionary<string, MapObjectInfo>();
             Dictionary<string, TagInfo> registeredTags = new Dictionary<string, TagInfo>();
+            
+            CentralConfiguration central = null;
+            MoonInfo moonSettings = null;
+            DungeonInfo dungeonInfo = null;
+            MoonDifficultyInfo moonDifficultyInfo = null;
 
-            if (registeredTags.Any())
+            try
             {
+                string save = GameNetworkManager.Instance.currentSaveFileName;
+                Dictionary<string, MoonDifficultyInfo> loadedData = ES3.Load("Lunar_Data", save, defaultValue: GetDefaultDictionary());
 
-                CentralConfiguration central = null;
-                MoonInfo moonSettings = null;
-                DungeonInfo dungeonInfo = null;
-
-                if (File.Exists(LunarConfig.CENTRAL_FILE))
+                if (loadedData.Keys.Contains(level.name))
                 {
-                    central = new CentralConfiguration(File.ReadAllText(LunarConfig.CENTRAL_FILE));
+                    moonDifficultyInfo = loadedData[level.name];
                 }
-
-                if (File.Exists(LunarConfig.MOON_FILE))
+                else
                 {
-                    foreach (MoonEntry entry in parseMoonConfiguration.parseConfiguration(new MoonConfiguration(File.ReadAllText(LunarConfig.MOON_FILE)).moonConfig))
-                    {
-                        try
-                        {
-                            MoonInfo moon = parseMoonEntry.parseEntry(entry.configString);
-                            if (moon.moonID == level.name)
-                            {
-                                moonSettings = moon;
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            MiniLogger.LogError($"Moon Configuration File contains invalid entry, skipping entry!\n{e}");
-                        }
-                    }
+                    moonDifficultyInfo = new MoonDifficultyInfo();
                 }
+            }
+            catch (Exception e)
+            {
+                MiniLogger.LogError($"Error occured while fetching moon difficulty values, please report this!\n{e}");
+            }
 
-                if (File.Exists(LunarConfig.DUNGEON_FILE))
-                {
-                    foreach (DungeonEntry entry in parseDungeonConfiguration.parseConfiguration(new DungeonConfiguration(File.ReadAllText(LunarConfig.DUNGEON_FILE)).dungeonConfig))
-                    {
-                        try
-                        {
-                            DungeonInfo dungeon = parseDungeonEntry.parseEntry(entry.configString);
-                            if (dungeon.dungeonID == currentDungeon)
-                            {
-                                dungeonInfo = dungeon;
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            MiniLogger.LogError($"Dungeon Configuration File contains invalid entry, skipping entry!\n{e}");
-                        }
-                    }
-                }
+            if (File.Exists(LunarConfig.CENTRAL_FILE))
+            {
+                central = new CentralConfiguration(File.ReadAllText(LunarConfig.CENTRAL_FILE));
+            }
 
-                if (moonSettings != null && dungeonInfo != null && central != null)
+            if (File.Exists(LunarConfig.MOON_FILE))
+            {
+                foreach (MoonEntry entry in parseMoonConfiguration.parseConfiguration(new MoonConfiguration(File.ReadAllText(LunarConfig.MOON_FILE)).moonConfig))
                 {
                     try
                     {
-                        foreach (var entry in parseItemConfiguration.parseConfiguration(File.ReadAllText(LunarConfig.ITEM_FILE)))
+                        MoonInfo moon = parseMoonEntry.parseEntry(entry.configString);
+                        if (moon.moonID == level.name)
                         {
-                            ItemInfo info = parseItemEntry.parseEntry(entry.configString);
-                            registeredItems.Add(info.itemID, info);
-                        }
-
-                        foreach (var entry in parseEnemyConfiguration.parseConfiguration(File.ReadAllText(LunarConfig.ENEMY_FILE)))
-                        {
-                            EnemyInfo info = parseEnemyEntry.parseEntry(entry.configString);
-                            registeredEnemies.Add(info.enemyID, info);
-                        }
-
-                        foreach (var entry in parseMapObjectConfiguration.parseConfiguration(File.ReadAllText(LunarConfig.MAP_OBJECT_FILE)))
-                        {
-                            MapObjectInfo info = parseMapObjectEntry.parseEntry(entry.configString);
-                            registeredMapObjects.Add(info.objID, info);
-                        }
-
-                        foreach (var entry in parseTagConfiguration.parseConfiguration(File.ReadAllText(LunarConfig.TAG_FILE)))
-                        {
-                            TagInfo info = parseTagEntry.parseEntry(entry.configString);
-                            registeredTags.Add(info.tagID, info);
+                            moonSettings = moon;
                         }
                     }
                     catch (Exception e)
                     {
-                        MiniLogger.LogError($"An error occured while fetching pool values!\nPlease report this: {e}");
+                        MiniLogger.LogError($"Moon Configuration File contains invalid entry, skipping entry!\n{e}");
+                    }
+                }
+            }
+
+            if (File.Exists(LunarConfig.DUNGEON_FILE))
+            {
+                foreach (DungeonEntry entry in parseDungeonConfiguration.parseConfiguration(new DungeonConfiguration(File.ReadAllText(LunarConfig.DUNGEON_FILE)).dungeonConfig))
+                {
+                    try
+                    {
+                        DungeonInfo dungeon = parseDungeonEntry.parseEntry(entry.configString);
+                        if (dungeon.dungeonID == currentDungeon)
+                        {
+                            dungeonInfo = dungeon;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        MiniLogger.LogError($"Dungeon Configuration File contains invalid entry, skipping entry!\n{e}");
+                    }
+                }
+            }
+
+            if (moonSettings != null && dungeonInfo != null && central != null && moonDifficultyInfo != null)
+            {
+                try
+                {
+                    foreach (var entry in parseItemConfiguration.parseConfiguration(File.ReadAllText(LunarConfig.ITEM_FILE)))
+                    {
+                        ItemInfo info = parseItemEntry.parseEntry(entry.configString);
+                        registeredItems.Add(info.itemID, info);
                     }
 
+                    foreach (var entry in parseEnemyConfiguration.parseConfiguration(File.ReadAllText(LunarConfig.ENEMY_FILE)))
+                    {
+                        EnemyInfo info = parseEnemyEntry.parseEntry(entry.configString);
+                        registeredEnemies.Add(info.enemyID, info);
+                    }
+
+                    foreach (var entry in parseMapObjectConfiguration.parseConfiguration(File.ReadAllText(LunarConfig.MAP_OBJECT_FILE)))
+                    {
+                        MapObjectInfo info = parseMapObjectEntry.parseEntry(entry.configString);
+                        registeredMapObjects.Add(info.objID, info);
+                    }
+
+                    foreach (var entry in parseTagConfiguration.parseConfiguration(File.ReadAllText(LunarConfig.TAG_FILE)))
+                    {
+                        TagInfo info = parseTagEntry.parseEntry(entry.configString);
+                        registeredTags.Add(info.tagID, info);
+                    }
+                }
+                catch (Exception e)
+                {
+                    MiniLogger.LogError($"An error occured while fetching pool values!\nPlease report this: {e}");
+                }
+
+                if (registeredTags.Any())
+                {
                     try
                     {
                         MiniLogger.LogInfo("Setting Item Pools...");
@@ -880,6 +932,14 @@ namespace LunarConfig.Patches
                                 {
                                     poolMultipliers[multi.Key] = multi.Value;
                                 }
+                            }
+                        }
+
+                        foreach (var pool in central.scrapDecayPools)
+                        {
+                            if (poolMultipliers.Keys.Contains(pool))
+                            {
+                                poolMultipliers[pool] *= (float)Math.Pow(central.scrapDecayRate, Math.Max(moonDifficultyInfo.heat, 0));
                             }
                         }
 
@@ -1170,7 +1230,7 @@ namespace LunarConfig.Patches
 
                         foreach (var (id, trap) in registeredMapObjects)
                         {
-                            if (!presentTraps.Contains(id))
+                            if (!presentTraps.Contains(id) && objects.mapObjects.Keys.Contains(id))
                             {
                                 currentMapObjects.Add(id, objects.mapObjects[id]);
                             }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
-namespace LunarConfig.Objects
+namespace LunarConfig.Objects.Info
 {
     internal class EnemyInfo
     {
@@ -29,7 +29,7 @@ namespace LunarConfig.Objects
         public List<string> tags { get; set; }
         public List<string> blacklistTags { get; set; }
 
-        public EnemyInfo(EnemyType enemy) 
+        public EnemyInfo(EnemyType enemy)
         {
             enemyID = enemy.name;
             displayName = enemy.enemyName;

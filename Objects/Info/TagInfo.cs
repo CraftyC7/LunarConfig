@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace LunarConfig.Objects
+namespace LunarConfig.Objects.Info
 {
     internal class TagInfo
     {
@@ -16,7 +16,7 @@ namespace LunarConfig.Objects
         public Dictionary<string, float> daytimeEnemyPoolMultipliers = new Dictionary<string, float>();
         public Dictionary<string, float> dungeonMultipliers = new Dictionary<string, float>();
 
-        public TagInfo(string tagID, float mapObjectPeakMultiplier, /*Dictionary<string, float> mapObjectMultipliers,*/ Dictionary<string, float> itemPoolMultipliers, Dictionary<string, float> interiorEnemyPoolMultipliers, Dictionary<string, float> exteriorEnemyPoolMultipliers, Dictionary<string, float> daytimeEnemyPoolMultipliers, Dictionary<string, float> dungeonMultipliers) 
+        public TagInfo(string tagID, float mapObjectPeakMultiplier, /*Dictionary<string, float> mapObjectMultipliers,*/ Dictionary<string, float> itemPoolMultipliers, Dictionary<string, float> interiorEnemyPoolMultipliers, Dictionary<string, float> exteriorEnemyPoolMultipliers, Dictionary<string, float> daytimeEnemyPoolMultipliers, Dictionary<string, float> dungeonMultipliers)
         {
             this.tagID = tagID;
             this.mapObjectPeakMultiplier = mapObjectPeakMultiplier;

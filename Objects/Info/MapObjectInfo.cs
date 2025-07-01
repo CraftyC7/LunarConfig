@@ -5,12 +5,12 @@ using System.Runtime.Serialization;
 using System.Text;
 using UnityEngine;
 
-namespace LunarConfig.Objects
+namespace LunarConfig.Objects.Info
 {
     internal class MapObjectInfo
     {
-        public string objID {  get; set; }
-        public bool faceAwayWall {  get; set; }
+        public string objID { get; set; }
+        public bool faceAwayWall { get; set; }
         public bool faceWall { get; set; }
         public bool disallowNearEntrance { get; set; }
         public bool requireDistanceBetweenSpawns { get; set; }
@@ -18,7 +18,7 @@ namespace LunarConfig.Objects
         public bool spawnAgainstWall { get; set; }
         public AnimationCurve baseCurve { get; set; }
 
-        public MapObjectInfo(SpawnableMapObject obj) 
+        public MapObjectInfo(SpawnableMapObject obj)
         {
             objID = obj.prefabToSpawn.name;
             faceAwayWall = obj.spawnFacingAwayFromWall;

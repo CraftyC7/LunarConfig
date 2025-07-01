@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace LunarConfig.Objects
+namespace LunarConfig.Objects.Info
 {
     internal class ItemInfo
     {
-        public string itemID {  get; set; }
+        public string itemID { get; set; }
         public string displayName { get; set; }
         public int minValue { get; set; }
         public int maxValue { get; set; }
@@ -14,9 +14,9 @@ namespace LunarConfig.Objects
         public bool conductive { get; set; }
         public bool twoHanded { get; set; }
         public bool isScrap { get; set; }
-        public List<String> tags { get; set; }
+        public List<string> tags { get; set; }
 
-        public ItemInfo(Item item) 
+        public ItemInfo(Item item)
         {
             itemID = item.name;
             displayName = item.itemName;
@@ -26,10 +26,10 @@ namespace LunarConfig.Objects
             conductive = item.isConductiveMetal;
             twoHanded = item.twoHanded;
             isScrap = item.isScrap;
-            tags = new List<String>();
+            tags = new List<string>();
         }
 
-        public ItemInfo(string itemID, string displayName, int minValue, int maxValue, float weight, bool conductive, bool twoHanded, bool isScrap, List<String> tags)
+        public ItemInfo(string itemID, string displayName, int minValue, int maxValue, float weight, bool conductive, bool twoHanded, bool isScrap, List<string> tags)
         {
             this.itemID = itemID;
             this.displayName = displayName;
@@ -50,7 +50,7 @@ namespace LunarConfig.Objects
             }
             return displayName;
         }
-        
+
         public float getAverageValue()
         {
             return (minValue + maxValue) / 2;

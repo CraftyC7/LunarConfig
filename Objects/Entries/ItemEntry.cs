@@ -1,4 +1,4 @@
-﻿using LunarConfig.Objects;
+﻿using LunarConfig.Objects.Info;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using static UnityEngine.InputSystem.InputControlScheme.MatchResult;
 
-namespace LunarConfig.Configuration.Entries
+namespace LunarConfig.Objects.Entries
 {
     internal class ItemEntry
     {

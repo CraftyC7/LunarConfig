@@ -36,22 +36,6 @@
           "build/BepInEx.PluginInfoProps.props": {}
         }
       },
-      "Evaisa.LethalLib/1.1.0": {
-        "type": "package",
-        "dependencies": {
-          "BepInEx.Core": "5.4.21"
-        },
-        "compile": {
-          "lib/netstandard2.1/LethalLib.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/netstandard2.1/LethalLib.dll": {
-            "related": ".xml"
-          }
-        }
-      },
       "HarmonyX/2.7.0": {
         "type": "package",
         "dependencies": {
@@ -789,20 +773,6 @@
         "bepinex.plugininfoprops.2.1.0.nupkg.sha512",
         "bepinex.plugininfoprops.nuspec",
         "build/BepInEx.PluginInfoProps.props"
-      ]
-    },
-    "Evaisa.LethalLib/1.1.0": {
-      "sha512": "hFU/+YjDSYgyzeBclQj10OIyLIji4eaJHzFf231eLwCeDxnNqfVXkq09VXXttuLPRP+Hk+J+oFheaXS0tdCeUQ==",
-      "type": "package",
-      "path": "evaisa.lethallib/1.1.0",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "README.md",
-        "evaisa.lethallib.1.1.0.nupkg.sha512",
-        "evaisa.lethallib.nuspec",
-        "lib/netstandard2.1/LethalLib.dll",
-        "lib/netstandard2.1/LethalLib.xml"
       ]
     },
     "HarmonyX/2.7.0": {
@@ -2926,7 +2896,6 @@
       "BepInEx.Analyzers >= 1.*",
       "BepInEx.Core >= 5.*",
       "BepInEx.PluginInfoProps >= 2.*",
-      "Evaisa.LethalLib >= 1.*",
       "LethalCompany.GameLibs.Steam >= *-*",
       "TeamBMX.LobbyCompatibility >= 1.*",
       "UnityEngine.Modules >= 2022.3.9"
@@ -2998,11 +2967,6 @@
             "suppressParent": "All",
             "target": "Package",
             "version": "[2.*, )"
-          },
-          "Evaisa.LethalLib": {
-            "suppressParent": "All",
-            "target": "Package",
-            "version": "[1.*, )"
           },
           "LethalCompany.GameLibs.Steam": {
             "suppressParent": "All",

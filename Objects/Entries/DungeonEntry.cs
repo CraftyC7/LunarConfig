@@ -1,4 +1,4 @@
-﻿using LunarConfig.Objects;
+﻿using LunarConfig.Objects.Info;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 using static UnityEngine.InputSystem.InputControlScheme.MatchResult;
 using Match = System.Text.RegularExpressions.Match;
 
-namespace LunarConfig.Configuration.Entries
+namespace LunarConfig.Objects.Entries
 {
     internal class DungeonEntry
     {

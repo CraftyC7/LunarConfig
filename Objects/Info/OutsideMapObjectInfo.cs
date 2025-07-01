@@ -6,16 +6,16 @@ using System.Text;
 using System.Transactions;
 using UnityEngine;
 
-namespace LunarConfig.Objects
+namespace LunarConfig.Objects.Info
 {
     internal class OutsideMapObjectInfo
     {
-        public string objID {  get; set; }
+        public string objID { get; set; }
         public int objWidth { get; set; }
-        public bool faceAwayWall {  get; set; }
+        public bool faceAwayWall { get; set; }
         public AnimationCurve baseCurve { get; set; }
 
-        public OutsideMapObjectInfo(SpawnableOutsideObjectWithRarity obj) 
+        public OutsideMapObjectInfo(SpawnableOutsideObjectWithRarity obj)
         {
             SpawnableOutsideObject _obj = obj.spawnableObject;
             objID = _obj.name;

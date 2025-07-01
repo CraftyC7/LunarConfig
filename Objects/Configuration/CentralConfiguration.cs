@@ -6,10 +6,12 @@ using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
-namespace LunarConfig.Configuration
+namespace LunarConfig.Objects.Configuration
 {
     internal class CentralConfiguration
     {
+        public float scrapDecayRate = 1;
+        public List<string> scrapDecayPools = new List<string>();
         public bool clearItems = false;
         public bool clearEnemies = false;
         public bool clearDungeons = false;
@@ -26,6 +28,14 @@ namespace LunarConfig.Configuration
         public string CreateConfiguration(CentralConfiguration config)
         {
             string configString =
+                "[Scrap Decay]\n" +
+                "## Controls the rate at which scrap decays.\n" +
+                "# Setting type: Float\n" +
+                $"Scrap Decay Rate = {config.scrapDecayRate.ToString()}\n" +
+                "## The scrap pools that are decayed by the above value.\n" +
+                "## Separate pools with commas.\n" +
+                "# Setting type: String\n" +
+                $"Scrap Decay Pools = {string.Join(", ", config.scrapDecayPools)}\n" +
                 "[Clear Weight Pools]\n" +
                 "## Clears all scrap on all moons.\n" +
                 "# Setting type: Boolean\n" +
@@ -92,34 +102,41 @@ namespace LunarConfig.Configuration
             bool TryParseBool(string value) =>
                 value.Equals("true", StringComparison.OrdinalIgnoreCase);
 
-            this.clearItems = TryParseBool(GetValue("Clear Scrap?"));
-            this.clearEnemies = TryParseBool(GetValue("Clear Enemies?"));
-            this.clearDungeons = TryParseBool(GetValue("Clear Dungeons?"));
-            this.logPools = TryParseBool(GetValue("Log Pools?"));
-            this.useTrapCurves = TryParseBool(GetValue("Use Trap Curves?"));
+
+            scrapDecayRate = float.Parse(GetValue("Scrap Decay Rate"));
+            string itemDecayLine = GetValue("Scrap Decay Pools");
+            scrapDecayPools = string.IsNullOrWhiteSpace(itemDecayLine)
+                ? new List<string>()
+                : Regex.Split(itemDecayLine, @"[\s,]+").Where(tag => !string.IsNullOrWhiteSpace(tag)).ToList();
+
+            clearItems = TryParseBool(GetValue("Clear Scrap?"));
+            clearEnemies = TryParseBool(GetValue("Clear Enemies?"));
+            clearDungeons = TryParseBool(GetValue("Clear Dungeons?"));
+            logPools = TryParseBool(GetValue("Log Pools?"));
+            useTrapCurves = TryParseBool(GetValue("Use Trap Curves?"));
 
             string tagLine = GetValue("Tags");
-            this.tags = string.IsNullOrWhiteSpace(tagLine)
+            tags = string.IsNullOrWhiteSpace(tagLine)
                 ? new List<string>()
                 : Regex.Split(tagLine, @"[\s,]+").Where(tag => !string.IsNullOrWhiteSpace(tag)).ToList();
 
             string itemLine = GetValue("Item Pools");
-            this.itemPools = string.IsNullOrWhiteSpace(itemLine)
+            itemPools = string.IsNullOrWhiteSpace(itemLine)
                 ? new List<string>()
                 : Regex.Split(itemLine, @"[\s,]+").Where(tag => !string.IsNullOrWhiteSpace(tag)).ToList();
 
             string interiorEnemyLine = GetValue("Interior Enemy Pools");
-            this.interiorEnemyPools = string.IsNullOrWhiteSpace(interiorEnemyLine)
+            interiorEnemyPools = string.IsNullOrWhiteSpace(interiorEnemyLine)
                 ? new List<string>()
                 : Regex.Split(interiorEnemyLine, @"[\s,]+").Where(tag => !string.IsNullOrWhiteSpace(tag)).ToList();
 
             string exteriorEnemyLine = GetValue("Exterior Enemy Pools");
-            this.exteriorEnemyPools = string.IsNullOrWhiteSpace(exteriorEnemyLine)
+            exteriorEnemyPools = string.IsNullOrWhiteSpace(exteriorEnemyLine)
                 ? new List<string>()
                 : Regex.Split(exteriorEnemyLine, @"[\s,]+").Where(tag => !string.IsNullOrWhiteSpace(tag)).ToList();
 
             string daytimeEnemyLine = GetValue("Daytime Enemy Pools");
-            this.daytimeEnemyPools = string.IsNullOrWhiteSpace(daytimeEnemyLine)
+            daytimeEnemyPools = string.IsNullOrWhiteSpace(daytimeEnemyLine)
                 ? new List<string>()
                 : Regex.Split(daytimeEnemyLine, @"[\s,]+").Where(tag => !string.IsNullOrWhiteSpace(tag)).ToList();
         }
