@@ -67,6 +67,11 @@
               "target": "Package",
               "version": "[2.*, )"
             },
+            "IAmBatby.LethalLevelLoader": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[1.4.*, )"
+            },
             "LethalCompany.GameLibs.Steam": {
               "suppressParent": "All",
               "target": "Package",

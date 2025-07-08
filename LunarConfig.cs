@@ -3,6 +3,7 @@ using BepInEx.Logging;
 using HarmonyLib;
 using LobbyCompatibility.Attributes;
 using LobbyCompatibility.Enums;
+using LunarConfig.Objects.Config;
 using LunarConfig.Patches;
 using System.IO;
 
@@ -43,6 +44,8 @@ namespace LunarConfig
         public static LunarConfig Instance { get; private set; } = null!;
         internal new static ManualLogSource Logger { get; private set; } = null!;
         internal static Harmony? Harmony { get; set; }
+
+        public static LunarCentral central { get; set; } = new LunarCentral();
 
         private void Awake()
         {

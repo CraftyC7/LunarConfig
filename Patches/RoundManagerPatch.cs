@@ -10,6 +10,8 @@ using DunGen.Graph;
 using LunarConfig.Objects.Info;
 using LunarConfig.Objects.Entries;
 using LunarConfig.Objects.Configuration;
+using LethalLevelLoader;
+using LunarConfig.Objects.Config;
 
 namespace LunarConfig.Patches
 {
@@ -35,6 +37,102 @@ namespace LunarConfig.Patches
         {
             try
             {
+                LunarCentral lunarCentral = LunarConfig.central;
+
+                lunarCentral.InitConfig();
+
+                LunarConfigFile itemFile = lunarCentral.files[LunarConfig.ITEM_FILE_NAME];
+                LunarConfigFile enemyFile = lunarCentral.files[LunarConfig.ENEMY_FILE_NAME];
+                LunarConfigFile moonFile = lunarCentral.files[LunarConfig.MOON_FILE_NAME];
+
+                foreach (var extendedItem in PatchedContent.ExtendedItems)
+                {
+                    try
+                    {
+                        Item item = extendedItem.Item;
+                        LunarConfigEntry configuredItem = itemFile.entries[lunarCentral.UUIDify($"{item.itemName} ({extendedItem.UniqueIdentificationName})")];
+
+                        configuredItem.SetValue("Display Name", ref item.itemName);
+                        configuredItem.SetValue("Minimum Value", ref item.minValue);
+                        configuredItem.SetValue("Maximum Value", ref item.maxValue);
+                        configuredItem.SetValue("Weight", ref item.weight);
+                        configuredItem.SetValue("Conductivity", ref item.isConductiveMetal);
+                        configuredItem.SetValue("Two-Handed", ref item.twoHanded);
+                        configuredItem.SetValue("Is Scrap?", ref item.isScrap);
+                    }
+                    catch (Exception e)
+                    {
+                        MiniLogger.LogError($"An error occured while setting item values, please report this!\n{e}");
+                    }
+                }
+
+                foreach (var extendedEnemy in PatchedContent.ExtendedEnemyTypes)
+                {
+                    try
+                    {
+                        EnemyType enemy = extendedEnemy.EnemyType;
+                        LunarConfigEntry configuredEnemy = enemyFile.entries[lunarCentral.UUIDify($"{enemy.enemyName} ({extendedEnemy.UniqueIdentificationName})")];
+
+                        configuredEnemy.SetValue("Display Name", ref enemy.enemyName);
+                        configuredEnemy.SetValue("Can See Through Fog?", ref enemy.canSeeThroughFog);
+                        configuredEnemy.SetValue("Door Speed Multiplier", ref enemy.doorSpeedMultiplier);
+                        configuredEnemy.SetValue("Is Daytime Enemy?", ref enemy.isDaytimeEnemy);
+                        configuredEnemy.SetValue("Is Outdoor Enemy?", ref enemy.isOutsideEnemy);
+                        configuredEnemy.SetValue("Loudness Multiplier", ref enemy.loudnessMultiplier);
+                        configuredEnemy.SetValue("Max Count", ref enemy.MaxCount);
+                        configuredEnemy.SetValue("Power Level", ref enemy.PowerLevel);
+                        configuredEnemy.SetCurve("Probability Curve", ref enemy.probabilityCurve);
+                        configuredEnemy.SetValue("Use Falloff?", ref enemy.useNumberSpawnedFalloff);
+                        configuredEnemy.SetCurve("Falloff Curve", ref enemy.numberSpawnedFalloff);
+                        configuredEnemy.SetValue("Enemy HP", ref enemy.enemyPrefab.GetComponent<EnemyAI>().enemyHP);
+                        configuredEnemy.SetValue("Can Die?", ref enemy.canDie);
+                        configuredEnemy.SetValue("Destroy On Death?", ref enemy.destroyOnDeath);
+                        configuredEnemy.SetValue("Can Destroy?", ref enemy.canBeDestroyed);
+                        configuredEnemy.SetValue("Can Stun?", ref enemy.canBeStunned);
+                        configuredEnemy.SetValue("Stun Difficulty", ref enemy.stunGameDifficultyMultiplier);
+                        configuredEnemy.SetValue("Stun Time", ref enemy.stunTimeMultiplier);
+                    }
+                    catch (Exception e)
+                    {
+                        MiniLogger.LogError($"An error occured while setting enemy values, please report this!\n{e}");
+                    }
+                }
+
+                foreach (var extendedMoon in PatchedContent.ExtendedLevels)
+                {
+                    try
+                    {
+                        SelectableLevel moon = extendedMoon.SelectableLevel;
+                        LunarConfigEntry configuredMoon = moonFile.entries[lunarCentral.UUIDify($"{moon.PlanetName} ({extendedMoon.UniqueIdentificationName})")];
+
+                        configuredMoon.SetValue("Display Name", ref moon.PlanetName);
+                        configuredMoon.SetValue("Risk Level", ref moon.riskLevel);
+                        moon.LevelDescription = configuredMoon.GetValue<string>("Description").Replace(";", "\n");
+                        extendedMoon.RoutePrice = configuredMoon.GetValue<int>("Route Price");
+                        extendedMoon.IsRouteHidden = configuredMoon.GetValue<bool>("Is Hidden?");
+                        extendedMoon.IsRouteLocked = configuredMoon.GetValue<bool>("Is Locked?");
+                        configuredMoon.SetValue("Has Time?", ref moon.planetHasTime);
+                        configuredMoon.SetValue("Time Multiplier", ref moon.DaySpeedMultiplier);
+                        configuredMoon.SetValue("Daytime Probability Range", ref moon.daytimeEnemiesProbabilityRange);
+                        configuredMoon.SetCurve("Daytime Curve", ref moon.daytimeEnemySpawnChanceThroughDay);
+                        configuredMoon.SetValue("Max Daytime Power", ref moon.maxDaytimeEnemyPowerCount);
+                        configuredMoon.SetValue("Interior Probability Range", ref moon.spawnProbabilityRange);
+                        configuredMoon.SetCurve("Interior Curve", ref moon.enemySpawnChanceThroughoutDay);
+                        configuredMoon.SetValue("Max Interior Power", ref moon.maxEnemyPowerCount);
+                        configuredMoon.SetCurve("Outside Curve", ref moon.outsideEnemySpawnChanceThroughDay);
+                        configuredMoon.SetValue("Max Outside Power", ref moon.maxOutsideEnemyPowerCount);
+                        configuredMoon.SetValue("Min Scrap", ref moon.minScrap);
+                        configuredMoon.SetValue("Max Scrap", ref moon.maxScrap);
+                        configuredMoon.SetValue("Interior Multiplier", ref moon.factorySizeMultiplier);
+                    }
+                    catch (Exception e)
+                    {
+                        MiniLogger.LogError($"An error occured while setting moon values, please report this!\n{e}");
+                    }
+                }
+
+
+                /*
                 NetworkManager manager = UnityEngine.Object.FindObjectOfType<NetworkManager>();
                 
                 CentralConfiguration central;
@@ -77,8 +175,14 @@ namespace LunarConfig.Patches
                     itemConfig = new ItemConfiguration("");
                 }
 
+                foreach (var item in registeredItems)
+                {
+                    MiniLogger.LogInfo($"Registered : {item}");
+                }
+
                 foreach (var item in Resources.FindObjectsOfTypeAll<Item>())
                 {
+                    MiniLogger.LogInfo($"{item.name} {item.GetHashCode()}");
                     if (item.spawnPrefab == null)
                     {
                         //Item is missing prefab!
@@ -87,7 +191,7 @@ namespace LunarConfig.Patches
                     {
                         //Item not a real item!
                     }
-                    else if (registeredItems.Contains(item.name))
+                    else if (configuredItems.Keys.Contains(item.name))
                     {
                         ItemInfo configuredItem = configuredItems[item.name];
                         item.itemName = configuredItem.displayName;
@@ -217,7 +321,7 @@ namespace LunarConfig.Patches
                 {
                     mapObjectConfig = new MapObjectConfiguration("");
                 }
-
+                */
                 /*
 
                 if (File.Exists(LunarConfig.OUTSIDE_MAP_OBJECT_FILE))
@@ -243,7 +347,7 @@ namespace LunarConfig.Patches
                 }
 
                 */
-
+                /*
                 foreach (var moon in Resources.FindObjectsOfTypeAll<SelectableLevel>())
                 {
                     if (registeredMoons.Contains(moon.name))
@@ -268,6 +372,7 @@ namespace LunarConfig.Patches
                         moon.maxScrap = configuredMoon.maxScrap;
                         moon.factorySizeMultiplier = configuredMoon.interiorSizeMultiplier;
                         */
+                /*
                     }
                     else
                     {
@@ -300,243 +405,245 @@ namespace LunarConfig.Patches
                             mapObjectConfig.AddEntry(new MapObjectEntry(new MapObjectInfo(spawnableObject)));
                         }
                     }
-
-                    /*
-
-                    foreach (SpawnableOutsideObjectWithRarity spawnableObject in moon.spawnableOutsideObjects)
-                    {
-                        GameObject prefab = spawnableObject.spawnableObject.prefabToSpawn;
-                        if (configuredOutsideMapObjects.Keys.Contains(spawnableObject.spawnableObject.name))
-                        {
-                            OutsideMapObjectInfo configuredMapObject = configuredOutsideMapObjects[spawnableObject.spawnableObject.name];
-                            spawnableObject.spawnableObject.objectWidth = configuredMapObject.objWidth;
-                            spawnableObject.spawnableObject.spawnFacingAwayFromWall = configuredMapObject.faceAwayWall;
-                        }
-                        else if (!registeredOutsideMapObjects.Contains(spawnableObject.spawnableObject.name))
-                        {
-                            registeredOutsideMapObjects.Add(spawnableObject.spawnableObject.name);
-                            MiniLogger.LogInfo($"Recorded {spawnableObject.spawnableObject.name}");
-                            outsideMapObjectConfig.AddEntry(new OutsideMapObjectEntry(new OutsideMapObjectInfo(spawnableObject)));
-                        }
-                    }
-
                     */
+                /*
+
+                foreach (SpawnableOutsideObjectWithRarity spawnableObject in moon.spawnableOutsideObjects)
+                {
+                    GameObject prefab = spawnableObject.spawnableObject.prefabToSpawn;
+                    if (configuredOutsideMapObjects.Keys.Contains(spawnableObject.spawnableObject.name))
+                    {
+                        OutsideMapObjectInfo configuredMapObject = configuredOutsideMapObjects[spawnableObject.spawnableObject.name];
+                        spawnableObject.spawnableObject.objectWidth = configuredMapObject.objWidth;
+                        spawnableObject.spawnableObject.spawnFacingAwayFromWall = configuredMapObject.faceAwayWall;
+                    }
+                    else if (!registeredOutsideMapObjects.Contains(spawnableObject.spawnableObject.name))
+                    {
+                        registeredOutsideMapObjects.Add(spawnableObject.spawnableObject.name);
+                        MiniLogger.LogInfo($"Recorded {spawnableObject.spawnableObject.name}");
+                        outsideMapObjectConfig.AddEntry(new OutsideMapObjectEntry(new OutsideMapObjectInfo(spawnableObject)));
+                    }
                 }
 
-                
+                */
+                /*
+            }
 
-                HashSet<string> registeredDungeons = new HashSet<string>();
-                DungeonConfiguration dungeonConfig;
-                Dictionary<string, DungeonInfo> configuredDungeons = new Dictionary<string, DungeonInfo>();
 
-                if (File.Exists(LunarConfig.DUNGEON_FILE))
+
+            HashSet<string> registeredDungeons = new HashSet<string>();
+            DungeonConfiguration dungeonConfig;
+            Dictionary<string, DungeonInfo> configuredDungeons = new Dictionary<string, DungeonInfo>();
+
+            if (File.Exists(LunarConfig.DUNGEON_FILE))
+            {
+                dungeonConfig = new DungeonConfiguration(File.ReadAllText(LunarConfig.DUNGEON_FILE));
+                string newDungeonConfigString = "";
+                foreach (DungeonEntry entry in parseDungeonConfiguration.parseConfiguration(dungeonConfig.dungeonConfig))
                 {
-                    dungeonConfig = new DungeonConfiguration(File.ReadAllText(LunarConfig.DUNGEON_FILE));
-                    string newDungeonConfigString = "";
-                    foreach (DungeonEntry entry in parseDungeonConfiguration.parseConfiguration(dungeonConfig.dungeonConfig))
+                    try
                     {
-                        try
-                        {
-                            DungeonInfo dungeon = parseDungeonEntry.parseEntry(entry.configString);
-                            List<string> mapObjects = dungeon.mapObjectMultipliers.Keys.ToList();
+                        DungeonInfo dungeon = parseDungeonEntry.parseEntry(entry.configString);
+                        List<string> mapObjects = dungeon.mapObjectMultipliers.Keys.ToList();
 
-                            foreach (var obj in registeredMapObjects)
+                        foreach (var obj in registeredMapObjects)
+                        {
+                            if (mapObjects.Contains(obj))
                             {
-                                if (mapObjects.Contains(obj))
-                                {
-                                    continue;
-                                }
-                                else
-                                {
-                                    dungeon.mapObjectMultipliers.Add(obj, 1);
-                                }
+                                continue;
                             }
+                            else
+                            {
+                                dungeon.mapObjectMultipliers.Add(obj, 1);
+                            }
+                        }
 
-                            newDungeonConfigString += new DungeonEntry(dungeon).configString;
-                            registeredDungeons.Add(dungeon.dungeonID);
-                            configuredDungeons.Add(dungeon.dungeonID, dungeon);
-                        }
-                        catch (Exception e)
-                        {
-                            MiniLogger.LogError($"Dungeon Configuration File contains invalid entry, skipping entry!\n{e}");
-                        }
+                        newDungeonConfigString += new DungeonEntry(dungeon).configString;
+                        registeredDungeons.Add(dungeon.dungeonID);
+                        configuredDungeons.Add(dungeon.dungeonID, dungeon);
                     }
-
-                    if (newDungeonConfigString != dungeonConfig.dungeonConfig)
+                    catch (Exception e)
                     {
-                        dungeonConfig.dungeonConfig = newDungeonConfigString;
-                        MiniLogger.LogInfo("Dungeon Configuration Updated!");
+                        MiniLogger.LogError($"Dungeon Configuration File contains invalid entry, skipping entry!\n{e}");
                     }
+                }
+
+                if (newDungeonConfigString != dungeonConfig.dungeonConfig)
+                {
+                    dungeonConfig.dungeonConfig = newDungeonConfigString;
+                    MiniLogger.LogInfo("Dungeon Configuration Updated!");
+                }
+            }
+            else
+            {
+                dungeonConfig = new DungeonConfiguration("");
+            }
+
+            foreach (var dungeon in Resources.FindObjectsOfTypeAll<DungeonFlow>())
+            {
+                if (registeredDungeons.Contains(dungeon.name))
+                {
+                    // Dungeon already recorded
                 }
                 else
                 {
-                    dungeonConfig = new DungeonConfiguration("");
+                    dungeonConfig.AddEntry(new DungeonEntry(new DungeonInfo(dungeon, registeredMapObjects)));
+                    MiniLogger.LogInfo($"Recorded {dungeon.name}");
+                    registeredDungeons.Add(dungeon.name);
                 }
+            }
 
-                foreach (var dungeon in Resources.FindObjectsOfTypeAll<DungeonFlow>())
+            HashSet<string> registeredTags = new HashSet<string>();
+            TagConfiguration tagConfig;
+            List<TagInfo> configuredTags = new List<TagInfo>();
+
+            if (File.Exists(LunarConfig.TAG_FILE))
+            {
+                tagConfig = new TagConfiguration(File.ReadAllText(LunarConfig.TAG_FILE));
+                string newTagConfigString = "";
+                foreach (TagEntry entry in parseTagConfiguration.parseConfiguration(tagConfig.tagConfig))
                 {
-                    if (registeredDungeons.Contains(dungeon.name))
+                    try
                     {
-                        // Dungeon already recorded
+                        TagInfo tag = parseTagEntry.parseEntry(entry.configString);
+                        //List<string> mapObjects = tag.mapObjectMultipliers.Keys.ToList();
+                        List<string> itemPools = tag.itemPoolMultipliers.Keys.ToList();
+                        List<string> interiorEnemyPools = tag.interiorEnemyPoolMultipliers.Keys.ToList();
+                        List<string> exteriorEnemyPools = tag.exteriorEnemyPoolMultipliers.Keys.ToList();
+                        List<string> daytimeEnemyPools = tag.daytimeEnemyPoolMultipliers.Keys.ToList();
+                        List<string> dungeons = tag.dungeonMultipliers.Keys.ToList();
+                        */
+                /*
+                foreach (var obj in registeredMapObjects)
+                {
+                    if (mapObjects.Contains(obj))
+                    {
+                        continue;
                     }
                     else
                     {
-                        dungeonConfig.AddEntry(new DungeonEntry(new DungeonInfo(dungeon, registeredMapObjects)));
-                        MiniLogger.LogInfo($"Recorded {dungeon.name}");
-                        registeredDungeons.Add(dungeon.name);
+                        tag.mapObjectMultipliers.Add(obj, 1);
                     }
                 }
-
-                HashSet<string> registeredTags = new HashSet<string>();
-                TagConfiguration tagConfig;
-                List<TagInfo> configuredTags = new List<TagInfo>();
-
-                if (File.Exists(LunarConfig.TAG_FILE))
+                */
+                /*
+                foreach (var obj in central.itemPools)
                 {
-                    tagConfig = new TagConfiguration(File.ReadAllText(LunarConfig.TAG_FILE));
-                    string newTagConfigString = "";
-                    foreach (TagEntry entry in parseTagConfiguration.parseConfiguration(tagConfig.tagConfig))
+                    if (itemPools.Contains(obj))
                     {
-                        try
-                        {
-                            TagInfo tag = parseTagEntry.parseEntry(entry.configString);
-                            //List<string> mapObjects = tag.mapObjectMultipliers.Keys.ToList();
-                            List<string> itemPools = tag.itemPoolMultipliers.Keys.ToList();
-                            List<string> interiorEnemyPools = tag.interiorEnemyPoolMultipliers.Keys.ToList();
-                            List<string> exteriorEnemyPools = tag.exteriorEnemyPoolMultipliers.Keys.ToList();
-                            List<string> daytimeEnemyPools = tag.daytimeEnemyPoolMultipliers.Keys.ToList();
-                            List<string> dungeons = tag.dungeonMultipliers.Keys.ToList();
-
-                            /*
-                            foreach (var obj in registeredMapObjects)
-                            {
-                                if (mapObjects.Contains(obj))
-                                {
-                                    continue;
-                                }
-                                else
-                                {
-                                    tag.mapObjectMultipliers.Add(obj, 1);
-                                }
-                            }
-                            */
-
-                            foreach (var obj in central.itemPools)
-                            {
-                                if (itemPools.Contains(obj))
-                                {
-                                    continue;
-                                }
-                                else
-                                {
-                                    tag.itemPoolMultipliers.Add(obj, 1);
-                                }
-                            }
-
-                            foreach (var obj in central.interiorEnemyPools)
-                            {
-                                if (interiorEnemyPools.Contains(obj))
-                                {
-                                    continue;
-                                }
-                                else
-                                {
-                                    tag.interiorEnemyPoolMultipliers.Add(obj, 1);
-                                }
-                            }
-
-                            foreach (var obj in central.exteriorEnemyPools)
-                            {
-                                if (exteriorEnemyPools.Contains(obj))
-                                {
-                                    continue;
-                                }
-                                else
-                                {
-                                    tag.exteriorEnemyPoolMultipliers.Add(obj, 1);
-                                }
-                            }
-
-                            foreach (var obj in central.daytimeEnemyPools)
-                            {
-                                if (daytimeEnemyPools.Contains(obj))
-                                {
-                                    continue;
-                                }
-                                else
-                                {
-                                    tag.daytimeEnemyPoolMultipliers.Add(obj, 1);
-                                }
-                            }
-
-                            foreach (var obj in registeredDungeons)
-                            {
-                                if (dungeons.Contains(obj))
-                                {
-                                    continue;
-                                }
-                                else
-                                {
-                                    tag.dungeonMultipliers.Add(obj, 1f);
-                                }
-                            }
-
-                            newTagConfigString += new TagEntry(tag).configString;
-                            registeredTags.Add(tag.tagID);
-                            configuredTags.Add(tag);
-                        }
-                        catch (Exception e)
-                        {
-                            MiniLogger.LogError($"Tag Configuration File contains invalid entry, skipping entry!\n{e}");
-                        }
-                    }
-
-                    if (newTagConfigString != tagConfig.tagConfig) 
-                    {
-                        tagConfig.tagConfig = newTagConfigString;
-                        MiniLogger.LogInfo("Tag Configuration Updated!");
-                    }
-                }
-                else
-                {
-                    tagConfig = new TagConfiguration("");
-                }
-
-                foreach (var tag in central.tags)
-                {
-                    if (registeredTags.Contains(tag))
-                    {
-                        // Tag already recorded
+                        continue;
                     }
                     else
                     {
-                        TagEntry tagEntry = new TagEntry(new TagInfo(
-                            tag, 
-                            1, 
-                            //registeredMapObjects.ToDictionary(k => k, v => 1f),
-                            central.itemPools.ToDictionary(k => k, v => 1f),
-                            central.interiorEnemyPools.ToDictionary(k => k, v => 1f),
-                            central.exteriorEnemyPools.ToDictionary(k => k, v => 1f),
-                            central.daytimeEnemyPools.ToDictionary(k => k, v => 1f),
-                            registeredDungeons.ToDictionary(k => k, v => 1f)
-                            ));
-                        tagConfig.AddEntry(tagEntry);
-                        MiniLogger.LogInfo($"Recorded {tag}");
-                        registeredTags.Add(tag);
+                        tag.itemPoolMultipliers.Add(obj, 1);
                     }
                 }
 
-                Directory.CreateDirectory(Path.GetDirectoryName(LunarConfig.ITEM_FILE)!);
-                File.WriteAllText(LunarConfig.ITEM_FILE, itemConfig.itemConfig);
-                File.WriteAllText(LunarConfig.ENEMY_FILE, enemyConfig.enemyConfig);
-                File.WriteAllText(LunarConfig.MOON_FILE, moonConfig.moonConfig);
-                File.WriteAllText(LunarConfig.MAP_OBJECT_FILE, mapObjectConfig.mapObjectConfig);
-                //File.WriteAllText(LunarConfig.OUTSIDE_MAP_OBJECT_FILE, outsideMapObjectConfig.outsideMapObjectConfig);
-                File.WriteAllText(LunarConfig.DUNGEON_FILE, dungeonConfig.dungeonConfig);
-                File.WriteAllText(LunarConfig.TAG_FILE, tagConfig.tagConfig);
-                File.WriteAllText(LunarConfig.CENTRAL_FILE, central.CreateConfiguration(central));
+                foreach (var obj in central.interiorEnemyPools)
+                {
+                    if (interiorEnemyPools.Contains(obj))
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        tag.interiorEnemyPoolMultipliers.Add(obj, 1);
+                    }
+                }
 
-                MiniLogger.LogInfo("Logging complete!");
+                foreach (var obj in central.exteriorEnemyPools)
+                {
+                    if (exteriorEnemyPools.Contains(obj))
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        tag.exteriorEnemyPoolMultipliers.Add(obj, 1);
+                    }
+                }
+
+                foreach (var obj in central.daytimeEnemyPools)
+                {
+                    if (daytimeEnemyPools.Contains(obj))
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        tag.daytimeEnemyPoolMultipliers.Add(obj, 1);
+                    }
+                }
+
+                foreach (var obj in registeredDungeons)
+                {
+                    if (dungeons.Contains(obj))
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        tag.dungeonMultipliers.Add(obj, 1f);
+                    }
+                }
+
+                newTagConfigString += new TagEntry(tag).configString;
+                registeredTags.Add(tag.tagID);
+                configuredTags.Add(tag);
+            }
+            catch (Exception e)
+            {
+                MiniLogger.LogError($"Tag Configuration File contains invalid entry, skipping entry!\n{e}");
+            }
+        }
+
+        if (newTagConfigString != tagConfig.tagConfig) 
+        {
+            tagConfig.tagConfig = newTagConfigString;
+            MiniLogger.LogInfo("Tag Configuration Updated!");
+        }
+    }
+    else
+    {
+        tagConfig = new TagConfiguration("");
+    }
+
+    foreach (var tag in central.tags)
+    {
+        if (registeredTags.Contains(tag))
+        {
+            // Tag already recorded
+        }
+        else
+        {
+            TagEntry tagEntry = new TagEntry(new TagInfo(
+                tag, 
+                1, 
+                //registeredMapObjects.ToDictionary(k => k, v => 1f),
+                central.itemPools.ToDictionary(k => k, v => 1f),
+                central.interiorEnemyPools.ToDictionary(k => k, v => 1f),
+                central.exteriorEnemyPools.ToDictionary(k => k, v => 1f),
+                central.daytimeEnemyPools.ToDictionary(k => k, v => 1f),
+                registeredDungeons.ToDictionary(k => k, v => 1f)
+                ));
+            tagConfig.AddEntry(tagEntry);
+            MiniLogger.LogInfo($"Recorded {tag}");
+            registeredTags.Add(tag);
+        }
+    }
+
+    Directory.CreateDirectory(Path.GetDirectoryName(LunarConfig.ITEM_FILE)!);
+    File.WriteAllText(LunarConfig.ITEM_FILE, itemConfig.itemConfig);
+    File.WriteAllText(LunarConfig.ENEMY_FILE, enemyConfig.enemyConfig);
+    File.WriteAllText(LunarConfig.MOON_FILE, moonConfig.moonConfig);
+    File.WriteAllText(LunarConfig.MAP_OBJECT_FILE, mapObjectConfig.mapObjectConfig);
+    //File.WriteAllText(LunarConfig.OUTSIDE_MAP_OBJECT_FILE, outsideMapObjectConfig.outsideMapObjectConfig);
+    File.WriteAllText(LunarConfig.DUNGEON_FILE, dungeonConfig.dungeonConfig);
+    File.WriteAllText(LunarConfig.TAG_FILE, tagConfig.tagConfig);
+    File.WriteAllText(LunarConfig.CENTRAL_FILE, central.CreateConfiguration(central));
+
+    MiniLogger.LogInfo("Logging complete!");
+    */
             }
             catch (Exception e) 
             {

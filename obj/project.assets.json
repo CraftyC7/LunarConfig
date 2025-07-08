@@ -36,6 +36,18 @@
           "build/BepInEx.PluginInfoProps.props": {}
         }
       },
+      "Evaisa.LethalLib/0.16.0": {
+        "type": "package",
+        "dependencies": {
+          "BepInEx.Core": "5.4.21"
+        },
+        "compile": {
+          "lib/netstandard2.1/LethalLib.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.1/LethalLib.dll": {}
+        }
+      },
       "HarmonyX/2.7.0": {
         "type": "package",
         "dependencies": {
@@ -51,6 +63,21 @@
           "lib/netstandard2.0/0Harmony.dll": {
             "related": ".xml"
           }
+        }
+      },
+      "IAmBatby.LethalLevelLoader/1.4.0": {
+        "type": "package",
+        "dependencies": {
+          "BepInEx.Core": "5.4.21",
+          "Evaisa.LethalLib": "0.16.0",
+          "LethalCompany.GameLibs.Steam": "67.0.0-ngd.0",
+          "MaxWasUnavailable.LethalModDataLib": "1.2.2"
+        },
+        "compile": {
+          "lib/netstandard2.1/LethalLevelLoader.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.1/LethalLevelLoader.dll": {}
         }
       },
       "LethalCompany.GameLibs.Steam/70.0.0-ngd.0": {
@@ -124,6 +151,24 @@
           "ref/netstandard2.1/UnityEngine.NVIDIAModule.dll": {},
           "ref/netstandard2.1/UnityEngine.UI.dll": {},
           "ref/netstandard2.1/com.olegknyazev.softmask.dll": {}
+        }
+      },
+      "MaxWasUnavailable.LethalModDataLib/1.2.2": {
+        "type": "package",
+        "dependencies": {
+          "BepInEx.Core": "5.4.21",
+          "BepInEx.PluginInfoProps": "1.1.0",
+          "UnityEngine.Modules": "2022.3.9"
+        },
+        "compile": {
+          "lib/netstandard2.1/MaxWasUnavailable.LethalModDataLib.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.1/MaxWasUnavailable.LethalModDataLib.dll": {
+            "related": ".xml"
+          }
         }
       },
       "Microsoft.NETCore.Platforms/1.1.0": {
@@ -775,6 +820,19 @@
         "build/BepInEx.PluginInfoProps.props"
       ]
     },
+    "Evaisa.LethalLib/0.16.0": {
+      "sha512": "4kxRiEA08YWcRMOaxFFiUxgfjFbGua9n2plM27Hse6YQ2zuXPMm3BagOX4vYM/XTH0P50giITeXqKRS0BUYQJQ==",
+      "type": "package",
+      "path": "evaisa.lethallib/0.16.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "evaisa.lethallib.0.16.0.nupkg.sha512",
+        "evaisa.lethallib.nuspec",
+        "lib/netstandard2.1/LethalLib.dll"
+      ]
+    },
     "HarmonyX/2.7.0": {
       "sha512": "lec/SkduQspMa3Pi/nM/NSvA84Za8HCCWA8ybdToKiTqnBZa+JC5g6rxoFQCg/1vNuYcvjy77edePZzIEsRmvw==",
       "type": "package",
@@ -792,6 +850,20 @@
         "lib/netstandard2.0/0Harmony.dll",
         "lib/netstandard2.0/0Harmony.xml",
         "logo_mini.png"
+      ]
+    },
+    "IAmBatby.LethalLevelLoader/1.4.0": {
+      "sha512": "Ok9ANF0gu3NcK74PnxQimmscjB5Yy+E18ryuMm9irBPPNCAMnd4dSOw2HH3b7uEXzbhKhW+uhHRWdM2UfTuf0Q==",
+      "type": "package",
+      "path": "iambatby.lethallevelloader/1.4.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "iambatby.lethallevelloader.1.4.0.nupkg.sha512",
+        "iambatby.lethallevelloader.nuspec",
+        "icon.png",
+        "lib/netstandard2.1/LethalLevelLoader.dll"
       ]
     },
     "LethalCompany.GameLibs.Steam/70.0.0-ngd.0": {
@@ -867,6 +939,23 @@
         "ref/netstandard2.1/UnityEngine.NVIDIAModule.dll",
         "ref/netstandard2.1/UnityEngine.UI.dll",
         "ref/netstandard2.1/com.olegknyazev.softmask.dll"
+      ]
+    },
+    "MaxWasUnavailable.LethalModDataLib/1.2.2": {
+      "sha512": "sIvyoqkr6YH9UMxhPjw7i7W9JyRFNFwt9Dx+eDGT+JbuHx1PzAQvWiIb7GNpzE6eeHy1UDjjPE0N859YMXcN3A==",
+      "type": "package",
+      "path": "maxwasunavailable.lethalmoddatalib/1.2.2",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "CHANGELOG.md",
+        "README.md",
+        "lib/net472/MaxWasUnavailable.LethalModDataLib.dll",
+        "lib/net472/MaxWasUnavailable.LethalModDataLib.xml",
+        "lib/netstandard2.1/MaxWasUnavailable.LethalModDataLib.dll",
+        "lib/netstandard2.1/MaxWasUnavailable.LethalModDataLib.xml",
+        "maxwasunavailable.lethalmoddatalib.1.2.2.nupkg.sha512",
+        "maxwasunavailable.lethalmoddatalib.nuspec"
       ]
     },
     "Microsoft.NETCore.Platforms/1.1.0": {
@@ -2896,6 +2985,7 @@
       "BepInEx.Analyzers >= 1.*",
       "BepInEx.Core >= 5.*",
       "BepInEx.PluginInfoProps >= 2.*",
+      "IAmBatby.LethalLevelLoader >= 1.4.*",
       "LethalCompany.GameLibs.Steam >= *-*",
       "TeamBMX.LobbyCompatibility >= 1.*",
       "UnityEngine.Modules >= 2022.3.9"
@@ -2967,6 +3057,11 @@
             "suppressParent": "All",
             "target": "Package",
             "version": "[2.*, )"
+          },
+          "IAmBatby.LethalLevelLoader": {
+            "suppressParent": "All",
+            "target": "Package",
+            "version": "[1.4.*, )"
           },
           "LethalCompany.GameLibs.Steam": {
             "suppressParent": "All",
