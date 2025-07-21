@@ -36,16 +36,20 @@
           "build/BepInEx.PluginInfoProps.props": {}
         }
       },
-      "Evaisa.LethalLib/0.16.0": {
+      "Evaisa.LethalLib/1.1.1": {
         "type": "package",
         "dependencies": {
           "BepInEx.Core": "5.4.21"
         },
         "compile": {
-          "lib/netstandard2.1/LethalLib.dll": {}
+          "lib/netstandard2.1/LethalLib.dll": {
+            "related": ".xml"
+          }
         },
         "runtime": {
-          "lib/netstandard2.1/LethalLib.dll": {}
+          "lib/netstandard2.1/LethalLib.dll": {
+            "related": ".xml"
+          }
         }
       },
       "HarmonyX/2.7.0": {
@@ -761,6 +765,18 @@
         "runtime": {
           "lib/netstandard2.0/_._": {}
         }
+      },
+      "XuXiaolan.CodeRebirthLib/0.7.2": {
+        "type": "package",
+        "dependencies": {
+          "Evaisa.LethalLib": "1.1.1"
+        },
+        "compile": {
+          "lib/netstandard2.1/com.github.xuuxiaolan.coderebirthlib.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.1/com.github.xuuxiaolan.coderebirthlib.dll": {}
+        }
       }
     }
   },
@@ -820,17 +836,18 @@
         "build/BepInEx.PluginInfoProps.props"
       ]
     },
-    "Evaisa.LethalLib/0.16.0": {
-      "sha512": "4kxRiEA08YWcRMOaxFFiUxgfjFbGua9n2plM27Hse6YQ2zuXPMm3BagOX4vYM/XTH0P50giITeXqKRS0BUYQJQ==",
+    "Evaisa.LethalLib/1.1.1": {
+      "sha512": "ZHy0gSo79ImSE0SXOTG6Qy0YrSzzBHk93VajkQmH4cgM5um0LL0CAnVa4pAV4bK9bXTCgjJrsAg4hCLWfiYe4Q==",
       "type": "package",
-      "path": "evaisa.lethallib/0.16.0",
+      "path": "evaisa.lethallib/1.1.1",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "README.md",
-        "evaisa.lethallib.0.16.0.nupkg.sha512",
+        "evaisa.lethallib.1.1.1.nupkg.sha512",
         "evaisa.lethallib.nuspec",
-        "lib/netstandard2.1/LethalLib.dll"
+        "lib/netstandard2.1/LethalLib.dll",
+        "lib/netstandard2.1/LethalLib.xml"
       ]
     },
     "HarmonyX/2.7.0": {
@@ -2978,6 +2995,18 @@
         "unityengine.modules.2022.3.9.nupkg.sha512",
         "unityengine.modules.nuspec"
       ]
+    },
+    "XuXiaolan.CodeRebirthLib/0.7.2": {
+      "sha512": "13Iuiu1/QbXauYMFrDuWRHD4JgL9TznBjSdRzQYkomMGlibEGewJ7Z5HoQV4tTBLfyFtYRCWBpt2UOfqfYSchg==",
+      "type": "package",
+      "path": "xuxiaolan.coderebirthlib/0.7.2",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/netstandard2.1/com.github.xuuxiaolan.coderebirthlib.dll",
+        "xuxiaolan.coderebirthlib.0.7.2.nupkg.sha512",
+        "xuxiaolan.coderebirthlib.nuspec"
+      ]
     }
   },
   "projectFileDependencyGroups": {
@@ -2985,10 +3014,12 @@
       "BepInEx.Analyzers >= 1.*",
       "BepInEx.Core >= 5.*",
       "BepInEx.PluginInfoProps >= 2.*",
+      "Evaisa.LethalLib >= 1.1.*",
       "IAmBatby.LethalLevelLoader >= 1.4.*",
       "LethalCompany.GameLibs.Steam >= *-*",
       "TeamBMX.LobbyCompatibility >= 1.*",
-      "UnityEngine.Modules >= 2022.3.9"
+      "UnityEngine.Modules >= 2022.3.9",
+      "XuXiaolan.CodeRebirthLib >= 0.7.*"
     ]
   },
   "packageFolders": {
@@ -3058,6 +3089,11 @@
             "target": "Package",
             "version": "[2.*, )"
           },
+          "Evaisa.LethalLib": {
+            "suppressParent": "All",
+            "target": "Package",
+            "version": "[1.1.*, )"
+          },
           "IAmBatby.LethalLevelLoader": {
             "suppressParent": "All",
             "target": "Package",
@@ -3078,6 +3114,11 @@
             "suppressParent": "All",
             "target": "Package",
             "version": "[2022.3.9, )"
+          },
+          "XuXiaolan.CodeRebirthLib": {
+            "suppressParent": "All",
+            "target": "Package",
+            "version": "[0.7.*, )"
           }
         },
         "imports": [

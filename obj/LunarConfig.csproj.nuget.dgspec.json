@@ -67,6 +67,11 @@
               "target": "Package",
               "version": "[2.*, )"
             },
+            "Evaisa.LethalLib": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[1.1.*, )"
+            },
             "IAmBatby.LethalLevelLoader": {
               "suppressParent": "All",
               "target": "Package",
@@ -87,6 +92,11 @@
               "suppressParent": "All",
               "target": "Package",
               "version": "[2022.3.9, )"
+            },
+            "XuXiaolan.CodeRebirthLib": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[0.7.*, )"
             }
           },
           "imports": [

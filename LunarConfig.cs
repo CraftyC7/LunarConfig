@@ -26,17 +26,23 @@ namespace LunarConfig
         internal static readonly string MOON_FILE_NAME = "LunarConfigMoons.cfg";
         internal static readonly string MOON_FILE = Path.Combine(EXPORT_DIRECTORY, MOON_FILE_NAME);
 
+        internal static readonly string VEHICLE_FILE_NAME = "LunarConfigVehicles.cfg";
+        internal static readonly string VEHICLE_FILE = Path.Combine(EXPORT_DIRECTORY, VEHICLE_FILE_NAME);
+
         internal static readonly string MAP_OBJECT_FILE_NAME = "LunarConfigMapObjects.cfg";
         internal static readonly string MAP_OBJECT_FILE = Path.Combine(EXPORT_DIRECTORY, MAP_OBJECT_FILE_NAME);
 
-        //internal static readonly string OUTSIDE_MAP_OBJECT_FILE_NAME = "OutsideMapObjects.cfg";
-        //internal static readonly string OUTSIDE_MAP_OBJECT_FILE = Path.Combine(EXPORT_DIRECTORY, OUTSIDE_MAP_OBJECT_FILE_NAME);
+        internal static readonly string OUTSIDE_MAP_OBJECT_FILE_NAME = "LunarConfigOutsideMapObjects.cfg";
+        internal static readonly string OUTSIDE_MAP_OBJECT_FILE = Path.Combine(EXPORT_DIRECTORY, OUTSIDE_MAP_OBJECT_FILE_NAME);
 
         internal static readonly string DUNGEON_FILE_NAME = "LunarConfigDungeons.cfg";
         internal static readonly string DUNGEON_FILE = Path.Combine(EXPORT_DIRECTORY, DUNGEON_FILE_NAME);
 
         internal static readonly string TAG_FILE_NAME = "LunarConfigTags.cfg";
         internal static readonly string TAG_FILE = Path.Combine(EXPORT_DIRECTORY, TAG_FILE_NAME);
+
+        internal static readonly string WEATHER_FILE_NAME = "LunarConfigWeathers.cfg";
+        internal static readonly string WEATHER_FILE = Path.Combine(EXPORT_DIRECTORY, WEATHER_FILE_NAME);
 
         internal static readonly string CENTRAL_FILE_NAME = "LunarConfigCentral.cfg";
         internal static readonly string CENTRAL_FILE = Path.Combine(Paths.ConfigPath, CENTRAL_FILE_NAME);

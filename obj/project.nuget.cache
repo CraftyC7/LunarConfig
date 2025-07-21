@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "V80LLVJ6Soc=",
+  "dgSpecHash": "+/N/+lR2SD0=",
   "success": true,
   "projectFilePath": "C:\\Users\\pataa\\Desktop\\LCDev\\LunarConfig\\LunarConfig.csproj",
   "expectedPackageFiles": [
@@ -8,7 +8,7 @@
     "C:\\Users\\pataa\\.nuget\\packages\\bepinex.baselib\\5.4.20\\bepinex.baselib.5.4.20.nupkg.sha512",
     "C:\\Users\\pataa\\.nuget\\packages\\bepinex.core\\5.4.21\\bepinex.core.5.4.21.nupkg.sha512",
     "C:\\Users\\pataa\\.nuget\\packages\\bepinex.plugininfoprops\\2.1.0\\bepinex.plugininfoprops.2.1.0.nupkg.sha512",
-    "C:\\Users\\pataa\\.nuget\\packages\\evaisa.lethallib\\0.16.0\\evaisa.lethallib.0.16.0.nupkg.sha512",
+    "C:\\Users\\pataa\\.nuget\\packages\\evaisa.lethallib\\1.1.1\\evaisa.lethallib.1.1.1.nupkg.sha512",
     "C:\\Users\\pataa\\.nuget\\packages\\harmonyx\\2.7.0\\harmonyx.2.7.0.nupkg.sha512",
     "C:\\Users\\pataa\\.nuget\\packages\\iambatby.lethallevelloader\\1.4.0\\iambatby.lethallevelloader.1.4.0.nupkg.sha512",
     "C:\\Users\\pataa\\.nuget\\packages\\lethalcompany.gamelibs.steam\\70.0.0-ngd.0\\lethalcompany.gamelibs.steam.70.0.0-ngd.0.nupkg.sha512",
@@ -47,7 +47,8 @@
     "C:\\Users\\pataa\\.nuget\\packages\\system.threading\\4.3.0\\system.threading.4.3.0.nupkg.sha512",
     "C:\\Users\\pataa\\.nuget\\packages\\system.threading.tasks\\4.3.0\\system.threading.tasks.4.3.0.nupkg.sha512",
     "C:\\Users\\pataa\\.nuget\\packages\\teambmx.lobbycompatibility\\1.5.1\\teambmx.lobbycompatibility.1.5.1.nupkg.sha512",
-    "C:\\Users\\pataa\\.nuget\\packages\\unityengine.modules\\2022.3.9\\unityengine.modules.2022.3.9.nupkg.sha512"
+    "C:\\Users\\pataa\\.nuget\\packages\\unityengine.modules\\2022.3.9\\unityengine.modules.2022.3.9.nupkg.sha512",
+    "C:\\Users\\pataa\\.nuget\\packages\\xuxiaolan.coderebirthlib\\0.7.2\\xuxiaolan.coderebirthlib.0.7.2.nupkg.sha512"
   ],
   "logs": []
 }
