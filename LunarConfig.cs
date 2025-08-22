@@ -14,7 +14,6 @@ namespace LunarConfig
     [LobbyCompatibility(CompatibilityLevel.Everyone, VersionStrictness.None)]
     public class LunarConfig : BaseUnityPlugin
     {
-        // Based off of LethalQuantities see NOTICE
         internal static readonly string EXPORT_DIRECTORY = Path.Combine(Paths.ConfigPath, MyPluginInfo.PLUGIN_NAME);
 
         internal static readonly string ITEM_FILE_NAME = "LunarConfigItems.cfg";
@@ -70,6 +69,7 @@ namespace LunarConfig
             Logger.LogDebug("Patching...");
 
             Harmony.PatchAll(typeof(RoundManagerPatch));
+            Harmony.PatchAll(typeof(StartOfRoundPatch));
 
             Logger.LogDebug("Finished patching!");
         }

@@ -97,6 +97,11 @@
               "suppressParent": "All",
               "target": "Package",
               "version": "[0.7.*, )"
+            },
+            "mrov.WeatherRegistry": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[0.7.*, )"
             }
           },
           "imports": [

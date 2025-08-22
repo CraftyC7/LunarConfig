@@ -24,6 +24,8 @@ namespace LunarConfig.Patches
         public static string lastLevel = "";
         public static bool shouldIncrement = false;
 
+        public static Dictionary<string, List<string>> registeredOverrides = new Dictionary<string, List<string>>();
+
         public static Dictionary<string, SpawnableMapObject> configuredMapObjects = new Dictionary<string, SpawnableMapObject>();
         public static Dictionary<string, CRMapObjectDefinition> configuredCROutsideObjects = new Dictionary<string, CRMapObjectDefinition>();
         public static Dictionary<string, SpawnableOutsideObjectWithRarity> configuredOutsideObjects = new Dictionary<string, SpawnableOutsideObjectWithRarity>();
@@ -39,11 +41,45 @@ namespace LunarConfig.Patches
 
                 lunarCentral.InitConfig();
 
-                LunarConfigEntry centralConfig = lunarCentral.files[LunarConfig.CENTRAL_FILE_NAME].entries["Configuration"];
+                registeredOverrides["Item"] = new List<string>();
+                registeredOverrides["Enemy"] = new List<string>();
+                registeredOverrides["Moon"] = new List<string>();
+
+                LunarConfigFile centralFile = lunarCentral.files[LunarConfig.CENTRAL_FILE_NAME];
+                LunarConfigEntry centralConfig = centralFile.entries["Configuration"];
+                LunarConfigEntry overrideItems = centralFile.entries["Item Overrides"];
+                LunarConfigEntry overrideEnemies = centralFile.entries["Enemy Overrides"];
+                LunarConfigEntry overrideMoons = centralFile.entries["Moon Overrides"];
+                
+                foreach (var val in overrideItems.fields.Keys)
+                {
+                    if (overrideItems.GetValue<bool>(val))
+                    {
+                        registeredOverrides["Item"].Add(val.Replace("Override ", ""));
+                    }
+                }
+
+                foreach (var val in overrideEnemies.fields.Keys)
+                {
+                    if (overrideEnemies.GetValue<bool>(val))
+                    {
+                        registeredOverrides["Enemy"].Add(val.Replace("Override ", ""));
+                    }
+                }
+
+                foreach (var val in overrideMoons.fields.Keys)
+                {
+                    if (overrideMoons.GetValue<bool>(val))
+                    {
+                        registeredOverrides["Moon"].Add(val.Replace("Override ", ""));
+                    }
+                }
 
                 if (centralConfig.GetValue<bool>("Configure Items"))
                 {
                     LunarConfigFile itemFile = lunarCentral.files[LunarConfig.ITEM_FILE_NAME];
+
+                    List<string> overridenSettings = registeredOverrides["Item"];
 
                     // LLL/Vanilla Items
                     foreach (var extendedItem in PatchedContent.ExtendedItems)
@@ -55,13 +91,13 @@ namespace LunarConfig.Patches
 
                             if (configuredItem.GetValue<bool>("Configure Content"))
                             {
-                                configuredItem.SetValue("Display Name", ref item.itemName);
-                                configuredItem.SetValue("Minimum Value", ref item.minValue);
-                                configuredItem.SetValue("Maximum Value", ref item.maxValue);
-                                configuredItem.SetValue("Weight", ref item.weight);
-                                configuredItem.SetValue("Conductivity", ref item.isConductiveMetal);
-                                configuredItem.SetValue("Two-Handed", ref item.twoHanded);
-                                configuredItem.SetValue("Is Scrap?", ref item.isScrap);
+                                configuredItem.SetValue("Display Name", ref item.itemName, overridenSettings.Contains("Display Name"));
+                                configuredItem.SetValue("Minimum Value", ref item.minValue, overridenSettings.Contains("Minimum Value"));
+                                configuredItem.SetValue("Maximum Value", ref item.maxValue, overridenSettings.Contains("Maximum Value"));
+                                configuredItem.SetValue("Weight", ref item.weight, overridenSettings.Contains("Weight"));
+                                configuredItem.SetValue("Conductivity", ref item.isConductiveMetal, overridenSettings.Contains("Conductivity"));
+                                configuredItem.SetValue("Two-Handed", ref item.twoHanded, overridenSettings.Contains("Two-Handed"));
+                                configuredItem.SetValue("Is Scrap?", ref item.isScrap, overridenSettings.Contains("Is Scrap?"));
                             }
                         }
                         catch (Exception e)
@@ -80,13 +116,13 @@ namespace LunarConfig.Patches
 
                             if (configuredItem.GetValue<bool>("Configure Content"))
                             {
-                                configuredItem.SetValue("Display Name", ref item.itemName);
-                                configuredItem.SetValue("Minimum Value", ref item.minValue);
-                                configuredItem.SetValue("Maximum Value", ref item.maxValue);
-                                configuredItem.SetValue("Weight", ref item.weight);
-                                configuredItem.SetValue("Conductivity", ref item.isConductiveMetal);
-                                configuredItem.SetValue("Two-Handed", ref item.twoHanded);
-                                configuredItem.SetValue("Is Scrap?", ref item.isScrap);
+                                configuredItem.SetValue("Display Name", ref item.itemName, overridenSettings.Contains("Display Name"));
+                                configuredItem.SetValue("Minimum Value", ref item.minValue, overridenSettings.Contains("Minimum Value"));
+                                configuredItem.SetValue("Maximum Value", ref item.maxValue, overridenSettings.Contains("Maximum Value"));
+                                configuredItem.SetValue("Weight", ref item.weight, overridenSettings.Contains("Weight"));
+                                configuredItem.SetValue("Conductivity", ref item.isConductiveMetal, overridenSettings.Contains("Conductivity"));
+                                configuredItem.SetValue("Two-Handed", ref item.twoHanded, overridenSettings.Contains("Two-Handed"));
+                                configuredItem.SetValue("Is Scrap?", ref item.isScrap, overridenSettings.Contains("Is Scrap?"));
                             }
                         }
                         catch (Exception e)
@@ -104,13 +140,13 @@ namespace LunarConfig.Patches
 
                             if (configuredItem.GetValue<bool>("Configure Content"))
                             {
-                                configuredItem.SetValue("Display Name", ref item.itemName);
-                                configuredItem.SetValue("Minimum Value", ref item.minValue);
-                                configuredItem.SetValue("Maximum Value", ref item.maxValue);
-                                configuredItem.SetValue("Weight", ref item.weight);
-                                configuredItem.SetValue("Conductivity", ref item.isConductiveMetal);
-                                configuredItem.SetValue("Two-Handed", ref item.twoHanded);
-                                configuredItem.SetValue("Is Scrap?", ref item.isScrap);
+                                configuredItem.SetValue("Display Name", ref item.itemName, overridenSettings.Contains("Display Name"));
+                                configuredItem.SetValue("Minimum Value", ref item.minValue, overridenSettings.Contains("Minimum Value"));
+                                configuredItem.SetValue("Maximum Value", ref item.maxValue, overridenSettings.Contains("Maximum Value"));
+                                configuredItem.SetValue("Weight", ref item.weight, overridenSettings.Contains("Weight"));
+                                configuredItem.SetValue("Conductivity", ref item.isConductiveMetal, overridenSettings.Contains("Conductivity"));
+                                configuredItem.SetValue("Two-Handed", ref item.twoHanded, overridenSettings.Contains("Two-Handed"));
+                                configuredItem.SetValue("Is Scrap?", ref item.isScrap, overridenSettings.Contains("Is Scrap?"));
                             }
                         }
                         catch (Exception e)
@@ -128,13 +164,13 @@ namespace LunarConfig.Patches
 
                             if (configuredItem.GetValue<bool>("Configure Content"))
                             {
-                                configuredItem.SetValue("Display Name", ref item.itemName);
-                                configuredItem.SetValue("Minimum Value", ref item.minValue);
-                                configuredItem.SetValue("Maximum Value", ref item.maxValue);
-                                configuredItem.SetValue("Weight", ref item.weight);
-                                configuredItem.SetValue("Conductivity", ref item.isConductiveMetal);
-                                configuredItem.SetValue("Two-Handed", ref item.twoHanded);
-                                configuredItem.SetValue("Is Scrap?", ref item.isScrap);
+                                configuredItem.SetValue("Display Name", ref item.itemName, overridenSettings.Contains("Display Name"));
+                                configuredItem.SetValue("Minimum Value", ref item.minValue, overridenSettings.Contains("Minimum Value"));
+                                configuredItem.SetValue("Maximum Value", ref item.maxValue, overridenSettings.Contains("Maximum Value"));
+                                configuredItem.SetValue("Weight", ref item.weight, overridenSettings.Contains("Weight"));
+                                configuredItem.SetValue("Conductivity", ref item.isConductiveMetal, overridenSettings.Contains("Conductivity"));
+                                configuredItem.SetValue("Two-Handed", ref item.twoHanded, overridenSettings.Contains("Two-Handed"));
+                                configuredItem.SetValue("Is Scrap?", ref item.isScrap, overridenSettings.Contains("Is Scrap?"));
                             }
                         }
                         catch (Exception e)
@@ -148,6 +184,8 @@ namespace LunarConfig.Patches
                 {
                     LunarConfigFile enemyFile = lunarCentral.files[LunarConfig.ENEMY_FILE_NAME];
 
+                    List<string> overridenSettings = registeredOverrides["Enemy"];
+
                     // LLL/Vanilla Enemies
                     foreach (var extendedEnemy in PatchedContent.ExtendedEnemyTypes)
                     {
@@ -158,24 +196,24 @@ namespace LunarConfig.Patches
 
                             if (configuredEnemy.GetValue<bool>("Configure Content"))
                             {
-                                extendedEnemy.EnemyDisplayName = configuredEnemy.GetValue<string>("Display Name");
-                                configuredEnemy.SetValue("Can See Through Fog?", ref enemy.canSeeThroughFog);
-                                configuredEnemy.SetValue("Door Speed Multiplier", ref enemy.doorSpeedMultiplier);
-                                configuredEnemy.SetValue("Is Daytime Enemy?", ref enemy.isDaytimeEnemy);
-                                configuredEnemy.SetValue("Is Outdoor Enemy?", ref enemy.isOutsideEnemy);
-                                configuredEnemy.SetValue("Loudness Multiplier", ref enemy.loudnessMultiplier);
-                                configuredEnemy.SetValue("Max Count", ref enemy.MaxCount);
-                                configuredEnemy.SetValue("Power Level", ref enemy.PowerLevel);
-                                configuredEnemy.SetCurve("Probability Curve", ref enemy.probabilityCurve);
-                                configuredEnemy.SetValue("Use Falloff?", ref enemy.useNumberSpawnedFalloff);
-                                configuredEnemy.SetCurve("Falloff Curve", ref enemy.numberSpawnedFalloff);
-                                configuredEnemy.SetValue("Enemy HP", ref enemy.enemyPrefab.GetComponent<EnemyAI>().enemyHP);
-                                configuredEnemy.SetValue("Can Die?", ref enemy.canDie);
-                                configuredEnemy.SetValue("Destroy On Death?", ref enemy.destroyOnDeath);
-                                configuredEnemy.SetValue("Can Destroy?", ref enemy.canBeDestroyed);
-                                configuredEnemy.SetValue("Can Stun?", ref enemy.canBeStunned);
-                                configuredEnemy.SetValue("Stun Difficulty", ref enemy.stunGameDifficultyMultiplier);
-                                configuredEnemy.SetValue("Stun Time", ref enemy.stunTimeMultiplier);
+                                extendedEnemy.EnemyDisplayName = configuredEnemy.GetValue<string>("Display Name", overridenSettings.Contains("Display Name"));
+                                configuredEnemy.SetValue("Can See Through Fog?", ref enemy.canSeeThroughFog, overridenSettings.Contains("Can See Through Fog?"));
+                                configuredEnemy.SetValue("Door Speed Multiplier", ref enemy.doorSpeedMultiplier, overridenSettings.Contains("Door Speed Multiplier"));
+                                configuredEnemy.SetValue("Is Daytime Enemy?", ref enemy.isDaytimeEnemy, overridenSettings.Contains("Is Daytime Enemy?"));
+                                configuredEnemy.SetValue("Is Outdoor Enemy?", ref enemy.isOutsideEnemy, overridenSettings.Contains("Is Outdoor Enemy?"));
+                                configuredEnemy.SetValue("Loudness Multiplier", ref enemy.loudnessMultiplier, overridenSettings.Contains("Loudness Multiplier"));
+                                configuredEnemy.SetValue("Max Count", ref enemy.MaxCount, overridenSettings.Contains("Max Count"));
+                                configuredEnemy.SetValue("Power Level", ref enemy.PowerLevel, overridenSettings.Contains("Power Level"));
+                                configuredEnemy.SetCurve("Probability Curve", ref enemy.probabilityCurve, overridenSettings.Contains("Probability Curve"));
+                                configuredEnemy.SetValue("Use Falloff?", ref enemy.useNumberSpawnedFalloff, overridenSettings.Contains("Use Falloff?"));
+                                configuredEnemy.SetCurve("Falloff Curve", ref enemy.numberSpawnedFalloff, overridenSettings.Contains("Falloff Curve"));
+                                configuredEnemy.SetValue("Enemy HP", ref enemy.enemyPrefab.GetComponent<EnemyAI>().enemyHP, overridenSettings.Contains("Enemy HP"));
+                                configuredEnemy.SetValue("Can Die?", ref enemy.canDie, overridenSettings.Contains("Can Die?"));
+                                configuredEnemy.SetValue("Destroy On Death?", ref enemy.destroyOnDeath, overridenSettings.Contains("Destroy On Death?"));
+                                configuredEnemy.SetValue("Can Destroy?", ref enemy.canBeDestroyed, overridenSettings.Contains("Can Destroy?"));
+                                configuredEnemy.SetValue("Can Stun?", ref enemy.canBeStunned, overridenSettings.Contains("Can Stun?"));
+                                configuredEnemy.SetValue("Stun Difficulty", ref enemy.stunGameDifficultyMultiplier, overridenSettings.Contains("Stun Difficulty"));
+                                configuredEnemy.SetValue("Stun Time", ref enemy.stunTimeMultiplier, overridenSettings.Contains("Stun Time"));
                             }
                         }
                         catch (Exception e)
@@ -194,85 +232,29 @@ namespace LunarConfig.Patches
 
                             if (configuredEnemy.GetValue<bool>("Configure Content"))
                             {
-                                configuredEnemy.SetValue("Display Name", ref enemy.enemyName);
-                                configuredEnemy.SetValue("Can See Through Fog?", ref enemy.canSeeThroughFog);
-                                configuredEnemy.SetValue("Door Speed Multiplier", ref enemy.doorSpeedMultiplier);
-                                configuredEnemy.SetValue("Is Daytime Enemy?", ref enemy.isDaytimeEnemy);
-                                configuredEnemy.SetValue("Is Outdoor Enemy?", ref enemy.isOutsideEnemy);
-                                configuredEnemy.SetValue("Loudness Multiplier", ref enemy.loudnessMultiplier);
-                                configuredEnemy.SetValue("Max Count", ref enemy.MaxCount);
-                                configuredEnemy.SetValue("Power Level", ref enemy.PowerLevel);
-                                configuredEnemy.SetCurve("Probability Curve", ref enemy.probabilityCurve);
-                                configuredEnemy.SetValue("Use Falloff?", ref enemy.useNumberSpawnedFalloff);
-                                configuredEnemy.SetCurve("Falloff Curve", ref enemy.numberSpawnedFalloff);
-                                configuredEnemy.SetValue("Enemy HP", ref enemy.enemyPrefab.GetComponent<EnemyAI>().enemyHP);
-                                configuredEnemy.SetValue("Can Die?", ref enemy.canDie);
-                                configuredEnemy.SetValue("Destroy On Death?", ref enemy.destroyOnDeath);
-                                configuredEnemy.SetValue("Can Destroy?", ref enemy.canBeDestroyed);
-                                configuredEnemy.SetValue("Can Stun?", ref enemy.canBeStunned);
-                                configuredEnemy.SetValue("Stun Difficulty", ref enemy.stunGameDifficultyMultiplier);
-                                configuredEnemy.SetValue("Stun Time", ref enemy.stunTimeMultiplier);
+                                configuredEnemy.SetValue("Display Name", ref enemy.enemyName, overridenSettings.Contains("Display Name"));
+                                configuredEnemy.SetValue("Can See Through Fog?", ref enemy.canSeeThroughFog, overridenSettings.Contains("Can See Through Fog?"));
+                                configuredEnemy.SetValue("Door Speed Multiplier", ref enemy.doorSpeedMultiplier, overridenSettings.Contains("Door Speed Multiplier"));
+                                configuredEnemy.SetValue("Is Daytime Enemy?", ref enemy.isDaytimeEnemy, overridenSettings.Contains("Is Daytime Enemy?"));
+                                configuredEnemy.SetValue("Is Outdoor Enemy?", ref enemy.isOutsideEnemy, overridenSettings.Contains("Is Outdoor Enemy?"));
+                                configuredEnemy.SetValue("Loudness Multiplier", ref enemy.loudnessMultiplier, overridenSettings.Contains("Loudness Multiplier"));
+                                configuredEnemy.SetValue("Max Count", ref enemy.MaxCount, overridenSettings.Contains("Max Count"));
+                                configuredEnemy.SetValue("Power Level", ref enemy.PowerLevel, overridenSettings.Contains("Power Level"));
+                                configuredEnemy.SetCurve("Probability Curve", ref enemy.probabilityCurve, overridenSettings.Contains("Probability Curve"));
+                                configuredEnemy.SetValue("Use Falloff?", ref enemy.useNumberSpawnedFalloff, overridenSettings.Contains("Use Falloff?"));
+                                configuredEnemy.SetCurve("Falloff Curve", ref enemy.numberSpawnedFalloff, overridenSettings.Contains("Falloff Curve"));
+                                configuredEnemy.SetValue("Enemy HP", ref enemy.enemyPrefab.GetComponent<EnemyAI>().enemyHP, overridenSettings.Contains("Enemy HP"));
+                                configuredEnemy.SetValue("Can Die?", ref enemy.canDie, overridenSettings.Contains("Can Die?"));
+                                configuredEnemy.SetValue("Destroy On Death?", ref enemy.destroyOnDeath, overridenSettings.Contains("Destroy On Death?"));
+                                configuredEnemy.SetValue("Can Destroy?", ref enemy.canBeDestroyed, overridenSettings.Contains("Can Destroy?"));
+                                configuredEnemy.SetValue("Can Stun?", ref enemy.canBeStunned, overridenSettings.Contains("Can Stun?"));
+                                configuredEnemy.SetValue("Stun Difficulty", ref enemy.stunGameDifficultyMultiplier, overridenSettings.Contains("Stun Difficulty"));
+                                configuredEnemy.SetValue("Stun Time", ref enemy.stunTimeMultiplier, overridenSettings.Contains("Stun Time"));
                             }
                         }
                         catch (Exception e)
                         {
                             MiniLogger.LogError($"An error occured while setting enemy values, please report this!\n{e}");
-                        }
-                    }
-                }
-
-                if (centralConfig.GetValue<bool>("Configure Moons"))
-                {
-                    LunarConfigFile moonFile = lunarCentral.files[LunarConfig.MOON_FILE_NAME];
-
-                    // LLL/Vanilla Moons
-                    foreach (var extendedMoon in PatchedContent.ExtendedLevels)
-                    {
-                        try
-                        {
-                            SelectableLevel moon = extendedMoon.SelectableLevel;
-                            LunarConfigEntry configuredMoon = moonFile.entries[lunarCentral.UUIDify($"LLL - {extendedMoon.NumberlessPlanetName} ({extendedMoon.UniqueIdentificationName})")];
-
-                            if (configuredMoon.GetValue<bool>("Configure Content"))
-                            {
-                                configuredMoon.SetValue("Display Name", ref moon.PlanetName);
-                                configuredMoon.SetValue("Risk Level", ref moon.riskLevel);
-                                moon.LevelDescription = configuredMoon.GetValue<string>("Description").Replace(";", "\n");
-                                extendedMoon.RoutePrice = configuredMoon.GetValue<int>("Route Price");
-                                extendedMoon.IsRouteHidden = configuredMoon.GetValue<bool>("Is Hidden?");
-                                extendedMoon.IsRouteLocked = configuredMoon.GetValue<bool>("Is Locked?");
-                                configuredMoon.SetValue("Has Time?", ref moon.planetHasTime);
-                                configuredMoon.SetValue("Time Multiplier", ref moon.DaySpeedMultiplier);
-                                configuredMoon.SetValue("Daytime Probability Range", ref moon.daytimeEnemiesProbabilityRange);
-                                configuredMoon.SetCurve("Daytime Curve", ref moon.daytimeEnemySpawnChanceThroughDay);
-                                configuredMoon.SetValue("Max Daytime Power", ref moon.maxDaytimeEnemyPowerCount);
-                                configuredMoon.SetEnemies("Spawnable Daytime Enemies", ref moon.DaytimeEnemies);
-                                configuredMoon.SetValue("Interior Probability Range", ref moon.spawnProbabilityRange);
-                                configuredMoon.SetCurve("Interior Curve", ref moon.enemySpawnChanceThroughoutDay);
-                                configuredMoon.SetValue("Max Interior Power", ref moon.maxEnemyPowerCount);
-                                configuredMoon.SetEnemies("Spawnable Interior Enemies", ref moon.Enemies);
-                                configuredMoon.SetCurve("Outside Curve", ref moon.outsideEnemySpawnChanceThroughDay);
-                                configuredMoon.SetValue("Max Outside Power", ref moon.maxOutsideEnemyPowerCount);
-                                configuredMoon.SetEnemies("Spawnable Outside Enemies", ref moon.OutsideEnemies);
-                                configuredMoon.SetValue("Min Scrap", ref moon.minScrap);
-                                configuredMoon.SetValue("Max Scrap", ref moon.maxScrap);
-                                configuredMoon.SetItems("Spawnable Scrap", ref moon.spawnableScrap);
-                                configuredMoon.SetValue("Interior Multiplier", ref moon.factorySizeMultiplier);
-                                configuredMoon.SetDungeons("Possible Interiors", extendedMoon);
-
-                                extendedMoon.ContentTags.Clear();
-
-                                foreach (var tag in configuredMoon.GetValue<string>("Tags").Split(','))
-                                {
-                                    string fixedTag = lunarCentral.UUIDify(tag).RemoveWhitespace();
-
-                                    extendedMoon.ContentTags.Add(ContentTag.Create(fixedTag));
-                                }
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            MiniLogger.LogError($"An error occured while setting moon values, please report this!\n{e}");
                         }
                     }
                 }
@@ -428,525 +410,54 @@ namespace LunarConfig.Patches
                         }
                     }
                 }
-
-                
-
-                /*
-                NetworkManager manager = UnityEngine.Object.FindObjectOfType<NetworkManager>();
-                
-                CentralConfiguration central;
-
-                if (File.Exists(LunarConfig.CENTRAL_FILE))
-                {
-                    central = new CentralConfiguration(File.ReadAllText(LunarConfig.CENTRAL_FILE));
-                }
-                else
-                {
-                    central = new CentralConfiguration();
-                    central.CreateConfiguration(central);
-                }
-                
-                HashSet<string> registeredItems = new HashSet<string>();
-                ItemConfiguration itemConfig;
-                Dictionary<string, ItemInfo> configuredItems = new Dictionary<string, ItemInfo>();
-
-                MiniLogger.LogInfo("Beginning Logging...");
-                
-                if (File.Exists(LunarConfig.ITEM_FILE))
-                {
-                    itemConfig = new ItemConfiguration(File.ReadAllText(LunarConfig.ITEM_FILE));
-                    foreach (ItemEntry entry in parseItemConfiguration.parseConfiguration(itemConfig.itemConfig))
-                    {
-                        try
-                        {
-                            ItemInfo item = parseItemEntry.parseEntry(entry.configString);
-                            registeredItems.Add(item.itemID);
-                            configuredItems.Add(item.itemID, item);
-                        }
-                        catch (Exception e)
-                        {
-                            MiniLogger.LogError($"Item Configuration File contains invalid entry, skipping entry!\n{e}");
-                        }
-                    }
-                }
-                else
-                {
-                    itemConfig = new ItemConfiguration("");
-                }
-
-                foreach (var item in registeredItems)
-                {
-                    MiniLogger.LogInfo($"Registered : {item}");
-                }
-
-                foreach (var item in Resources.FindObjectsOfTypeAll<Item>())
-                {
-                    MiniLogger.LogInfo($"{item.name} {item.GetHashCode()}");
-                    if (item.spawnPrefab == null)
-                    {
-                        //Item is missing prefab!
-                    }
-                    else if (!manager.NetworkConfig.Prefabs.Contains(item.spawnPrefab))
-                    {
-                        //Item not a real item!
-                    }
-                    else if (configuredItems.Keys.Contains(item.name))
-                    {
-                        ItemInfo configuredItem = configuredItems[item.name];
-                        item.itemName = configuredItem.displayName;
-                        item.minValue = configuredItem.minValue;
-                        item.maxValue = configuredItem.maxValue;
-                        item.weight = configuredItem.weight;
-                        item.isConductiveMetal = configuredItem.conductive;
-                        item.twoHanded = configuredItem.twoHanded;
-                        item.isScrap = configuredItem.isScrap;
-                    }
-                    else
-                    {
-                        itemConfig.AddEntry(new ItemEntry(new ItemInfo(item)));
-                        MiniLogger.LogInfo($"Recorded {item.name}");
-                        registeredItems.Add(item.name);
-                    }
-                }
-
-                HashSet<string> registeredEnemies = new HashSet<string>();
-                EnemyConfiguration enemyConfig;
-                Dictionary<string, EnemyInfo> configuredEnemies = new Dictionary<string, EnemyInfo>();
-
-                if (File.Exists(LunarConfig.ENEMY_FILE))
-                {
-                    enemyConfig = new EnemyConfiguration(File.ReadAllText(LunarConfig.ENEMY_FILE));
-                    foreach (EnemyEntry entry in parseEnemyConfiguration.parseConfiguration(enemyConfig.enemyConfig))
-                    {
-                        try
-                        {
-                            EnemyInfo enemy = parseEnemyEntry.parseEntry(entry.configString);
-                            registeredEnemies.Add(enemy.enemyID);
-                            configuredEnemies.Add(enemy.enemyID, enemy);
-                        }
-                        catch (Exception e)
-                        {
-                            MiniLogger.LogError($"Enemy Configuration File contains invalid entry, skipping entry!\n{e}");
-                        }
-                    }
-                }
-                else
-                {
-                    enemyConfig = new EnemyConfiguration("");
-                }
-
-                foreach (var enemy in Resources.FindObjectsOfTypeAll<EnemyType>())
-                {
-                    if (enemy.enemyPrefab == null)
-                    {
-                        //Enemy is missing prefab!
-                    }
-                    else if (!manager.NetworkConfig.Prefabs.Contains(enemy.enemyPrefab))
-                    {
-                        //Enemy not a real enemy!
-                    }
-                    else if (registeredEnemies.Contains(enemy.name))
-                    {
-                        EnemyInfo configuredEnemy = configuredEnemies[enemy.name];
-                        enemy.enemyName = configuredEnemy.displayName;
-                        enemy.canSeeThroughFog = configuredEnemy.canSeeThroughFog;
-                        enemy.doorSpeedMultiplier = configuredEnemy.doorSpeedMultiplier;
-                        enemy.isDaytimeEnemy = configuredEnemy.isDaytimeEnemy;
-                        enemy.isOutsideEnemy = configuredEnemy.isOutsideEnemy;
-                        enemy.loudnessMultiplier = configuredEnemy.loudnessMultiplier;
-                        enemy.MaxCount = configuredEnemy.maxCount;
-                        enemy.PowerLevel = configuredEnemy.powerLevel;
-                        enemy.probabilityCurve = configuredEnemy.probabilityCurve;
-                        enemy.enemyPrefab.GetComponent<EnemyAI>().enemyHP = configuredEnemy.enemyHP;
-                    }
-                    else
-                    {
-                        enemyConfig.AddEntry(new EnemyEntry(new EnemyInfo(enemy)));
-                        MiniLogger.LogInfo($"Recorded {enemy.name}");
-                        registeredEnemies.Add(enemy.name);
-                    }
-                }
-                
-                HashSet<string> registeredMoons = new HashSet<string>();
-                HashSet<string> registeredMapObjects = new HashSet<string>();
-                //HashSet<string> registeredOutsideMapObjects = new HashSet<string>();
-                MoonConfiguration moonConfig;
-                MapObjectConfiguration mapObjectConfig;
-                //OutsideMapObjectConfiguration outsideMapObjectConfig;
-                Dictionary<string, MoonInfo> configuredMoons = new Dictionary<string, MoonInfo>();
-                Dictionary<string, MapObjectInfo> configuredMapObjects = new Dictionary<string, MapObjectInfo>();
-                //Dictionary<string, OutsideMapObjectInfo> configuredOutsideMapObjects = new Dictionary<string, OutsideMapObjectInfo>();
-
-                if (File.Exists(LunarConfig.MOON_FILE))
-                {
-                    moonConfig = new MoonConfiguration(File.ReadAllText(LunarConfig.MOON_FILE));
-                    foreach (MoonEntry entry in parseMoonConfiguration.parseConfiguration(moonConfig.moonConfig))
-                    {
-                        try
-                        {
-                            MoonInfo moon = parseMoonEntry.parseEntry(entry.configString);
-                            registeredMoons.Add(moon.moonID);
-                            configuredMoons.Add(moon.moonID, moon);
-                        }
-                        catch (Exception e)
-                        {
-                            MiniLogger.LogError($"Moon Configuration File contains invalid entry, skipping entry!\n{e}");
-                        }
-                    }
-                }
-                else
-                {
-                    moonConfig = new MoonConfiguration("");
-                }
-
-                if (File.Exists(LunarConfig.MAP_OBJECT_FILE))
-                {
-                    mapObjectConfig = new MapObjectConfiguration(File.ReadAllText(LunarConfig.MAP_OBJECT_FILE));
-                    foreach (MapObjectEntry entry in parseMapObjectConfiguration.parseConfiguration(mapObjectConfig.mapObjectConfig))
-                    {
-                        try
-                        {
-                            MapObjectInfo mapObject = parseMapObjectEntry.parseEntry(entry.configString);
-                            registeredMapObjects.Add(mapObject.objID);
-                            configuredMapObjects.Add(mapObject.objID, mapObject);
-                        }
-                        catch (Exception e)
-                        {
-                            MiniLogger.LogError($"Map Object Configuration File contains invalid entry, skipping entry!\n{e}");
-                        }
-                    }
-                }
-                else
-                {
-                    mapObjectConfig = new MapObjectConfiguration("");
-                }
-                */
-                /*
-
-                if (File.Exists(LunarConfig.OUTSIDE_MAP_OBJECT_FILE))
-                {
-                    outsideMapObjectConfig = new OutsideMapObjectConfiguration(File.ReadAllText(LunarConfig.OUTSIDE_MAP_OBJECT_FILE));
-                    foreach (OutsideMapObjectEntry entry in Objects.parseOutsideMapObjectConfiguration.parseConfiguration(outsideMapObjectConfig.outsideMapObjectConfig))
-                    {
-                        try
-                        {
-                            OutsideMapObjectInfo mapObject = Config_Entries.parseOutsideMapObjectEntry.parseEntry(entry.configString);
-                            registeredOutsideMapObjects.Add(mapObject.objID);
-                            configuredOutsideMapObjects.Add(mapObject.objID, mapObject);
-                        }
-                        catch (Exception e)
-                        {
-                            MiniLogger.LogError($"Outside Map Object Configuration File contains invalid entry, skipping entry!\n{e}");
-                        }
-                    }
-                }
-                else
-                {
-                    outsideMapObjectConfig = new OutsideMapObjectConfiguration("");
-                }
-
-                */
-                /*
-                foreach (var moon in Resources.FindObjectsOfTypeAll<SelectableLevel>())
-                {
-                    if (registeredMoons.Contains(moon.name))
-                    {
-                        // Moon exists in config
-                        MoonInfo configuredMoon = configuredMoons[moon.name];
-                        moon.PlanetName = configuredMoon.displayName;
-                        moon.riskLevel = configuredMoon.risk;
-                        moon.LevelDescription = configuredMoon.description;
-                        /*
-                        moon.planetHasTime = configuredMoon.hasTime;
-                        moon.DaySpeedMultiplier = configuredMoon.timeMultiplier;
-                        moon.daytimeEnemiesProbabilityRange = configuredMoon.daytimeProbabilityRange;
-                        moon.daytimeEnemySpawnChanceThroughDay = configuredMoon.daytimeCurve;
-                        moon.maxDaytimeEnemyPowerCount = configuredMoon.maxDaytimePower;
-                        moon.spawnProbabilityRange = configuredMoon.interiorProbabilityRange;
-                        moon.enemySpawnChanceThroughoutDay = configuredMoon.interiorCurve;
-                        moon.maxEnemyPowerCount = configuredMoon.maxInteriorPower;
-                        moon.outsideEnemySpawnChanceThroughDay = configuredMoon.outsideCurve;
-                        moon.maxOutsideEnemyPowerCount = configuredMoon.maxOutsidePower;
-                        moon.minScrap = configuredMoon.minScrap;
-                        moon.maxScrap = configuredMoon.maxScrap;
-                        moon.factorySizeMultiplier = configuredMoon.interiorSizeMultiplier;
-                        */
-                /*
-                    }
-                    else
-                    {
-                        moonConfig.AddEntry(new MoonEntry(new MoonInfo(moon)));
-                        MiniLogger.LogInfo($"Recorded {moon.name}");
-                        registeredMoons.Add(moon.name);
-                    }
-
-                    foreach (SpawnableMapObject spawnableObject in moon.spawnableMapObjects)
-                    {
-                        GameObject prefab = spawnableObject.prefabToSpawn;
-                        if (!manager.NetworkConfig.Prefabs.Contains(prefab))
-                        {
-                            // No object networked
-                        }
-                        else if (configuredMapObjects.Keys.Contains(prefab.name))
-                        {
-                            MapObjectInfo configuredMapObject = configuredMapObjects[prefab.name];
-                            spawnableObject.spawnFacingAwayFromWall = configuredMapObject.faceAwayWall;
-                            spawnableObject.spawnFacingWall = configuredMapObject.faceWall;
-                            spawnableObject.disallowSpawningNearEntrances = configuredMapObject.disallowNearEntrance;
-                            spawnableObject.requireDistanceBetweenSpawns = configuredMapObject.requireDistanceBetweenSpawns;
-                            spawnableObject.spawnWithBackFlushAgainstWall = configuredMapObject.spawnFlushAgainstWall;
-                            spawnableObject.spawnWithBackToWall = configuredMapObject.spawnAgainstWall;
-                        }
-                        else if (!registeredMapObjects.Contains(prefab.name))
-                        {
-                            registeredMapObjects.Add(prefab.name);
-                            MiniLogger.LogInfo($"Recorded {prefab.name}");
-                            mapObjectConfig.AddEntry(new MapObjectEntry(new MapObjectInfo(spawnableObject)));
-                        }
-                    }
-                    */
-                /*
-
-                foreach (SpawnableOutsideObjectWithRarity spawnableObject in moon.spawnableOutsideObjects)
-                {
-                    GameObject prefab = spawnableObject.spawnableObject.prefabToSpawn;
-                    if (configuredOutsideMapObjects.Keys.Contains(spawnableObject.spawnableObject.name))
-                    {
-                        OutsideMapObjectInfo configuredMapObject = configuredOutsideMapObjects[spawnableObject.spawnableObject.name];
-                        spawnableObject.spawnableObject.objectWidth = configuredMapObject.objWidth;
-                        spawnableObject.spawnableObject.spawnFacingAwayFromWall = configuredMapObject.faceAwayWall;
-                    }
-                    else if (!registeredOutsideMapObjects.Contains(spawnableObject.spawnableObject.name))
-                    {
-                        registeredOutsideMapObjects.Add(spawnableObject.spawnableObject.name);
-                        MiniLogger.LogInfo($"Recorded {spawnableObject.spawnableObject.name}");
-                        outsideMapObjectConfig.AddEntry(new OutsideMapObjectEntry(new OutsideMapObjectInfo(spawnableObject)));
-                    }
-                }
-
-                */
-                /*
-            }
-
-
-
-            HashSet<string> registeredDungeons = new HashSet<string>();
-            DungeonConfiguration dungeonConfig;
-            Dictionary<string, DungeonInfo> configuredDungeons = new Dictionary<string, DungeonInfo>();
-
-            if (File.Exists(LunarConfig.DUNGEON_FILE))
-            {
-                dungeonConfig = new DungeonConfiguration(File.ReadAllText(LunarConfig.DUNGEON_FILE));
-                string newDungeonConfigString = "";
-                foreach (DungeonEntry entry in parseDungeonConfiguration.parseConfiguration(dungeonConfig.dungeonConfig))
-                {
-                    try
-                    {
-                        DungeonInfo dungeon = parseDungeonEntry.parseEntry(entry.configString);
-                        List<string> mapObjects = dungeon.mapObjectMultipliers.Keys.ToList();
-
-                        foreach (var obj in registeredMapObjects)
-                        {
-                            if (mapObjects.Contains(obj))
-                            {
-                                continue;
-                            }
-                            else
-                            {
-                                dungeon.mapObjectMultipliers.Add(obj, 1);
-                            }
-                        }
-
-                        newDungeonConfigString += new DungeonEntry(dungeon).configString;
-                        registeredDungeons.Add(dungeon.dungeonID);
-                        configuredDungeons.Add(dungeon.dungeonID, dungeon);
-                    }
-                    catch (Exception e)
-                    {
-                        MiniLogger.LogError($"Dungeon Configuration File contains invalid entry, skipping entry!\n{e}");
-                    }
-                }
-
-                if (newDungeonConfigString != dungeonConfig.dungeonConfig)
-                {
-                    dungeonConfig.dungeonConfig = newDungeonConfigString;
-                    MiniLogger.LogInfo("Dungeon Configuration Updated!");
-                }
-            }
-            else
-            {
-                dungeonConfig = new DungeonConfiguration("");
-            }
-
-            foreach (var dungeon in Resources.FindObjectsOfTypeAll<DungeonFlow>())
-            {
-                if (registeredDungeons.Contains(dungeon.name))
-                {
-                    // Dungeon already recorded
-                }
-                else
-                {
-                    dungeonConfig.AddEntry(new DungeonEntry(new DungeonInfo(dungeon, registeredMapObjects)));
-                    MiniLogger.LogInfo($"Recorded {dungeon.name}");
-                    registeredDungeons.Add(dungeon.name);
-                }
-            }
-
-            HashSet<string> registeredTags = new HashSet<string>();
-            TagConfiguration tagConfig;
-            List<TagInfo> configuredTags = new List<TagInfo>();
-
-            if (File.Exists(LunarConfig.TAG_FILE))
-            {
-                tagConfig = new TagConfiguration(File.ReadAllText(LunarConfig.TAG_FILE));
-                string newTagConfigString = "";
-                foreach (TagEntry entry in parseTagConfiguration.parseConfiguration(tagConfig.tagConfig))
-                {
-                    try
-                    {
-                        TagInfo tag = parseTagEntry.parseEntry(entry.configString);
-                        //List<string> mapObjects = tag.mapObjectMultipliers.Keys.ToList();
-                        List<string> itemPools = tag.itemPoolMultipliers.Keys.ToList();
-                        List<string> interiorEnemyPools = tag.interiorEnemyPoolMultipliers.Keys.ToList();
-                        List<string> exteriorEnemyPools = tag.exteriorEnemyPoolMultipliers.Keys.ToList();
-                        List<string> daytimeEnemyPools = tag.daytimeEnemyPoolMultipliers.Keys.ToList();
-                        List<string> dungeons = tag.dungeonMultipliers.Keys.ToList();
-                        */
-                /*
-                foreach (var obj in registeredMapObjects)
-                {
-                    if (mapObjects.Contains(obj))
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        tag.mapObjectMultipliers.Add(obj, 1);
-                    }
-                }
-                */
-                /*
-                foreach (var obj in central.itemPools)
-                {
-                    if (itemPools.Contains(obj))
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        tag.itemPoolMultipliers.Add(obj, 1);
-                    }
-                }
-
-                foreach (var obj in central.interiorEnemyPools)
-                {
-                    if (interiorEnemyPools.Contains(obj))
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        tag.interiorEnemyPoolMultipliers.Add(obj, 1);
-                    }
-                }
-
-                foreach (var obj in central.exteriorEnemyPools)
-                {
-                    if (exteriorEnemyPools.Contains(obj))
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        tag.exteriorEnemyPoolMultipliers.Add(obj, 1);
-                    }
-                }
-
-                foreach (var obj in central.daytimeEnemyPools)
-                {
-                    if (daytimeEnemyPools.Contains(obj))
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        tag.daytimeEnemyPoolMultipliers.Add(obj, 1);
-                    }
-                }
-
-                foreach (var obj in registeredDungeons)
-                {
-                    if (dungeons.Contains(obj))
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        tag.dungeonMultipliers.Add(obj, 1f);
-                    }
-                }
-
-                newTagConfigString += new TagEntry(tag).configString;
-                registeredTags.Add(tag.tagID);
-                configuredTags.Add(tag);
-            }
-            catch (Exception e)
-            {
-                MiniLogger.LogError($"Tag Configuration File contains invalid entry, skipping entry!\n{e}");
-            }
-        }
-
-        if (newTagConfigString != tagConfig.tagConfig) 
-        {
-            tagConfig.tagConfig = newTagConfigString;
-            MiniLogger.LogInfo("Tag Configuration Updated!");
-        }
-    }
-    else
-    {
-        tagConfig = new TagConfiguration("");
-    }
-
-    foreach (var tag in central.tags)
-    {
-        if (registeredTags.Contains(tag))
-        {
-            // Tag already recorded
-        }
-        else
-        {
-            TagEntry tagEntry = new TagEntry(new TagInfo(
-                tag, 
-                1, 
-                //registeredMapObjects.ToDictionary(k => k, v => 1f),
-                central.itemPools.ToDictionary(k => k, v => 1f),
-                central.interiorEnemyPools.ToDictionary(k => k, v => 1f),
-                central.exteriorEnemyPools.ToDictionary(k => k, v => 1f),
-                central.daytimeEnemyPools.ToDictionary(k => k, v => 1f),
-                registeredDungeons.ToDictionary(k => k, v => 1f)
-                ));
-            tagConfig.AddEntry(tagEntry);
-            MiniLogger.LogInfo($"Recorded {tag}");
-            registeredTags.Add(tag);
-        }
-    }
-
-    Directory.CreateDirectory(Path.GetDirectoryName(LunarConfig.ITEM_FILE)!);
-    File.WriteAllText(LunarConfig.ITEM_FILE, itemConfig.itemConfig);
-    File.WriteAllText(LunarConfig.ENEMY_FILE, enemyConfig.enemyConfig);
-    File.WriteAllText(LunarConfig.MOON_FILE, moonConfig.moonConfig);
-    File.WriteAllText(LunarConfig.MAP_OBJECT_FILE, mapObjectConfig.mapObjectConfig);
-    //File.WriteAllText(LunarConfig.OUTSIDE_MAP_OBJECT_FILE, outsideMapObjectConfig.outsideMapObjectConfig);
-    File.WriteAllText(LunarConfig.DUNGEON_FILE, dungeonConfig.dungeonConfig);
-    File.WriteAllText(LunarConfig.TAG_FILE, tagConfig.tagConfig);
-    File.WriteAllText(LunarConfig.CENTRAL_FILE, central.CreateConfiguration(central));
-
-    MiniLogger.LogInfo("Logging complete!");
-    */
             }
             catch (Exception e) 
             {
                 MiniLogger.LogError($"An error occured, please report this!\n{e}");
+            }
+        }
+
+        [HarmonyPatch(typeof(RoundManager), nameof(RoundManager.LoadNewLevel))]
+        [HarmonyPriority(800)]
+        [HarmonyPrefix]
+        private static void onLoadNewLevelPrefix(RoundManager __instance)
+        {
+            try
+            {
+                LunarCentral lunarCentral = LunarConfig.central;
+                LunarConfigEntry centralConfig = lunarCentral.files[LunarConfig.CENTRAL_FILE_NAME].entries["Configuration"];
+
+                if (centralConfig.GetValue<bool>("Configure Moons"))
+                {
+                    LunarConfigFile moonFile = lunarCentral.files[LunarConfig.MOON_FILE_NAME];
+
+                    List<string> overridenSettings = registeredOverrides["Moon"];
+
+                    ExtendedLevel extendedMoon = LevelManager.CurrentExtendedLevel;
+                    SelectableLevel moon = extendedMoon.SelectableLevel;
+                    LunarConfigEntry configuredMoon = moonFile.entries[lunarCentral.UUIDify($"LLL - {extendedMoon.NumberlessPlanetName} ({extendedMoon.UniqueIdentificationName})")];
+
+                    if (configuredMoon.GetValue<bool>("Configure Content"))
+                    {
+                        extendedMoon.ContentTags.Clear();
+
+                        foreach (var tag in configuredMoon.GetValue<string>("Tags", overridenSettings.Contains("Tags"), true).Split(','))
+                        {
+                            string fixedTag = lunarCentral.UUIDify(tag).RemoveWhitespace();
+
+                            extendedMoon.ContentTags.Add(ContentTag.Create(fixedTag));
+                        }
+
+                        LunarCentral.RefreshMatchers();
+
+                        configuredMoon.SetValue("Interior Multiplier", ref moon.factorySizeMultiplier, overridenSettings.Contains("Interior Multiplier"));
+                        configuredMoon.SetDungeons("Possible Interiors", lunarCentral, extendedMoon, overridenSettings.Contains("Possible Interiors"));
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                MiniLogger.LogError($"An error occured while setting interior values, please report this!\n{e}");
             }
         }
 
@@ -962,20 +473,227 @@ namespace LunarConfig.Patches
                 LunarConfigFile mapObjectFile = lunarCentral.files[LunarConfig.MAP_OBJECT_FILE_NAME];
                 LunarConfigFile outsideObjectFile = lunarCentral.files[LunarConfig.OUTSIDE_MAP_OBJECT_FILE_NAME];
 
-                ExtendedLevel level = null;
+                LunarConfigEntry centralConfig = lunarCentral.files[LunarConfig.CENTRAL_FILE_NAME].entries["Configuration"];
 
-                foreach (var lev in PatchedContent.ExtendedLevels)
+                if (centralConfig.GetValue<bool>("Configure Moons"))
                 {
-                    if (lev.IsCurrentLevel)
+                    LunarConfigFile moonFile = lunarCentral.files[LunarConfig.MOON_FILE_NAME];
+
+                    List<string> overridenSettings = registeredOverrides["Moon"];
+
+                    try
                     {
-                        foreach (var obj in lev.SelectableLevel.spawnableOutsideObjects)
+                        ExtendedLevel extendedMoon = LevelManager.CurrentExtendedLevel;
+                        SelectableLevel moon = extendedMoon.SelectableLevel;
+                        LunarConfigEntry configuredMoon = moonFile.entries[lunarCentral.UUIDify($"LLL - {extendedMoon.NumberlessPlanetName} ({extendedMoon.UniqueIdentificationName})")];
+
+                        if (configuredMoon.GetValue<bool>("Configure Content"))
                         {
-                            MiniLogger.LogInfo(obj.spawnableObject.name);
+                            extendedMoon.ContentTags.Clear();
+
+                            foreach (var tag in configuredMoon.GetValue<string>("Tags", overridenSettings.Contains("Tags"), true).Split(','))
+                            {
+                                string fixedTag = lunarCentral.UUIDify(tag).RemoveWhitespace();
+
+                                extendedMoon.ContentTags.Add(ContentTag.Create(fixedTag));
+                            }
+
+                            LunarCentral.RefreshMatchers();
+
+                            configuredMoon.SetValue("Display Name", ref moon.PlanetName);
+                            configuredMoon.SetValue("Risk Level", ref moon.riskLevel);
+                            moon.LevelDescription = configuredMoon.GetValue<string>("Description").Replace(";", "\n");
+                            configuredMoon.SetValue("Has Time?", ref moon.planetHasTime, overridenSettings.Contains("Has Time?"));
+                            configuredMoon.SetValue("Time Multiplier", ref moon.DaySpeedMultiplier, overridenSettings.Contains("Time Multiplier"));
+                            configuredMoon.SetValue("Daytime Probability Range", ref moon.daytimeEnemiesProbabilityRange, overridenSettings.Contains("Daytime Probability Range"));
+                            configuredMoon.SetCurve("Daytime Curve", ref moon.daytimeEnemySpawnChanceThroughDay, overridenSettings.Contains("Daytime Curve"));
+                            configuredMoon.SetValue("Max Daytime Power", ref moon.maxDaytimeEnemyPowerCount, overridenSettings.Contains("Max Daytime Power"));
+                            configuredMoon.SetEnemies("Spawnable Daytime Enemies", lunarCentral, ref moon.DaytimeEnemies, overridenSettings.Contains("Spawnable Daytime Enemies"));
+                            configuredMoon.SetValue("Interior Probability Range", ref moon.spawnProbabilityRange, overridenSettings.Contains("Interior Probability Range"));
+                            configuredMoon.SetCurve("Interior Curve", ref moon.enemySpawnChanceThroughoutDay, overridenSettings.Contains("Interior Curve"));
+                            configuredMoon.SetValue("Max Interior Power", ref moon.maxEnemyPowerCount, overridenSettings.Contains("Max Interior Power"));
+                            configuredMoon.SetEnemies("Spawnable Interior Enemies", lunarCentral, ref moon.Enemies, overridenSettings.Contains("Spawnable Interior Enemies"));
+                            configuredMoon.SetCurve("Outside Curve", ref moon.outsideEnemySpawnChanceThroughDay, overridenSettings.Contains("Outside Curve"));
+                            configuredMoon.SetValue("Max Outside Power", ref moon.maxOutsideEnemyPowerCount, overridenSettings.Contains("Max Outside Power"));
+                            configuredMoon.SetEnemies("Spawnable Outside Enemies", lunarCentral, ref moon.OutsideEnemies, overridenSettings.Contains("Spawnable Outside Enemies"));
+                            configuredMoon.SetValue("Min Scrap", ref moon.minScrap, overridenSettings.Contains("Min Scrap"));
+                            configuredMoon.SetValue("Max Scrap", ref moon.maxScrap, overridenSettings.Contains("Max Scrap"));
+                            configuredMoon.SetItems("Spawnable Scrap", lunarCentral, ref moon.spawnableScrap, overridenSettings.Contains("Spawnable Scrap"));
                         }
-                        level = lev;
-                        break;
+                    }
+                    catch (Exception e)
+                    {
+                        MiniLogger.LogError($"An error occured while setting moon values, please report this!\n{e}");
                     }
                 }
+
+                LunarCentral.RefreshMatchers();
+
+                if (centralConfig.GetValue<bool>("Configure Items") && registeredOverrides["Item"].Count > 0)
+                {
+                    LunarConfigFile itemFile = lunarCentral.files[LunarConfig.ITEM_FILE_NAME];
+
+                    List<string> overridenSettings = registeredOverrides["Item"];
+
+                    // LLL/Vanilla Items
+                    foreach (var extendedItem in PatchedContent.ExtendedItems)
+                    {
+                        try
+                        {
+                            Item item = extendedItem.Item;
+                            LunarConfigEntry configuredItem = itemFile.entries[lunarCentral.UUIDify($"LLL - {item.itemName} ({extendedItem.UniqueIdentificationName})")];
+
+                            if (configuredItem.GetValue<bool>("Configure Content"))
+                            {
+                                configuredItem.SetValue("Minimum Value", ref item.minValue, overridenSettings.Contains("Minimum Value"));
+                                configuredItem.SetValue("Maximum Value", ref item.maxValue, overridenSettings.Contains("Maximum Value"));
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            MiniLogger.LogError($"An error occured while setting item values, please report this!\n{e}");
+                        }
+                    }
+
+                    // LL/CRLib Items
+                    foreach (var spawnableItem in Items.scrapItems)
+                    {
+                        try
+                        {
+                            Item item = spawnableItem.item;
+                            LunarConfigEntry configuredItem = itemFile.entries[lunarCentral.UUIDify($"LL - {item.itemName} ({spawnableItem.modName}.{item.name})")];
+
+                            if (configuredItem.GetValue<bool>("Configure Content"))
+                            {
+                                configuredItem.SetValue("Minimum Value", ref item.minValue, overridenSettings.Contains("Minimum Value"));
+                                configuredItem.SetValue("Maximum Value", ref item.maxValue, overridenSettings.Contains("Maximum Value"));
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            MiniLogger.LogError($"An error occured while setting item values, please report this!\n{e}");
+                        }
+                    }
+
+                    foreach (var spawnableItem in Items.shopItems)
+                    {
+                        try
+                        {
+                            Item item = spawnableItem.item;
+                            LunarConfigEntry configuredItem = itemFile.entries[lunarCentral.UUIDify($"LL - {item.itemName} ({spawnableItem.modName}.{item.name})")];
+
+                            if (configuredItem.GetValue<bool>("Configure Content"))
+                            {
+                                configuredItem.SetValue("Minimum Value", ref item.minValue, overridenSettings.Contains("Minimum Value"));
+                                configuredItem.SetValue("Maximum Value", ref item.maxValue, overridenSettings.Contains("Maximum Value"));
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            MiniLogger.LogError($"An error occured while setting item values, please report this!\n{e}");
+                        }
+                    }
+
+                    foreach (var spawnableItem in Items.plainItems)
+                    {
+                        try
+                        {
+                            Item item = spawnableItem.item;
+                            LunarConfigEntry configuredItem = itemFile.entries[lunarCentral.UUIDify($"LL - {item.itemName} ({spawnableItem.modName}.{item.name})")];
+
+                            if (configuredItem.GetValue<bool>("Configure Content"))
+                            {
+                                configuredItem.SetValue("Minimum Value", ref item.minValue, overridenSettings.Contains("Minimum Value"));
+                                configuredItem.SetValue("Maximum Value", ref item.maxValue, overridenSettings.Contains("Maximum Value"));
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            MiniLogger.LogError($"An error occured while setting item values, please report this!\n{e}");
+                        }
+                    }
+                }
+
+                if (centralConfig.GetValue<bool>("Configure Enemies") && registeredOverrides["Enemy"].Count > 0)
+                {
+                    LunarConfigFile enemyFile = lunarCentral.files[LunarConfig.ENEMY_FILE_NAME];
+
+                    List<string> overridenSettings = registeredOverrides["Enemy"];
+
+                    // LLL/Vanilla Enemies
+                    foreach (var extendedEnemy in PatchedContent.ExtendedEnemyTypes)
+                    {
+                        try
+                        {
+                            EnemyType enemy = extendedEnemy.EnemyType;
+                            LunarConfigEntry configuredEnemy = enemyFile.entries[lunarCentral.UUIDify($"LLL - {enemy.enemyName} ({extendedEnemy.UniqueIdentificationName})")];
+
+                            if (configuredEnemy.GetValue<bool>("Configure Content"))
+                            {
+                                extendedEnemy.EnemyDisplayName = configuredEnemy.GetValue<string>("Display Name", overridenSettings.Contains("Display Name"));
+                                configuredEnemy.SetValue("Can See Through Fog?", ref enemy.canSeeThroughFog, overridenSettings.Contains("Can See Through Fog?"));
+                                configuredEnemy.SetValue("Door Speed Multiplier", ref enemy.doorSpeedMultiplier, overridenSettings.Contains("Door Speed Multiplier"));
+                                configuredEnemy.SetValue("Is Daytime Enemy?", ref enemy.isDaytimeEnemy, overridenSettings.Contains("Is Daytime Enemy?"));
+                                configuredEnemy.SetValue("Is Outdoor Enemy?", ref enemy.isOutsideEnemy, overridenSettings.Contains("Is Outdoor Enemy?"));
+                                configuredEnemy.SetValue("Loudness Multiplier", ref enemy.loudnessMultiplier, overridenSettings.Contains("Loudness Multiplier"));
+                                configuredEnemy.SetValue("Max Count", ref enemy.MaxCount, overridenSettings.Contains("Max Count"));
+                                configuredEnemy.SetValue("Power Level", ref enemy.PowerLevel, overridenSettings.Contains("Power Level"));
+                                configuredEnemy.SetCurve("Probability Curve", ref enemy.probabilityCurve, overridenSettings.Contains("Probability Curve"));
+                                configuredEnemy.SetValue("Use Falloff?", ref enemy.useNumberSpawnedFalloff, overridenSettings.Contains("Use Falloff?"));
+                                configuredEnemy.SetCurve("Falloff Curve", ref enemy.numberSpawnedFalloff, overridenSettings.Contains("Falloff Curve"));
+                                configuredEnemy.SetValue("Enemy HP", ref enemy.enemyPrefab.GetComponent<EnemyAI>().enemyHP, overridenSettings.Contains("Enemy HP"));
+                                configuredEnemy.SetValue("Can Die?", ref enemy.canDie, overridenSettings.Contains("Can Die?"));
+                                configuredEnemy.SetValue("Destroy On Death?", ref enemy.destroyOnDeath, overridenSettings.Contains("Destroy On Death?"));
+                                configuredEnemy.SetValue("Can Destroy?", ref enemy.canBeDestroyed, overridenSettings.Contains("Can Destroy?"));
+                                configuredEnemy.SetValue("Can Stun?", ref enemy.canBeStunned, overridenSettings.Contains("Can Stun?"));
+                                configuredEnemy.SetValue("Stun Difficulty", ref enemy.stunGameDifficultyMultiplier, overridenSettings.Contains("Stun Difficulty"));
+                                configuredEnemy.SetValue("Stun Time", ref enemy.stunTimeMultiplier, overridenSettings.Contains("Stun Time"));
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            MiniLogger.LogError($"An error occured while setting enemy values, please report this!\n{e}");
+                        }
+                    }
+
+                    // LL/CRLib Enemies
+                    foreach (var spawnableEnemy in Enemies.spawnableEnemies)
+                    {
+                        try
+                        {
+                            EnemyType enemy = spawnableEnemy.enemy;
+                            LunarConfigEntry configuredEnemy = enemyFile.entries[lunarCentral.UUIDify($"LL - {enemy.enemyName} ({spawnableEnemy.modName}.{enemy.name})")];
+
+                            if (configuredEnemy.GetValue<bool>("Configure Content"))
+                            {
+                                configuredEnemy.SetValue("Display Name", ref enemy.enemyName, overridenSettings.Contains("Display Name"));
+                                configuredEnemy.SetValue("Can See Through Fog?", ref enemy.canSeeThroughFog, overridenSettings.Contains("Can See Through Fog?"));
+                                configuredEnemy.SetValue("Door Speed Multiplier", ref enemy.doorSpeedMultiplier, overridenSettings.Contains("Door Speed Multiplier"));
+                                configuredEnemy.SetValue("Is Daytime Enemy?", ref enemy.isDaytimeEnemy, overridenSettings.Contains("Is Daytime Enemy?"));
+                                configuredEnemy.SetValue("Is Outdoor Enemy?", ref enemy.isOutsideEnemy, overridenSettings.Contains("Is Outdoor Enemy?"));
+                                configuredEnemy.SetValue("Loudness Multiplier", ref enemy.loudnessMultiplier, overridenSettings.Contains("Loudness Multiplier"));
+                                configuredEnemy.SetValue("Max Count", ref enemy.MaxCount, overridenSettings.Contains("Max Count"));
+                                configuredEnemy.SetValue("Power Level", ref enemy.PowerLevel, overridenSettings.Contains("Power Level"));
+                                configuredEnemy.SetCurve("Probability Curve", ref enemy.probabilityCurve, overridenSettings.Contains("Probability Curve"));
+                                configuredEnemy.SetValue("Use Falloff?", ref enemy.useNumberSpawnedFalloff, overridenSettings.Contains("Use Falloff?"));
+                                configuredEnemy.SetCurve("Falloff Curve", ref enemy.numberSpawnedFalloff, overridenSettings.Contains("Falloff Curve"));
+                                configuredEnemy.SetValue("Enemy HP", ref enemy.enemyPrefab.GetComponent<EnemyAI>().enemyHP, overridenSettings.Contains("Enemy HP"));
+                                configuredEnemy.SetValue("Can Die?", ref enemy.canDie, overridenSettings.Contains("Can Die?"));
+                                configuredEnemy.SetValue("Destroy On Death?", ref enemy.destroyOnDeath, overridenSettings.Contains("Destroy On Death?"));
+                                configuredEnemy.SetValue("Can Destroy?", ref enemy.canBeDestroyed, overridenSettings.Contains("Can Destroy?"));
+                                configuredEnemy.SetValue("Can Stun?", ref enemy.canBeStunned, overridenSettings.Contains("Can Stun?"));
+                                configuredEnemy.SetValue("Stun Difficulty", ref enemy.stunGameDifficultyMultiplier, overridenSettings.Contains("Stun Difficulty"));
+                                configuredEnemy.SetValue("Stun Time", ref enemy.stunTimeMultiplier, overridenSettings.Contains("Stun Time"));
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            MiniLogger.LogError($"An error occured while setting enemy values, please report this!\n{e}");
+                        }
+                    }
+                }
+
+                ExtendedLevel level = LevelManager.CurrentExtendedLevel;
 
                 // Modifying Map Object Curves And Injecting Modified Objects
                 if (configuredMapObjects.Count > 0 && level != null)
@@ -1075,6 +793,65 @@ namespace LunarConfig.Patches
             }
         }
 
+        [HarmonyPatch(typeof(RoundManager), nameof(RoundManager.SpawnScrapInLevel))]
+        [HarmonyPriority(400)]
+        [HarmonyBefore("mrov.WeatherRegistry")]
+        [HarmonyPrefix]
+        private static void resetScrapMultipliers(RoundManager __instance)
+        {
+            try
+            {
+                __instance.scrapAmountMultiplier = 1;
+                __instance.scrapValueMultiplier = 0.4f;
+            }
+            catch (Exception e)
+            {
+                MiniLogger.LogError($"An error occured while setting moon values, please report this!\n{e}");
+            }
+        }
+
+        [HarmonyPatch(typeof(RoundManager), nameof(RoundManager.SpawnScrapInLevel))]
+        [HarmonyPriority(0)]
+        [HarmonyAfter("mrov.WeatherRegistry")]
+        [HarmonyPrefix]
+        private static void onScrapSpawnPrefix(RoundManager __instance)
+        {
+            LunarCentral lunarCentral = LunarConfig.central;
+
+            LunarConfigEntry centralConfig = lunarCentral.files[LunarConfig.CENTRAL_FILE_NAME].entries["Configuration"];
+
+            if (centralConfig.GetValue<bool>("Configure Moons"))
+            {
+                LunarConfigFile moonFile = lunarCentral.files[LunarConfig.MOON_FILE_NAME];
+
+                List<string> overridenSettings = registeredOverrides["Moon"];
+
+                // LLL/Vanilla Moons
+                foreach (var extendedMoon in PatchedContent.ExtendedLevels)
+                {
+                    try
+                    {
+                        if (extendedMoon.IsCurrentLevel)
+                        {
+                            SelectableLevel moon = extendedMoon.SelectableLevel;
+                            LunarConfigEntry configuredMoon = moonFile.entries[lunarCentral.UUIDify($"LLL - {extendedMoon.NumberlessPlanetName} ({extendedMoon.UniqueIdentificationName})")];
+
+                            if (configuredMoon.GetValue<bool>("Configure Content"))
+                            {
+                                __instance.scrapAmountMultiplier *= configuredMoon.GetValue<float>("Amount Multiplier");
+                                __instance.scrapValueMultiplier *= configuredMoon.GetValue<float>("Value Multiplier");
+                            }
+
+                            break;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        MiniLogger.LogError($"An error occured while setting moon values, please report this!\n{e}");
+                    }
+                }
+            }
+        }
             /*
             [HarmonyPatch(typeof(RoundManager), nameof(RoundManager.LoadNewLevel))]
             [HarmonyPriority(0)]

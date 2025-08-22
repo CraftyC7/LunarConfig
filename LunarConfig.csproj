@@ -51,6 +51,7 @@
 		<PackageReference Include="IAmBatby.LethalLevelLoader" Version="1.4.*" PrivateAssets="all" />
 		<PackageReference Include="XuXiaolan.CodeRebirthLib" Version="0.7.*" PrivateAssets="all" />
 		<PackageReference Include="Evaisa.LethalLib" Version="1.1.*" PrivateAssets="all" />
+		<PackageReference Include="mrov.WeatherRegistry" Version="0.7.*" PrivateAssets="all" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
