@@ -259,31 +259,6 @@ namespace LunarConfig.Patches
                     }
                 }
 
-                if (centralConfig.GetValue<bool>("Configure Vehicles"))
-                {
-                    LunarConfigFile vehicleFile = lunarCentral.files[LunarConfig.VEHICLE_FILE_NAME];
-
-                    // LLL/Vanilla Vehicles WIP
-                    foreach (var extendedVehicle in PatchedContent.ExtendedBuyableVehicles)
-                    {
-                        try
-                        {
-                            BuyableVehicle vehicle = extendedVehicle.BuyableVehicle;
-                            LunarConfigEntry configuredVehicle = vehicleFile.entries[lunarCentral.UUIDify($"LLL - {vehicle.vehicleDisplayName} ({extendedVehicle.UniqueIdentificationName})")];
-
-                            if (configuredVehicle.GetValue<bool>("Configure Content"))
-                            {
-                                configuredVehicle.SetValue("Display Name", ref vehicle.vehicleDisplayName);
-                                configuredVehicle.SetValue("Credits Worth", ref vehicle.creditsWorth);
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            MiniLogger.LogError($"An error occured while setting vehicle values, please report this!\n{e}");
-                        }
-                    }
-                }
-
                 if (centralConfig.GetValue<bool>("Configure Map Objects"))
                 {
                     LunarConfigFile mapObjectFile = lunarCentral.files[LunarConfig.MAP_OBJECT_FILE_NAME];

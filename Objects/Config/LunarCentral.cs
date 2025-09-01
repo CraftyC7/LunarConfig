@@ -134,7 +134,6 @@ namespace LunarConfig.Objects.Config
             if (centralConfig.GetValue<bool>("Configure Enemies")) { InitEnemies(); }
             if (centralConfig.GetValue<bool>("Configure Moons")) { InitMoons(); }
             if (centralConfig.GetValue<bool>("Configure Dungeons")) { InitDungeons(); }
-            if (centralConfig.GetValue<bool>("Configure Vehicles")) { InitVehicles(); }
             if (centralConfig.GetValue<bool>("Configure Map Objects")) { InitMapObjects(); }
             if (centralConfig.GetValue<bool>("Configure Outside Map Objects")) { InitOutsideMapObjects(); }
             if (centralConfig.GetValue<bool>("Configure Tags")) { InitTags(); }
@@ -879,34 +878,6 @@ namespace LunarConfig.Objects.Config
 
             dungeonFile.file.Save();
             dungeonFile.file.SaveOnConfigSet = true;
-        }
-
-        public void InitVehicles()
-        {
-            LunarConfigFile vehicleFile = AddFile(LunarConfig.VEHICLE_FILE, LunarConfig.VEHICLE_FILE_NAME);
-            vehicleFile.file.SaveOnConfigSet = false;
-
-            HashSet<string> registeredVehicles = new HashSet<string>();
-
-            // LLL/Vanilla Content
-            foreach (var vehicle in PatchedContent.ExtendedBuyableVehicles)
-            {
-                string vehicleUUID = UUIDify($"LLL - {vehicle.BuyableVehicle.vehicleDisplayName} ({vehicle.UniqueIdentificationName})");
-                if (!registeredVehicles.Contains(vehicleUUID))
-                {
-                    BuyableVehicle vehicleObj = vehicle.BuyableVehicle;
-                    LunarConfigEntry vehicleEntry = vehicleFile.AddEntry(vehicleUUID);
-                    MiniLogger.LogInfo($"Recording {vehicle.name}...");
-                    vehicleEntry.AddField("Configure Content", "Enable to change any of the settings below.", false);
-                    vehicleEntry.AddField("Display Name", "Changes the name of the vehicle.\nDoes not modify terminal commands/nodes.", vehicleObj.vehicleDisplayName);
-                    vehicleEntry.AddField("Credits Worth", "Changes the price of the vehicle.", vehicleObj.creditsWorth);
-                    MiniLogger.LogInfo($"Recorded {vehicle.name}");
-                    registeredVehicles.Add(vehicleUUID);
-                }
-            }
-
-            vehicleFile.file.Save();
-            vehicleFile.file.SaveOnConfigSet = true;
         }
 
         public void InitMapObjects()

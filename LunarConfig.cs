@@ -25,9 +25,6 @@ namespace LunarConfig
         internal static readonly string MOON_FILE_NAME = "LunarConfigMoons.cfg";
         internal static readonly string MOON_FILE = Path.Combine(EXPORT_DIRECTORY, MOON_FILE_NAME);
 
-        internal static readonly string VEHICLE_FILE_NAME = "LunarConfigVehicles.cfg";
-        internal static readonly string VEHICLE_FILE = Path.Combine(EXPORT_DIRECTORY, VEHICLE_FILE_NAME);
-
         internal static readonly string MAP_OBJECT_FILE_NAME = "LunarConfigMapObjects.cfg";
         internal static readonly string MAP_OBJECT_FILE = Path.Combine(EXPORT_DIRECTORY, MAP_OBJECT_FILE_NAME);
 
