@@ -75,7 +75,7 @@ namespace LunarConfig
         }
     }
 
-    // MiniLogger from LethalQuantities <3 see NOTICE
+    // MiniLogger from LethalQuantities <3
     public static class MiniLogger
     {
         private static ManualLogSource logger = BepInEx.Logging.Logger.CreateLogSource(MyPluginInfo.PLUGIN_NAME);
