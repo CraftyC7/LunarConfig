@@ -29,6 +29,17 @@ namespace LunarConfig.Patches
                     MiniLogger.LogInfo("Changing Moons");
                     LunarConfigFile moonFile = lunarCentral.files[LunarConfig.MOON_FILE_NAME];
 
+                    LunarConfigEntry enabledEntry = lunarCentral.files[LunarConfig.CENTRAL_FILE_NAME].entries["Enabled Moon Settings"];
+                    HashSet<string> enabledSettings = new HashSet<string>();
+
+                    foreach (var setting in enabledEntry.fields.Keys)
+                    {
+                        if (enabledEntry.GetValue<bool>(setting))
+                        {
+                            enabledSettings.Add(setting);
+                        }
+                    }
+
                     List<string> overridenSettings = RoundManagerPatch.registeredOverrides["Moon"];
 
                     // LLL/Vanilla Moons
@@ -41,12 +52,12 @@ namespace LunarConfig.Patches
 
                             if (configuredMoon.GetValue<bool>("Configure Content"))
                             {
-                                configuredMoon.SetValue("Display Name", ref moon.PlanetName);
-                                configuredMoon.SetValue("Risk Level", ref moon.riskLevel);
-                                moon.LevelDescription = configuredMoon.GetValue<string>("Description").Replace(";", "\n");
-                                extendedMoon.RoutePrice = configuredMoon.GetValue<int>("Route Price", overridenSettings.Contains("Route Price"));
-                                extendedMoon.IsRouteHidden = configuredMoon.GetValue<bool>("Is Hidden?", overridenSettings.Contains("Is Hidden?"));
-                                extendedMoon.IsRouteLocked = configuredMoon.GetValue<bool>("Is Locked?", overridenSettings.Contains("Is Locked?"));
+                                if (enabledSettings.Contains("Display Name")) { configuredMoon.SetValue("Display Name", ref moon.PlanetName); }
+                                if (enabledSettings.Contains("Risk Level")) { configuredMoon.SetValue("Risk Level", ref moon.riskLevel); }
+                                if (enabledSettings.Contains("Description")) { moon.LevelDescription = configuredMoon.GetValue<string>("Description").Replace(";", "\n"); }
+                                if (enabledSettings.Contains("Route Price")) { extendedMoon.RoutePrice = configuredMoon.GetValue<int>("Route Price"); }
+                                if (enabledSettings.Contains("Is Hidden?")) { extendedMoon.IsRouteHidden = configuredMoon.GetValue<bool>("Is Hidden?"); }
+                                if (enabledSettings.Contains("Is Locked?")) { extendedMoon.IsRouteLocked = configuredMoon.GetValue<bool>("Is Locked?"); }
                             }
                         }
                         catch (Exception e)
@@ -82,6 +93,17 @@ namespace LunarConfig.Patches
                     MiniLogger.LogInfo("Changing Moons");
                     LunarConfigFile moonFile = lunarCentral.files[LunarConfig.MOON_FILE_NAME];
 
+                    LunarConfigEntry enabledEntry = lunarCentral.files[LunarConfig.CENTRAL_FILE_NAME].entries["Enabled Moon Settings"];
+                    HashSet<string> enabledSettings = new HashSet<string>();
+
+                    foreach (var setting in enabledEntry.fields.Keys)
+                    {
+                        if (enabledEntry.GetValue<bool>(setting))
+                        {
+                            enabledSettings.Add(setting);
+                        }
+                    }
+
                     List<string> overridenSettings = RoundManagerPatch.registeredOverrides["Moon"];
 
                     // LLL/Vanilla Moons
@@ -94,12 +116,12 @@ namespace LunarConfig.Patches
 
                             if (configuredMoon.GetValue<bool>("Configure Content"))
                             {
-                                configuredMoon.SetValue("Display Name", ref moon.PlanetName);
-                                configuredMoon.SetValue("Risk Level", ref moon.riskLevel);
-                                moon.LevelDescription = configuredMoon.GetValue<string>("Description").Replace(";", "\n");
-                                extendedMoon.RoutePrice = configuredMoon.GetValue<int>("Route Price", overridenSettings.Contains("Route Price"));
-                                extendedMoon.IsRouteHidden = configuredMoon.GetValue<bool>("Is Hidden?", overridenSettings.Contains("Is Hidden?"));
-                                extendedMoon.IsRouteLocked = configuredMoon.GetValue<bool>("Is Locked?", overridenSettings.Contains("Is Locked?"));
+                                if (enabledSettings.Contains("Display Name")) { configuredMoon.SetValue("Display Name", ref moon.PlanetName); }
+                                if (enabledSettings.Contains("Risk Level")) { configuredMoon.SetValue("Risk Level", ref moon.riskLevel); }
+                                if (enabledSettings.Contains("Description")) { moon.LevelDescription = configuredMoon.GetValue<string>("Description").Replace(";", "\n"); }
+                                if (enabledSettings.Contains("Route Price")) { extendedMoon.RoutePrice = configuredMoon.GetValue<int>("Route Price"); }
+                                if (enabledSettings.Contains("Is Hidden?")) { extendedMoon.IsRouteHidden = configuredMoon.GetValue<bool>("Is Hidden?"); }
+                                if (enabledSettings.Contains("Is Locked?")) { extendedMoon.IsRouteLocked = configuredMoon.GetValue<bool>("Is Locked?"); }
                             }
                         }
                         catch (Exception e)
@@ -133,6 +155,17 @@ namespace LunarConfig.Patches
                 {
                     LunarConfigFile moonFile = lunarCentral.files[LunarConfig.MOON_FILE_NAME];
 
+                    LunarConfigEntry enabledEntry = centralFile.entries["Enabled Moon Settings"];
+                    HashSet<string> enabledSettings = new HashSet<string>();
+
+                    foreach (var setting in enabledEntry.fields.Keys)
+                    {
+                        if (enabledEntry.GetValue<bool>(setting))
+                        {
+                            enabledSettings.Add(setting);
+                        }
+                    }
+
                     // LLL/Vanilla Moons
                     foreach (var extendedMoon in PatchedContent.ExtendedLevels)
                     {
@@ -141,7 +174,7 @@ namespace LunarConfig.Patches
 
                         if (configuredMoon.GetValue<bool>("Configure Content"))
                         {
-                            configuredMoon.SetValue("Can Be Challenge Moon?", ref moon.planetHasTime);
+                            if (enabledSettings.Contains("Can Be Challenge Moon?")) { configuredMoon.SetValue("Can Be Challenge Moon?", ref moon.planetHasTime); }
                         }
                     }
                 }
@@ -170,6 +203,17 @@ namespace LunarConfig.Patches
                 {
                     LunarConfigFile moonFile = lunarCentral.files[LunarConfig.MOON_FILE_NAME];
 
+                    LunarConfigEntry enabledEntry = centralFile.entries["Enabled Moon Settings"];
+                    HashSet<string> enabledSettings = new HashSet<string>();
+
+                    foreach (var setting in enabledEntry.fields.Keys)
+                    {
+                        if (enabledEntry.GetValue<bool>(setting))
+                        {
+                            enabledSettings.Add(setting);
+                        }
+                    }
+
                     // LLL/Vanilla Moons
                     foreach (var extendedMoon in PatchedContent.ExtendedLevels)
                     {
@@ -178,7 +222,7 @@ namespace LunarConfig.Patches
 
                         if (configuredMoon.GetValue<bool>("Configure Content"))
                         {
-                            configuredMoon.SetValue("Has Time?", ref moon.planetHasTime);
+                            if (enabledSettings.Contains("Has Time?")) { configuredMoon.SetValue("Has Time?", ref moon.planetHasTime); }
                         }
                     }
                 }
