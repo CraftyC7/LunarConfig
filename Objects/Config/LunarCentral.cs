@@ -207,12 +207,12 @@ namespace LunarConfig.Objects.Config
             centralFile.file.SaveOnConfigSet = false;
 
             LunarConfigEntry configEntry = centralFile.AddEntry("Configuration");
-            configEntry.AddField("Configure Items", "Check this to generate and use configuration files for items.", false);
-            configEntry.AddField("Configure Enemies", "Check this to generate and use configuration files for enemies.", false);
-            configEntry.AddField("Configure Moons", "Check this to generate and use configuration files for moons.", false);
-            configEntry.AddField("Configure Dungeons", "Check this to generate and use configuration files for dungeons.", false);
-            configEntry.AddField("Configure Map Objects", "Check this to generate and use configuration files for map objects.", false);
-            configEntry.AddField("Configure Outside Map Objects", "Check this to generate and use configuration files for outside map objects.", false);
+            configEntry.AddField("Configure Items", "Check this to generate and use configuration files for items.", true);
+            configEntry.AddField("Configure Enemies", "Check this to generate and use configuration files for enemies.", true);
+            configEntry.AddField("Configure Moons", "Check this to generate and use configuration files for moons.", true);
+            configEntry.AddField("Configure Dungeons", "Check this to generate and use configuration files for dungeons.", true);
+            configEntry.AddField("Configure Map Objects", "Check this to generate and use configuration files for map objects.", true);
+            configEntry.AddField("Configure Outside Map Objects", "Check this to generate and use configuration files for outside map objects.", true);
 
             if (configEntry.GetValue<bool>("Configure Items"))
             {
@@ -284,7 +284,7 @@ namespace LunarConfig.Objects.Config
 
             if (configEntry.GetValue<bool>("Configure Map Objects"))
             {
-                LunarConfigEntry configMapObjects = centralFile.AddEntry("Enabled Map Objects Settings");
+                LunarConfigEntry configMapObjects = centralFile.AddEntry("Enabled Map Object Settings");
                 configMapObjects.AddField("Face Away From Wall?", "Disable this to disable configuring this property in map object config entries.", true);
                 configMapObjects.AddField("Face Towards Wall?", "Disable this to disable configuring this property in map object config entries.", true);
                 configMapObjects.AddField("Disallow Near Entrance?", "Disable this to disable configuring this property in map object config entries.", true);
@@ -300,7 +300,7 @@ namespace LunarConfig.Objects.Config
 
             if (configEntry.GetValue<bool>("Configure Outside Map Objects"))
             {
-                LunarConfigEntry configOutsideMapObjects = centralFile.AddEntry("Enabled Outside Map Objects Settings");
+                LunarConfigEntry configOutsideMapObjects = centralFile.AddEntry("Enabled Outside Map Object Settings");
 
                 foreach (var level in PatchedContent.ExtendedLevels)
                 {
@@ -314,6 +314,8 @@ namespace LunarConfig.Objects.Config
 
         public void InitItems()
         {
+            MiniLogger.LogInfo("Initializing Item Configuration...");
+
             LunarConfigFile itemFile = AddFile(LunarConfig.ITEM_FILE, LunarConfig.ITEM_FILE_NAME);
             itemFile.file.SaveOnConfigSet = false;
 
@@ -422,10 +424,14 @@ namespace LunarConfig.Objects.Config
 
             itemFile.file.Save();
             itemFile.file.SaveOnConfigSet = true;
+
+            MiniLogger.LogInfo("Item Configuration Initialized!");
         }
         
         public void InitEnemies()
         {
+            MiniLogger.LogInfo("Initializing Enemy Configuration...");
+
             LunarConfigFile enemyFile = AddFile(LunarConfig.ENEMY_FILE, LunarConfig.ENEMY_FILE_NAME);
             enemyFile.file.SaveOnConfigSet = false;
 
@@ -479,9 +485,9 @@ namespace LunarConfig.Objects.Config
                     if (enabledSettings.Contains("Can Die?")) { enemyEntry.AddField("Can Die?", "Whether or not an enemy can die.", enemyObj.canDie); }
                     if (enabledSettings.Contains("Destroy On Death?")) { enemyEntry.AddField("Destroy On Death?", "Whether or not an enemy is destroyed on death.", enemyObj.destroyOnDeath); }
                     if (enabledSettings.Contains("Can Destroy?")) { enemyEntry.AddField("Can Destroy?", "Whether or not an enemy can be destroyed.", enemyObj.canBeDestroyed); }
-                    if (enabledSettings.Contains("Can Stun?")) { enemyEntry.AddField("Can Stun?", "Whether or not an enemy can be stunned.", enemyObj.canBeStunned); }
-                    if (enabledSettings.Contains("Stun Difficulty")) { enemyEntry.AddField("Stun Difficulty", "I don't really know.", enemyObj.stunGameDifficultyMultiplier); }
-                    if (enabledSettings.Contains("Stun Time")) { enemyEntry.AddField("Stun Time", "I don't really know.", enemyObj.stunTimeMultiplier); }
+                    if (enabledSettings.Contains("Can Stun?")) { enemyEntry.AddField("Can Stun?", "Whether or not an enemy can be stunned.\nWARNING: Enabling this for enemies that have it disabled by default will likely cause issues, as the enemy most likely does not have stunning mechanics.", enemyObj.canBeStunned); }
+                    if (enabledSettings.Contains("Stun Difficulty")) { enemyEntry.AddField("Stun Difficulty", "Modifies the difficulty of using the zap gun on this enemy.", enemyObj.stunGameDifficultyMultiplier); }
+                    if (enabledSettings.Contains("Stun Time")) { enemyEntry.AddField("Stun Time", "Modifies the duration this enemy stays stunned.", enemyObj.stunTimeMultiplier); }
                     MiniLogger.LogInfo($"Recorded {enemy.name}");
                 }
             }
@@ -523,19 +529,23 @@ namespace LunarConfig.Objects.Config
                     if (enabledSettings.Contains("Can Die?")) { enemyEntry.AddField("Can Die?", "Whether or not an enemy can die.", enemyObj.canDie); }
                     if (enabledSettings.Contains("Destroy On Death?")) { enemyEntry.AddField("Destroy On Death?", "Whether or not an enemy is destroyed on death.", enemyObj.destroyOnDeath); }
                     if (enabledSettings.Contains("Can Destroy?")) { enemyEntry.AddField("Can Destroy?", "Whether or not an enemy can be destroyed.", enemyObj.canBeDestroyed); }
-                    if (enabledSettings.Contains("Can Stun?")) { enemyEntry.AddField("Can Stun?", "Whether or not an enemy can be stunned.", enemyObj.canBeStunned); }
-                    if (enabledSettings.Contains("Stun Difficulty")) { enemyEntry.AddField("Stun Difficulty", "I don't really know.", enemyObj.stunGameDifficultyMultiplier); }
-                    if (enabledSettings.Contains("Stun Time")) { enemyEntry.AddField("Stun Time", "I don't really know.", enemyObj.stunTimeMultiplier); }
+                    if (enabledSettings.Contains("Can Stun?")) { enemyEntry.AddField("Can Stun?", "Whether or not an enemy can be stunned.\nWARNING: Enabling this for enemies that have it disabled by default will likely cause issues, as the enemy most likely does not have stunning mechanics.", enemyObj.canBeStunned); }
+                    if (enabledSettings.Contains("Stun Difficulty")) { enemyEntry.AddField("Stun Difficulty", "Modifies the difficulty of using the zap gun on this enemy.", enemyObj.stunGameDifficultyMultiplier); }
+                    if (enabledSettings.Contains("Stun Time")) { enemyEntry.AddField("Stun Time", "Modifies the duration this enemy stays stunned.", enemyObj.stunTimeMultiplier); }
                     MiniLogger.LogInfo($"Recorded {enemyObj.name}");
                 }
             }
 
             enemyFile.file.Save();
             enemyFile.file.SaveOnConfigSet = true;
+
+            MiniLogger.LogInfo("Enemy Configuration Initialized!");
         }
 
         public void InitMoons()
         {
+            MiniLogger.LogInfo("Initializing Moon Configuration...");
+
             LunarConfigFile moonFile = AddFile(LunarConfig.MOON_FILE, LunarConfig.MOON_FILE_NAME);
             moonFile.file.SaveOnConfigSet = false;
 
@@ -689,10 +699,14 @@ namespace LunarConfig.Objects.Config
 
             moonFile.file.Save();
             moonFile.file.SaveOnConfigSet = true;
+
+            MiniLogger.LogInfo("Moon Configuration Initialized!");
         }
 
         public void InitDungeons()
         {
+            MiniLogger.LogInfo("Initializing Dungeon Configuration...");
+
             LunarConfigFile dungeonFile = AddFile(LunarConfig.DUNGEON_FILE, LunarConfig.DUNGEON_FILE_NAME);
             dungeonFile.file.SaveOnConfigSet = false;
 
@@ -715,10 +729,14 @@ namespace LunarConfig.Objects.Config
 
             dungeonFile.file.Save();
             dungeonFile.file.SaveOnConfigSet = true;
+
+            MiniLogger.LogInfo("Dungeon Configuration Initialized!");
         }
 
         public void InitMapObjects()
         {
+            MiniLogger.LogInfo("Initializing Map Object Configuration...");
+
             LunarConfigFile mapObjectFile = AddFile(LunarConfig.MAP_OBJECT_FILE, LunarConfig.MAP_OBJECT_FILE_NAME);
             mapObjectFile.file.SaveOnConfigSet = false;
 
@@ -815,10 +833,14 @@ namespace LunarConfig.Objects.Config
 
             mapObjectFile.file.Save();
             mapObjectFile.file.SaveOnConfigSet = true;
+
+            MiniLogger.LogInfo("Map Object Configuration Initialized!");
         }
 
         public void InitOutsideMapObjects()
         {
+            MiniLogger.LogInfo("Initializing Outside Map Object Configuration...");
+
             LunarConfigFile mapObjectFile = AddFile(LunarConfig.OUTSIDE_MAP_OBJECT_FILE, LunarConfig.OUTSIDE_MAP_OBJECT_FILE_NAME);
             mapObjectFile.file.SaveOnConfigSet = false;
 
@@ -893,6 +915,8 @@ namespace LunarConfig.Objects.Config
 
             mapObjectFile.file.Save();
             mapObjectFile.file.SaveOnConfigSet = true;
+
+            MiniLogger.LogInfo("Outside Map Object Configuration Initialized!");
         }
 
         public void FixDungeons()

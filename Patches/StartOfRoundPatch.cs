@@ -40,7 +40,7 @@ namespace LunarConfig.Patches
                         }
                     }
 
-                    List<string> overridenSettings = RoundManagerPatch.registeredOverrides["Moon"];
+                    List<string> overridenSettings = new List<string>();
 
                     // LLL/Vanilla Moons
                     foreach (var extendedMoon in PatchedContent.ExtendedLevels)
@@ -69,7 +69,7 @@ namespace LunarConfig.Patches
             }
             catch (Exception e)
             {
-                MiniLogger.LogError($"An issue occured when modifying spawn pools, please report this!\n{e}");
+                MiniLogger.LogError($"An error occured while setting moon values, please report this!\n{e}");
             }
         }
 
@@ -104,7 +104,7 @@ namespace LunarConfig.Patches
                         }
                     }
 
-                    List<string> overridenSettings = RoundManagerPatch.registeredOverrides["Moon"];
+                    List<string> overridenSettings = new List<string>();
 
                     // LLL/Vanilla Moons
                     foreach (var extendedMoon in PatchedContent.ExtendedLevels)
@@ -133,7 +133,7 @@ namespace LunarConfig.Patches
             }
             catch (Exception e)
             {
-                MiniLogger.LogError($"An issue occured when modifying spawn pools, please report this!\n{e}");
+                MiniLogger.LogError($"An error occured while setting moon values, please report this!\n{e}");
             }
         }
 

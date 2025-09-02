@@ -55,7 +55,7 @@ namespace LunarConfig.Patches
                         }
                     }
 
-                    List<string> overridenSettings = registeredOverrides["Item"];
+                    List<string> overridenSettings = new List<string>();
 
                     // LLL/Vanilla Items
                     foreach (var extendedItem in PatchedContent.ExtendedItems)
@@ -171,7 +171,7 @@ namespace LunarConfig.Patches
                         }
                     }
 
-                    List<string> overridenSettings = registeredOverrides["Enemy"];
+                    List<string> overridenSettings = new List<string>();
 
                     // LLL/Vanilla Enemies
                     foreach (var extendedEnemy in PatchedContent.ExtendedEnemyTypes)
@@ -415,7 +415,7 @@ namespace LunarConfig.Patches
                         }
                     }
 
-                    List<string> overridenSettings = registeredOverrides["Moon"];
+                    List<string> overridenSettings = new List<string>();
 
                     ExtendedLevel extendedMoon = LevelManager.CurrentExtendedLevel;
                     SelectableLevel moon = extendedMoon.SelectableLevel;
@@ -457,9 +457,6 @@ namespace LunarConfig.Patches
             {
                 LunarCentral lunarCentral = LunarConfig.central;
 
-                LunarConfigFile mapObjectFile = lunarCentral.files[LunarConfig.MAP_OBJECT_FILE_NAME];
-                LunarConfigFile outsideObjectFile = lunarCentral.files[LunarConfig.OUTSIDE_MAP_OBJECT_FILE_NAME];
-
                 LunarConfigEntry centralConfig = lunarCentral.files[LunarConfig.CENTRAL_FILE_NAME].entries["Configuration"];
 
                 LunarConfigEntry enabledEntry;
@@ -480,7 +477,7 @@ namespace LunarConfig.Patches
                         }
                     }
 
-                    List<string> overridenSettings = registeredOverrides["Moon"];
+                    List<string> overridenSettings = new List<string>();
 
                     try
                     {
@@ -536,120 +533,131 @@ namespace LunarConfig.Patches
                 ExtendedLevel level = LevelManager.CurrentExtendedLevel;
 
                 enabledSettings.Clear();
-                enabledEntry = lunarCentral.files[LunarConfig.CENTRAL_FILE_NAME].entries["Enabled Map Object Settings"];
-                enabledSettings = new HashSet<string>();
 
-                foreach (var setting in enabledEntry.fields.Keys)
+                if (centralConfig.GetValue<bool>("Configure Map Objects"))
                 {
-                    if (enabledEntry.GetValue<bool>(setting))
-                    {
-                        enabledSettings.Add(setting);
-                    }
-                }
+                    LunarConfigFile mapObjectFile = lunarCentral.files[LunarConfig.MAP_OBJECT_FILE_NAME];
 
-                if (enabledSettings.Contains($"Level Curve - {level.NumberlessPlanetName}"))
-                {
-                    // Modifying Map Object Curves And Injecting Modified Objects
-                    if (configuredMapObjects.Count > 0 && level != null)
+                    enabledEntry = lunarCentral.files[LunarConfig.CENTRAL_FILE_NAME].entries["Enabled Map Object Settings"];
+                    enabledSettings = new HashSet<string>();
+
+                    foreach (var setting in enabledEntry.fields.Keys)
                     {
-                        foreach (var mapObject in configuredMapObjects)
+                        if (enabledEntry.GetValue<bool>(setting))
                         {
-                            List<SpawnableMapObject> objects = level.SelectableLevel.spawnableMapObjects.ToList();
+                            enabledSettings.Add(setting);
+                        }
+                    }
 
-                            objects.RemoveAll(obj => obj.prefabToSpawn.name == mapObject.Value.prefabToSpawn.name);
-
-                            SpawnableMapObject objWithCurve = mapObject.Value;
-                            LunarConfigEntry configuredMapObject = mapObjectFile.entries[mapObject.Key];
-                            string stringCurve = configuredMapObject.GetValue<string>($"Level Curve - {level.NumberlessPlanetName}");
-                            if (stringCurve.Trim() != "")
+                    if (enabledSettings.Contains($"Level Curve - {level.NumberlessPlanetName}"))
+                    {
+                        // Modifying Map Object Curves And Injecting Modified Objects
+                        if (configuredMapObjects.Count > 0 && level != null)
+                        {
+                            foreach (var mapObject in configuredMapObjects)
                             {
-                                objWithCurve.numberToSpawn = LunarCentral.StringToCurve(stringCurve);
-                            }
-                            else
-                            {
-                                objWithCurve.numberToSpawn = LunarCentral.StringToCurve(configuredMapObject.GetValue<string>("Base Curve"));
-                            }
+                                List<SpawnableMapObject> objects = level.SelectableLevel.spawnableMapObjects.ToList();
 
-                            objects.Add(objWithCurve);
+                                objects.RemoveAll(obj => obj.prefabToSpawn.name == mapObject.Value.prefabToSpawn.name);
 
-                            level.SelectableLevel.spawnableMapObjects = objects.ToArray();
+                                SpawnableMapObject objWithCurve = mapObject.Value;
+                                LunarConfigEntry configuredMapObject = mapObjectFile.entries[mapObject.Key];
+                                string stringCurve = configuredMapObject.GetValue<string>($"Level Curve - {level.NumberlessPlanetName}");
+                                if (stringCurve.Trim() != "")
+                                {
+                                    objWithCurve.numberToSpawn = LunarCentral.StringToCurve(stringCurve);
+                                }
+                                else
+                                {
+                                    objWithCurve.numberToSpawn = LunarCentral.StringToCurve(configuredMapObject.GetValue<string>("Base Curve"));
+                                }
+
+                                objects.Add(objWithCurve);
+
+                                level.SelectableLevel.spawnableMapObjects = objects.ToArray();
+                            }
                         }
                     }
                 }
 
                 enabledSettings.Clear();
-                enabledEntry = lunarCentral.files[LunarConfig.CENTRAL_FILE_NAME].entries["Enabled Outside Map Object Settings"];
 
-                foreach (var setting in enabledEntry.fields.Keys)
+                if (centralConfig.GetValue<bool>("Configure Outside Map Objects"))
                 {
-                    if (enabledEntry.GetValue<bool>(setting))
-                    {
-                        enabledSettings.Add(setting);
-                    }
-                }
+                    LunarConfigFile outsideObjectFile = lunarCentral.files[LunarConfig.OUTSIDE_MAP_OBJECT_FILE_NAME];
+                    enabledEntry = lunarCentral.files[LunarConfig.CENTRAL_FILE_NAME].entries["Enabled Outside Map Object Settings"];
 
-                if (enabledSettings.Contains($"Level Curve - {level.NumberlessPlanetName}"))
-                {
-                    // Modifying Outside Vanilla Object Curves And Injecting Modified Objects
-                    if (configuredOutsideObjects.Count > 0 && level != null)
+                    foreach (var setting in enabledEntry.fields.Keys)
                     {
-                        foreach (var mapObject in configuredOutsideObjects)
+                        if (enabledEntry.GetValue<bool>(setting))
                         {
-                            List<SpawnableOutsideObjectWithRarity> objects = level.SelectableLevel.spawnableOutsideObjects.ToList();
-
-                            objects.RemoveAll(obj => obj.spawnableObject.name == mapObject.Value.spawnableObject.name);
-
-                            SpawnableOutsideObjectWithRarity objWithCurve = mapObject.Value;
-                            LunarConfigEntry configuredMapObject = outsideObjectFile.entries[mapObject.Key];
-                            string stringCurve = configuredMapObject.GetValue<string>($"Level Curve - {level.NumberlessPlanetName}");
-                            if (stringCurve.Trim() != "")
-                            {
-                                objWithCurve.randomAmount = LunarCentral.StringToCurve(stringCurve);
-                            }
-                            else
-                            {
-                                objWithCurve.randomAmount = LunarCentral.StringToCurve(configuredMapObject.GetValue<string>("Base Curve"));
-                            }
-
-                            objects.Add(objWithCurve);
-
-                            level.SelectableLevel.spawnableOutsideObjects = objects.ToArray();
+                            enabledSettings.Add(setting);
                         }
                     }
 
-                    // Modifying Outside CR Object Curves And Injecting Modified Objects
-                    if (configuredCROutsideObjects.Count > 0 && level != null)
+                    if (enabledSettings.Contains($"Level Curve - {level.NumberlessPlanetName}"))
                     {
-                        foreach (var mapObject in configuredCROutsideObjects)
+                        // Modifying Outside Vanilla Object Curves And Injecting Modified Objects
+                        if (configuredOutsideObjects.Count > 0 && level != null)
                         {
-                            MiniLogger.LogInfo($"Configuring {mapObject.Key}");
-
-                            Enum.TryParse(level.SelectableLevel.name, true, out Levels.LevelTypes levelType);
-
-                            LunarConfigEntry configuredMapObject = outsideObjectFile.entries[mapObject.Key];
-                            string stringCurve = configuredMapObject.GetValue<string>($"Level Curve - {level.NumberlessPlanetName}");
-                            if (stringCurve.Trim() == "")
+                            foreach (var mapObject in configuredOutsideObjects)
                             {
-                                stringCurve = configuredMapObject.GetValue<string>("Base Curve");
-                            }
-                            AnimationCurve configuredCurve = LunarCentral.StringToCurve(stringCurve);
+                                List<SpawnableOutsideObjectWithRarity> objects = level.SelectableLevel.spawnableOutsideObjects.ToList();
 
-                            if (levelType == Levels.LevelTypes.Modded)
-                            {
-                                AnimationCurve curve = mapObject.Value.OutsideSpawnMechanics.CurveFunction(level.SelectableLevel);
+                                objects.RemoveAll(obj => obj.spawnableObject.name == mapObject.Value.spawnableObject.name);
 
-                                if (curve != configuredCurve)
+                                SpawnableOutsideObjectWithRarity objWithCurve = mapObject.Value;
+                                LunarConfigEntry configuredMapObject = outsideObjectFile.entries[mapObject.Key];
+                                string stringCurve = configuredMapObject.GetValue<string>($"Level Curve - {level.NumberlessPlanetName}");
+                                if (stringCurve.Trim() != "")
                                 {
-                                    mapObject.Value.OutsideSpawnMechanics.CurvesByCustomLevelType[level.name] = configuredCurve;
+                                    objWithCurve.randomAmount = LunarCentral.StringToCurve(stringCurve);
                                 }
-                            }
-                            else
-                            {
-                                AnimationCurve curve = mapObject.Value.OutsideSpawnMechanics.CurveFunction(level.SelectableLevel);
-
-                                if (curve != configuredCurve)
+                                else
                                 {
-                                    mapObject.Value.OutsideSpawnMechanics.CurvesByLevelType[levelType] = configuredCurve;
+                                    objWithCurve.randomAmount = LunarCentral.StringToCurve(configuredMapObject.GetValue<string>("Base Curve"));
+                                }
+
+                                objects.Add(objWithCurve);
+
+                                level.SelectableLevel.spawnableOutsideObjects = objects.ToArray();
+                            }
+                        }
+
+                        // Modifying Outside CR Object Curves And Injecting Modified Objects
+                        if (configuredCROutsideObjects.Count > 0 && level != null)
+                        {
+                            foreach (var mapObject in configuredCROutsideObjects)
+                            {
+                                MiniLogger.LogInfo($"Configuring {mapObject.Key}");
+
+                                Enum.TryParse(level.SelectableLevel.name, true, out Levels.LevelTypes levelType);
+
+                                LunarConfigEntry configuredMapObject = outsideObjectFile.entries[mapObject.Key];
+                                string stringCurve = configuredMapObject.GetValue<string>($"Level Curve - {level.NumberlessPlanetName}");
+                                if (stringCurve.Trim() == "")
+                                {
+                                    stringCurve = configuredMapObject.GetValue<string>("Base Curve");
+                                }
+                                AnimationCurve configuredCurve = LunarCentral.StringToCurve(stringCurve);
+
+                                if (levelType == Levels.LevelTypes.Modded)
+                                {
+                                    AnimationCurve curve = mapObject.Value.OutsideSpawnMechanics.CurveFunction(level.SelectableLevel);
+
+                                    if (curve != configuredCurve)
+                                    {
+                                        mapObject.Value.OutsideSpawnMechanics.CurvesByCustomLevelType[level.name] = configuredCurve;
+                                    }
+                                }
+                                else
+                                {
+                                    AnimationCurve curve = mapObject.Value.OutsideSpawnMechanics.CurveFunction(level.SelectableLevel);
+
+                                    if (curve != configuredCurve)
+                                    {
+                                        mapObject.Value.OutsideSpawnMechanics.CurvesByLevelType[levelType] = configuredCurve;
+                                    }
                                 }
                             }
                         }
@@ -704,7 +712,7 @@ namespace LunarConfig.Patches
             {
                 LunarConfigFile moonFile = lunarCentral.files[LunarConfig.MOON_FILE_NAME];
 
-                List<string> overridenSettings = registeredOverrides["Moon"];
+                List<string> overridenSettings = new List<string>();
 
                 // LLL/Vanilla Moons
                 foreach (var extendedMoon in PatchedContent.ExtendedLevels)
