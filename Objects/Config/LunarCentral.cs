@@ -106,16 +106,6 @@ namespace LunarConfig.Objects.Config
 
             LunarConfigEntry centralConfig = files[LunarConfig.CENTRAL_FILE_NAME].entries["Configuration"];
 
-            LunarConfigEntry tagConfig = files[LunarConfig.CENTRAL_FILE_NAME].entries["Tags"];
-
-            foreach (var tag in tagConfig.GetValue<string>("Tags").Split(','))
-            {
-                MiniLogger.LogInfo(tagConfig.GetValue<string>("Tags"));
-                foundTags.Add(UUIDify(tag).RemoveWhitespace());
-            }
-
-            useLLLTags = tagConfig.GetValue<bool>("Use Base LLL Tags");
-
             if (centralConfig.GetValue<bool>("Configure Items")) { InitItems(); }
             if (centralConfig.GetValue<bool>("Configure Enemies")) { InitEnemies(); }
             if (centralConfig.GetValue<bool>("Configure Moons")) { InitMoons(); }
