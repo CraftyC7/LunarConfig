@@ -82,11 +82,6 @@
               "target": "Package",
               "version": "[*-*, )"
             },
-            "TeamBMX.LobbyCompatibility": {
-              "suppressParent": "All",
-              "target": "Package",
-              "version": "[1.*, )"
-            },
             "UnityEngine.Modules": {
               "include": "Compile",
               "suppressParent": "All",

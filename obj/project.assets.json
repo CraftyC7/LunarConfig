@@ -292,7 +292,7 @@
           }
         }
       },
-      "mrov.WeatherRegistry/0.7.0": {
+      "mrov.WeatherRegistry/0.7.3": {
         "type": "package",
         "dependencies": {
           "BepInEx.Core": "5.4.21",
@@ -723,7 +723,7 @@
           }
         }
       },
-      "TeamBMX.LobbyCompatibility/1.5.1": {
+      "TeamBMX.LobbyCompatibility/1.0.1": {
         "type": "package",
         "compile": {
           "lib/netstandard2.1/BMX.LobbyCompatibility.dll": {}
@@ -1171,17 +1171,17 @@
         "monomod.utils.nuspec"
       ]
     },
-    "mrov.WeatherRegistry/0.7.0": {
-      "sha512": "zQ4xGpXjppKKUCGqXMlGGbo13SD3vjYprdpl3piQO0g4cExnadUbAR9ZAsToUbDR4NG2ov7kGzkssIt8IUKobQ==",
+    "mrov.WeatherRegistry/0.7.3": {
+      "sha512": "fvI1r0WhgeQ/eMBMa38idvJB+aWkn538fVfWtISBJiI4J5WiN094sZxZD9n4NaPvO1eQw4iNLgq30InEy1SIVg==",
       "type": "package",
-      "path": "mrov.weatherregistry/0.7.0",
+      "path": "mrov.weatherregistry/0.7.3",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "README.md",
         "icon.png",
         "lib/netstandard2.1/WeatherRegistry.dll",
-        "mrov.weatherregistry.0.7.0.nupkg.sha512",
+        "mrov.weatherregistry.0.7.3.nupkg.sha512",
         "mrov.weatherregistry.nuspec"
       ]
     },
@@ -2887,19 +2887,18 @@
         "system.threading.tasks.nuspec"
       ]
     },
-    "TeamBMX.LobbyCompatibility/1.5.1": {
-      "sha512": "U1taVjagI6Ma1v7EXLX9dJpJJGHBt8R2UIdOgPu/k87ZFc9qER19a4C1FPigM7qBdE6/pzXo8ovwuPrRRFb51g==",
+    "TeamBMX.LobbyCompatibility/1.0.1": {
+      "sha512": "QS+sthsrkcyT8cSGNPmc2EEblaZwmb01Ink2gmPtAkniim7d77b1eqqPW9qX2iEVhHcpj2Ex+5FwO6GrQgzBkg==",
       "type": "package",
-      "path": "teambmx.lobbycompatibility/1.5.1",
+      "path": "teambmx.lobbycompatibility/1.0.1",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "CHANGELOG.md",
         "README.md",
         "icon_128x128.png",
         "lib/net472/BMX.LobbyCompatibility.dll",
         "lib/netstandard2.1/BMX.LobbyCompatibility.dll",
-        "teambmx.lobbycompatibility.1.5.1.nupkg.sha512",
+        "teambmx.lobbycompatibility.1.0.1.nupkg.sha512",
         "teambmx.lobbycompatibility.nuspec"
       ]
     },
@@ -3132,7 +3131,6 @@
       "Evaisa.LethalLib >= 1.1.*",
       "IAmBatby.LethalLevelLoader >= 1.4.*",
       "LethalCompany.GameLibs.Steam >= *-*",
-      "TeamBMX.LobbyCompatibility >= 1.*",
       "UnityEngine.Modules >= 2022.3.9",
       "XuXiaolan.CodeRebirthLib >= 0.7.*",
       "mrov.WeatherRegistry >= 0.7.*"
@@ -3219,11 +3217,6 @@
             "suppressParent": "All",
             "target": "Package",
             "version": "[*-*, )"
-          },
-          "TeamBMX.LobbyCompatibility": {
-            "suppressParent": "All",
-            "target": "Package",
-            "version": "[1.*, )"
           },
           "UnityEngine.Modules": {
             "include": "Compile",

@@ -1,8 +1,6 @@
 using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
-using LobbyCompatibility.Attributes;
-using LobbyCompatibility.Enums;
 using LunarConfig.Objects.Config;
 using LunarConfig.Patches;
 using System.IO;
@@ -10,8 +8,6 @@ using System.IO;
 namespace LunarConfig
 {
     [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
-    [BepInDependency("BMX.LobbyCompatibility", BepInDependency.DependencyFlags.HardDependency)]
-    [LobbyCompatibility(CompatibilityLevel.Everyone, VersionStrictness.None)]
     public class LunarConfig : BaseUnityPlugin
     {
         internal static readonly string EXPORT_DIRECTORY = Path.Combine(Paths.ConfigPath, MyPluginInfo.PLUGIN_NAME);
