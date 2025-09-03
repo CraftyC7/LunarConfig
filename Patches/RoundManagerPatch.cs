@@ -70,6 +70,7 @@ namespace LunarConfig.Patches
                                 if (enabledSettings.Contains("Display Name")) { configuredItem.SetValue("Display Name", ref item.itemName, overridenSettings.Contains("Display Name")); }
                                 if (enabledSettings.Contains("Minimum Value")) { configuredItem.SetValue("Minimum Value", ref item.minValue, overridenSettings.Contains("Minimum Value")); }
                                 if (enabledSettings.Contains("Maximum Value")) { configuredItem.SetValue("Maximum Value", ref item.maxValue, overridenSettings.Contains("Maximum Value")); }
+                                if (enabledSettings.Contains("Credits Worth")) { configuredItem.SetValue("Credits Worth", ref item.creditsWorth, overridenSettings.Contains("Credits Worth")); }
                                 if (enabledSettings.Contains("Weight")) { configuredItem.SetValue("Weight", ref item.weight, overridenSettings.Contains("Weight")); }
                                 if (enabledSettings.Contains("Conductivity")) { configuredItem.SetValue("Conductivity", ref item.isConductiveMetal, overridenSettings.Contains("Conductivity")); }
                                 if (enabledSettings.Contains("Two-Handed")) { configuredItem.SetValue("Two-Handed", ref item.twoHanded, overridenSettings.Contains("Two-Handed")); }
@@ -95,6 +96,7 @@ namespace LunarConfig.Patches
                                 if (enabledSettings.Contains("Display Name")) { configuredItem.SetValue("Display Name", ref item.itemName, overridenSettings.Contains("Display Name")); }
                                 if (enabledSettings.Contains("Minimum Value")) { configuredItem.SetValue("Minimum Value", ref item.minValue, overridenSettings.Contains("Minimum Value")); }
                                 if (enabledSettings.Contains("Maximum Value")) { configuredItem.SetValue("Maximum Value", ref item.maxValue, overridenSettings.Contains("Maximum Value")); }
+                                if (enabledSettings.Contains("Credits Worth")) { configuredItem.SetValue("Credits Worth", ref item.creditsWorth, overridenSettings.Contains("Credits Worth")); }
                                 if (enabledSettings.Contains("Weight")) { configuredItem.SetValue("Weight", ref item.weight, overridenSettings.Contains("Weight")); }
                                 if (enabledSettings.Contains("Conductivity")) { configuredItem.SetValue("Conductivity", ref item.isConductiveMetal, overridenSettings.Contains("Conductivity")); }
                                 if (enabledSettings.Contains("Two-Handed")) { configuredItem.SetValue("Two-Handed", ref item.twoHanded, overridenSettings.Contains("Two-Handed")); }
@@ -119,6 +121,7 @@ namespace LunarConfig.Patches
                                 if (enabledSettings.Contains("Display Name")) { configuredItem.SetValue("Display Name", ref item.itemName, overridenSettings.Contains("Display Name")); }
                                 if (enabledSettings.Contains("Minimum Value")) { configuredItem.SetValue("Minimum Value", ref item.minValue, overridenSettings.Contains("Minimum Value")); }
                                 if (enabledSettings.Contains("Maximum Value")) { configuredItem.SetValue("Maximum Value", ref item.maxValue, overridenSettings.Contains("Maximum Value")); }
+                                if (enabledSettings.Contains("Credits Worth")) { configuredItem.SetValue("Credits Worth", ref item.creditsWorth, overridenSettings.Contains("Credits Worth")); }
                                 if (enabledSettings.Contains("Weight")) { configuredItem.SetValue("Weight", ref item.weight, overridenSettings.Contains("Weight")); }
                                 if (enabledSettings.Contains("Conductivity")) { configuredItem.SetValue("Conductivity", ref item.isConductiveMetal, overridenSettings.Contains("Conductivity")); }
                                 if (enabledSettings.Contains("Two-Handed")) { configuredItem.SetValue("Two-Handed", ref item.twoHanded, overridenSettings.Contains("Two-Handed")); }
@@ -143,6 +146,7 @@ namespace LunarConfig.Patches
                                 if (enabledSettings.Contains("Display Name")) { configuredItem.SetValue("Display Name", ref item.itemName, overridenSettings.Contains("Display Name")); }
                                 if (enabledSettings.Contains("Minimum Value")) { configuredItem.SetValue("Minimum Value", ref item.minValue, overridenSettings.Contains("Minimum Value")); }
                                 if (enabledSettings.Contains("Maximum Value")) { configuredItem.SetValue("Maximum Value", ref item.maxValue, overridenSettings.Contains("Maximum Value")); }
+                                if (enabledSettings.Contains("Credits Worth")) { configuredItem.SetValue("Credits Worth", ref item.creditsWorth, overridenSettings.Contains("Credits Worth")); }
                                 if (enabledSettings.Contains("Weight")) { configuredItem.SetValue("Weight", ref item.weight, overridenSettings.Contains("Weight")); }
                                 if (enabledSettings.Contains("Conductivity")) { configuredItem.SetValue("Conductivity", ref item.isConductiveMetal, overridenSettings.Contains("Conductivity")); }
                                 if (enabledSettings.Contains("Two-Handed")) { configuredItem.SetValue("Two-Handed", ref item.twoHanded, overridenSettings.Contains("Two-Handed")); }
@@ -194,6 +198,7 @@ namespace LunarConfig.Patches
                                 if (enabledSettings.Contains("Probability Curve")) { configuredEnemy.SetCurve("Probability Curve", ref enemy.probabilityCurve, overridenSettings.Contains("Probability Curve")); }
                                 if (enabledSettings.Contains("Use Falloff?")) { configuredEnemy.SetValue("Use Falloff?", ref enemy.useNumberSpawnedFalloff, overridenSettings.Contains("Use Falloff?")); }
                                 if (enabledSettings.Contains("Falloff Curve")) { configuredEnemy.SetCurve("Falloff Curve", ref enemy.numberSpawnedFalloff, overridenSettings.Contains("Falloff Curve")); }
+                                if (enabledSettings.Contains("Normalized Time To Leave")) { configuredEnemy.SetValue("Normalized Time To Leave", ref enemy.normalizedTimeInDayToLeave, overridenSettings.Contains("Normalized Time To Leave")); }
                                 if (enabledSettings.Contains("Enemy HP")) { configuredEnemy.SetValue("Enemy HP", ref enemy.enemyPrefab.GetComponent<EnemyAI>().enemyHP, overridenSettings.Contains("Enemy HP")); }
                                 if (enabledSettings.Contains("Can Die?")) { configuredEnemy.SetValue("Can Die?", ref enemy.canDie, overridenSettings.Contains("Can Die?")); }
                                 if (enabledSettings.Contains("Destroy On Death?")) { configuredEnemy.SetValue("Destroy On Death?", ref enemy.destroyOnDeath, overridenSettings.Contains("Destroy On Death?")); }
@@ -230,6 +235,7 @@ namespace LunarConfig.Patches
                                 if (enabledSettings.Contains("Probability Curve")) { configuredEnemy.SetCurve("Probability Curve", ref enemy.probabilityCurve, overridenSettings.Contains("Probability Curve")); }
                                 if (enabledSettings.Contains("Use Falloff?")) { configuredEnemy.SetValue("Use Falloff?", ref enemy.useNumberSpawnedFalloff, overridenSettings.Contains("Use Falloff?")); }
                                 if (enabledSettings.Contains("Falloff Curve")) { configuredEnemy.SetCurve("Falloff Curve", ref enemy.numberSpawnedFalloff, overridenSettings.Contains("Falloff Curve")); }
+                                if (enabledSettings.Contains("Normalized Time To Leave")) { configuredEnemy.SetValue("Normalized Time To Leave", ref enemy.normalizedTimeInDayToLeave, overridenSettings.Contains("Normalized Time To Leave")); }
                                 if (enabledSettings.Contains("Enemy HP")) { configuredEnemy.SetValue("Enemy HP", ref enemy.enemyPrefab.GetComponent<EnemyAI>().enemyHP, overridenSettings.Contains("Enemy HP")); }
                                 if (enabledSettings.Contains("Can Die?")) { configuredEnemy.SetValue("Can Die?", ref enemy.canDie, overridenSettings.Contains("Can Die?")); }
                                 if (enabledSettings.Contains("Destroy On Death?")) { configuredEnemy.SetValue("Destroy On Death?", ref enemy.destroyOnDeath, overridenSettings.Contains("Destroy On Death?")); }
@@ -549,7 +555,7 @@ namespace LunarConfig.Patches
                         }
                     }
 
-                    if (enabledSettings.Contains($"Level Curve - {level.NumberlessPlanetName}"))
+                    if (enabledSettings.Contains($"Level Curve - {lunarCentral.UUIDify(level.NumberlessPlanetName)}"))
                     {
                         // Modifying Map Object Curves And Injecting Modified Objects
                         if (configuredMapObjects.Count > 0 && level != null)
@@ -562,7 +568,7 @@ namespace LunarConfig.Patches
 
                                 SpawnableMapObject objWithCurve = mapObject.Value;
                                 LunarConfigEntry configuredMapObject = mapObjectFile.entries[mapObject.Key];
-                                string stringCurve = configuredMapObject.GetValue<string>($"Level Curve - {level.NumberlessPlanetName}");
+                                string stringCurve = configuredMapObject.GetValue<string>($"Level Curve - {lunarCentral.UUIDify(level.NumberlessPlanetName)}");
                                 if (stringCurve.Trim() != "")
                                 {
                                     objWithCurve.numberToSpawn = LunarCentral.StringToCurve(stringCurve);
@@ -595,7 +601,7 @@ namespace LunarConfig.Patches
                         }
                     }
 
-                    if (enabledSettings.Contains($"Level Curve - {level.NumberlessPlanetName}"))
+                    if (enabledSettings.Contains($"Level Curve - {lunarCentral.UUIDify(level.NumberlessPlanetName)}"))
                     {
                         // Modifying Outside Vanilla Object Curves And Injecting Modified Objects
                         if (configuredOutsideObjects.Count > 0 && level != null)
@@ -608,7 +614,7 @@ namespace LunarConfig.Patches
 
                                 SpawnableOutsideObjectWithRarity objWithCurve = mapObject.Value;
                                 LunarConfigEntry configuredMapObject = outsideObjectFile.entries[mapObject.Key];
-                                string stringCurve = configuredMapObject.GetValue<string>($"Level Curve - {level.NumberlessPlanetName}");
+                                string stringCurve = configuredMapObject.GetValue<string>($"Level Curve - {lunarCentral.UUIDify(level.NumberlessPlanetName)}");
                                 if (stringCurve.Trim() != "")
                                 {
                                     objWithCurve.randomAmount = LunarCentral.StringToCurve(stringCurve);
@@ -634,7 +640,7 @@ namespace LunarConfig.Patches
                                 Enum.TryParse(level.SelectableLevel.name, true, out Levels.LevelTypes levelType);
 
                                 LunarConfigEntry configuredMapObject = outsideObjectFile.entries[mapObject.Key];
-                                string stringCurve = configuredMapObject.GetValue<string>($"Level Curve - {level.NumberlessPlanetName}");
+                                string stringCurve = configuredMapObject.GetValue<string>($"Level Curve - {lunarCentral.UUIDify(level.NumberlessPlanetName)}");
                                 if (stringCurve.Trim() == "")
                                 {
                                     stringCurve = configuredMapObject.GetValue<string>("Base Curve");

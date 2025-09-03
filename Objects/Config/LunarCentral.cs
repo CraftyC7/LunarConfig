@@ -220,6 +220,7 @@ namespace LunarConfig.Objects.Config
                 configItems.AddField("Display Name", "Disable this to disable configuring this property in item config entries.", true);
                 configItems.AddField("Minimum Value", "Disable this to disable configuring this property in item config entries.", true);
                 configItems.AddField("Maximum Value", "Disable this to disable configuring this property in item config entries.", true);
+                configItems.AddField("Credits Worth", "Disable this to disable configuring this property in item config entries.", true);
                 configItems.AddField("Weight", "Disable this to disable configuring this property in item config entries.", true);
                 configItems.AddField("Conductivity", "Disable this to disable configuring this property in item config entries.", true);
                 configItems.AddField("Two-Handed", "Disable this to disable configuring this property in item config entries.", true);
@@ -240,6 +241,7 @@ namespace LunarConfig.Objects.Config
                 configEnemies.AddField("Probability Curve", "Disable this to disable configuring this property in enemy config entries.", true);
                 configEnemies.AddField("Use Falloff?", "Disable this to disable configuring this property in enemy config entries.", true);
                 configEnemies.AddField("Falloff Curve", "Disable this to disable configuring this property in enemy config entries.", true);
+                configEnemies.AddField("Normalized Time To Leave", "Disable this to disable configuring this property in enemy config entries.", true);
                 configEnemies.AddField("Enemy HP", "Disable this to disable configuring this property in enemy config entries.", true);
                 configEnemies.AddField("Can Die?", "Disable this to disable configuring this property in enemy config entries.", true);
                 configEnemies.AddField("Destroy On Death?", "Disable this to disable configuring this property in enemy config entries.", true);
@@ -294,7 +296,7 @@ namespace LunarConfig.Objects.Config
 
                 foreach (var level in PatchedContent.ExtendedLevels)
                 {
-                    configMapObjects.AddField($"Level Curve - {level.NumberlessPlanetName}", "Disable this to disable configuring this property in map object config entries.", true);
+                    configMapObjects.AddField($"Level Curve - {UUIDify(level.NumberlessPlanetName)}", "Disable this to disable configuring this property in map object config entries.", true);
                 }
             }
 
@@ -304,7 +306,7 @@ namespace LunarConfig.Objects.Config
 
                 foreach (var level in PatchedContent.ExtendedLevels)
                 {
-                    configOutsideMapObjects.AddField($"Level Curve - {level.NumberlessPlanetName}", "Disable this to disable configuring this property in outside map object config entries.", true);
+                    configOutsideMapObjects.AddField($"Level Curve - {UUIDify(level.NumberlessPlanetName)}", "Disable this to disable configuring this property in outside map object config entries.", true);
                 }
             }
 
@@ -346,6 +348,7 @@ namespace LunarConfig.Objects.Config
                     if (enabledSettings.Contains("Display Name")) { itemEntry.AddField("Display Name", "Specifies the name that appears when scanning the item.", itemObj.itemName); }
                     if (enabledSettings.Contains("Minimum Value")) { itemEntry.AddField("Minimum Value", "The minimum scrap value and item can have.\nTypically multiplied by 0.4, setting not applicable to non-scrap.\nDoes not work on items like Apparatus and items from enemies (Hives, Double-barrel).", itemObj.minValue); }
                     if (enabledSettings.Contains("Maximum Value")) { itemEntry.AddField("Maximum Value", "The maximum scrap value and item can have.\nTypically multiplied by 0.4, setting not applicable to non-scrap.\nDoes not work on items like Apparatus and items from enemies (Hives, Double-barrel).", itemObj.maxValue); }
+                    if (enabledSettings.Contains("Credits Worth")) { itemEntry.AddField("Credits Worth", "The value of an item if it is sold in the shop.", itemObj.creditsWorth); }
                     if (enabledSettings.Contains("Weight")) { itemEntry.AddField("Weight", "Specifies the weight of an item.\nCalculated with: (x - 1) * 105 = weight in pounds.", itemObj.weight); }
                     if (enabledSettings.Contains("Conductivity")) { itemEntry.AddField("Conductivity", "Specifies whether an item is conductive.", itemObj.isConductiveMetal); }
                     if (enabledSettings.Contains("Two-Handed")) { itemEntry.AddField("Two-Handed", "Specifies whether an item is two-handed.", itemObj.twoHanded); }
@@ -369,6 +372,7 @@ namespace LunarConfig.Objects.Config
                     if (enabledSettings.Contains("Display Name")) { itemEntry.AddField("Display Name", "Specifies the name that appears when scanning the item.", itemObj.itemName); }
                     if (enabledSettings.Contains("Minimum Value")) { itemEntry.AddField("Minimum Value", "The minimum scrap value and item can have.\nTypically multiplied by 0.4, setting not applicable to non-scrap.\nDoes not work on items like Apparatus and items from enemies (Hives, Double-barrel).", itemObj.minValue); }
                     if (enabledSettings.Contains("Maximum Value")) { itemEntry.AddField("Maximum Value", "The maximum scrap value and item can have.\nTypically multiplied by 0.4, setting not applicable to non-scrap.\nDoes not work on items like Apparatus and items from enemies (Hives, Double-barrel).", itemObj.maxValue); }
+                    if (enabledSettings.Contains("Credits Worth")) { itemEntry.AddField("Credits Worth", "The value of an item if it is sold in the shop.", itemObj.creditsWorth); }
                     if (enabledSettings.Contains("Weight")) { itemEntry.AddField("Weight", "Specifies the weight of an item.\nCalculated with: (x - 1) * 105 = weight in pounds.", itemObj.weight); }
                     if (enabledSettings.Contains("Conductivity")) { itemEntry.AddField("Conductivity", "Specifies whether an item is conductive.", itemObj.isConductiveMetal); }
                     if (enabledSettings.Contains("Two-Handed")) { itemEntry.AddField("Two-Handed", "Specifies whether an item is two-handed.", itemObj.twoHanded); }
@@ -391,6 +395,7 @@ namespace LunarConfig.Objects.Config
                     if (enabledSettings.Contains("Display Name")) { itemEntry.AddField("Display Name", "Specifies the name that appears when scanning the item.", itemObj.itemName); }
                     if (enabledSettings.Contains("Minimum Value")) { itemEntry.AddField("Minimum Value", "The minimum scrap value and item can have.\nTypically multiplied by 0.4, setting not applicable to non-scrap.\nDoes not work on items like Apparatus and items from enemies (Hives, Double-barrel).", itemObj.minValue); }
                     if (enabledSettings.Contains("Maximum Value")) { itemEntry.AddField("Maximum Value", "The maximum scrap value and item can have.\nTypically multiplied by 0.4, setting not applicable to non-scrap.\nDoes not work on items like Apparatus and items from enemies (Hives, Double-barrel).", itemObj.maxValue); }
+                    if (enabledSettings.Contains("Credits Worth")) { itemEntry.AddField("Credits Worth", "The value of an item if it is sold in the shop.", itemObj.creditsWorth); }
                     if (enabledSettings.Contains("Weight")) { itemEntry.AddField("Weight", "Specifies the weight of an item.\nCalculated with: (x - 1) * 105 = weight in pounds.", itemObj.weight); }
                     if (enabledSettings.Contains("Conductivity")) { itemEntry.AddField("Conductivity", "Specifies whether an item is conductive.", itemObj.isConductiveMetal); }
                     if (enabledSettings.Contains("Two-Handed")) { itemEntry.AddField("Two-Handed", "Specifies whether an item is two-handed.", itemObj.twoHanded); }
@@ -413,6 +418,7 @@ namespace LunarConfig.Objects.Config
                     if (enabledSettings.Contains("Display Name")) { itemEntry.AddField("Display Name", "Specifies the name that appears when scanning the item.", itemObj.itemName); }
                     if (enabledSettings.Contains("Minimum Value")) { itemEntry.AddField("Minimum Value", "The minimum scrap value and item can have.\nTypically multiplied by 0.4, setting not applicable to non-scrap.\nDoes not work on items like Apparatus and items from enemies (Hives, Double-barrel).", itemObj.minValue); }
                     if (enabledSettings.Contains("Maximum Value")) { itemEntry.AddField("Maximum Value", "The maximum scrap value and item can have.\nTypically multiplied by 0.4, setting not applicable to non-scrap.\nDoes not work on items like Apparatus and items from enemies (Hives, Double-barrel).", itemObj.maxValue); }
+                    if (enabledSettings.Contains("Credits Worth")) { itemEntry.AddField("Credits Worth", "The value of an item if it is sold in the shop.", itemObj.creditsWorth); }
                     if (enabledSettings.Contains("Weight")) { itemEntry.AddField("Weight", "Specifies the weight of an item.\nCalculated with: (x - 1) * 105 = weight in pounds.", itemObj.weight); }
                     if (enabledSettings.Contains("Conductivity")) { itemEntry.AddField("Conductivity", "Specifies whether an item is conductive.", itemObj.isConductiveMetal); }
                     if (enabledSettings.Contains("Two-Handed")) { itemEntry.AddField("Two-Handed", "Specifies whether an item is two-handed.", itemObj.twoHanded); }
@@ -481,6 +487,7 @@ namespace LunarConfig.Objects.Config
                     if (enabledSettings.Contains("Probability Curve")) { enemyEntry.AddField("Probability Curve", "Multiplies enemy spawn weight depending on time of day.\nKeyframes represented by x,y and separated by semicolons.", CurveToString(enemyObj.probabilityCurve)); }
                     if (enabledSettings.Contains("Use Falloff?")) { enemyEntry.AddField("Use Falloff?", "Whether or not to use the falloff curve.", enemyObj.useNumberSpawnedFalloff); }
                     if (enabledSettings.Contains("Falloff Curve")) { enemyEntry.AddField("Falloff Curve", "Multiplier to enemy spawn weight depending on how many are already spawned.\nKeyframes represented by x,y and separated by semicolons.", CurveToString(enemyObj.numberSpawnedFalloff)); }
+                    if (enabledSettings.Contains("Normalized Time To Leave")) { enemyEntry.AddField("Normalized Time To Leave", "The time that an enemy leaves represented between 0 and 1 for the start and end of the day respectively.\nWARNING: Changing this for enemies that do not normally leave during the day may cause issues.", enemyObj.normalizedTimeInDayToLeave); }
                     if (enabledSettings.Contains("Enemy HP")) { enemyEntry.AddField("Enemy HP", "The amount of HP an enemy has.", enemyObj.enemyPrefab.GetComponent<EnemyAI>().enemyHP); }
                     if (enabledSettings.Contains("Can Die?")) { enemyEntry.AddField("Can Die?", "Whether or not an enemy can die.", enemyObj.canDie); }
                     if (enabledSettings.Contains("Destroy On Death?")) { enemyEntry.AddField("Destroy On Death?", "Whether or not an enemy is destroyed on death.", enemyObj.destroyOnDeath); }
@@ -525,6 +532,7 @@ namespace LunarConfig.Objects.Config
                     if (enabledSettings.Contains("Probability Curve")) { enemyEntry.AddField("Probability Curve", "Multiplies enemy spawn weight depending on time of day.\nKeyframes represented by x,y and separated by semicolons.", CurveToString(enemyObj.probabilityCurve)); }
                     if (enabledSettings.Contains("Use Falloff?")) { enemyEntry.AddField("Use Falloff?", "Whether or not to use the falloff curve.", enemyObj.useNumberSpawnedFalloff); }
                     if (enabledSettings.Contains("Falloff Curve")) { enemyEntry.AddField("Falloff Curve", "Multiplier to enemy spawn weight depending on how many are already spawned.\nKeyframes represented by x,y and separated by semicolons.", CurveToString(enemyObj.numberSpawnedFalloff)); }
+                    if (enabledSettings.Contains("Normalized Time To Leave")) { enemyEntry.AddField("Normalized Time To Leave", "The time that an enemy leaves represented between 0 and 1 for the start and end of the day respectively.\nWARNING: Changing this for enemies that do not normally leave during the day may cause issues.", enemyObj.normalizedTimeInDayToLeave); }
                     if (enabledSettings.Contains("Enemy HP")) { enemyEntry.AddField("Enemy HP", "The amount of HP an enemy has.", enemyObj.enemyPrefab.GetComponent<EnemyAI>().enemyHP); }
                     if (enabledSettings.Contains("Can Die?")) { enemyEntry.AddField("Can Die?", "Whether or not an enemy can die.", enemyObj.canDie); }
                     if (enabledSettings.Contains("Destroy On Death?")) { enemyEntry.AddField("Destroy On Death?", "Whether or not an enemy is destroyed on death.", enemyObj.destroyOnDeath); }
@@ -783,7 +791,7 @@ namespace LunarConfig.Objects.Config
                                     curve = CurveToString(obj.numberToSpawn);
                                 }
                             }
-                            if (enabledSettings.Contains($"Level Curve - {level.NumberlessPlanetName}")) { mapObjectEntry.AddField($"Level Curve - {level.NumberlessPlanetName}", $"The spawn curve for this trap on {level.NumberlessPlanetName}.", curve); }
+                            if (enabledSettings.Contains($"Level Curve - {UUIDify(level.NumberlessPlanetName)}")) { mapObjectEntry.AddField($"Level Curve - {UUIDify(level.NumberlessPlanetName)}", $"The spawn curve for this trap on {level.NumberlessPlanetName}.", curve); }
                         }
 
                         MiniLogger.LogInfo($"Recorded {mapObj.prefabToSpawn.name}");
@@ -822,7 +830,7 @@ namespace LunarConfig.Objects.Config
                                     curve = CurveToString(obj.numberToSpawn);
                                 }
                             }
-                            if (enabledSettings.Contains($"Level Curve - {level.NumberlessPlanetName}")) { mapObjectEntry.AddField($"Level Curve - {level.NumberlessPlanetName}", $"The spawn curve for this trap on {level.NumberlessPlanetName}.", curve); }
+                            if (enabledSettings.Contains($"Level Curve - {UUIDify(level.NumberlessPlanetName)}")) { mapObjectEntry.AddField($"Level Curve - {UUIDify(level.NumberlessPlanetName)}", $"The spawn curve for this trap on {level.NumberlessPlanetName}.", curve); }
                         }
 
                         MiniLogger.LogInfo($"Recorded {mapObj.prefabToSpawn.name}");
