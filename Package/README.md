@@ -14,6 +14,12 @@ After installing the mod, if you launch the game and load into a lobby, several 
 
 Any setting you want to change requires you to enable the "Configure Content" value in the given entry, otherwise the changes will not be acknowledged. I'm not going to go through each setting here as they are for the most part self-explanatory, but you can always ask questions in [the mod's discord thread](https://discord.com/channels/1168655651455639582/1390479837025538048/1390479837025538048).
 
+## Porting
+
+Lunar Config includes an option to port most configuration settings from CentralConfig. To do so, enable the "Run Late" option in 'LunarConfigCentral', you may also want to delete all Lunar Config files in the LunarConfig folder before doing this for the best result. Then run the game and load into a lobby to refresh your configuration files and most settings should port from CentralConfig (this isn't perfect, but it can get many settings).
+
+**Make sure you disable the 'Run Late' setting after you run the game once, as leaving it on will disable some of the mod's functionality!**
+
 ## Disabling Settings
 
 Lunar Config includes **several** configuration settings, and it's unlikely you'll use all of them; in order to disable changing a setting to save on performance or prevent changing something you don't want to touch, you have three options:

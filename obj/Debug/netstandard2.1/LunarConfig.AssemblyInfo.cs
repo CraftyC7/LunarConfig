@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Crafty.LunarConfig")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+770b094c646e5b21a32dce15b4076146fd10dfaa")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a06ea99e929e3b302b0d4e2ba03b671bae59dfe8")]
 [assembly: System.Reflection.AssemblyProductAttribute("LunarConfig")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Crafty.LunarConfig")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

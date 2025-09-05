@@ -1,3 +1,9 @@
+## Version 0.1.3
+
+Features
+- Added an option to initialize later than usual, allowing Lunar Config to port settings from CentralConfig
+- Added an option to clear orphaned config entries
+
 ## Version 0.1.2
 
 Features

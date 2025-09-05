@@ -1,9 +1,12 @@
-﻿using CodeRebirthLib;
+﻿using BepInEx.Configuration;
+using CodeRebirthLib;
 using DunGen.Graph;
+using HarmonyLib;
 using LethalLevelLoader;
 using LethalLib.Modules;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
 using WeatherRegistry;
 using ConfigHelper = LethalLevelLoader.ConfigHelper;
@@ -20,6 +23,7 @@ namespace LunarConfig.Objects.Config
 
         public HashSet<string> foundTags = new HashSet<string>();
         public bool useLLLTags = false;
+        public static bool clearOrphans = false;
 
         public static HashSet<string> currentStrings = new HashSet<string>();
         public static HashSet<string> currentTags = new HashSet<string>();
@@ -34,6 +38,17 @@ namespace LunarConfig.Objects.Config
         public string CurveToString(AnimationCurve curve)
         {
             return string.Join(" ; ", curve.keys.Select(kf => $"{kf.time},{kf.value}"));
+        }
+
+        // Taken from lethal.wiki
+        public static void ClearOrphanedEntries(ConfigFile cfg)
+        {
+            if (clearOrphans)
+            {
+                PropertyInfo orphanedEntriesProp = AccessTools.Property(typeof(ConfigFile), "OrphanedEntries");
+                var orphanedEntries = (Dictionary<ConfigDefinition, string>)orphanedEntriesProp.GetValue(cfg);
+                orphanedEntries.Clear();
+            }
         }
 
         public static AnimationCurve StringToCurve(string data)
@@ -98,8 +113,6 @@ namespace LunarConfig.Objects.Config
         
         public void InitConfig()
         {
-            InitCentral();
-
             InitCollections();
 
             FixDungeons();
@@ -213,6 +226,9 @@ namespace LunarConfig.Objects.Config
             configEntry.AddField("Configure Dungeons", "Check this to generate and use configuration files for dungeons.", true);
             configEntry.AddField("Configure Map Objects", "Check this to generate and use configuration files for map objects.", true);
             configEntry.AddField("Configure Outside Map Objects", "Check this to generate and use configuration files for outside map objects.", true);
+            configEntry.AddField("Run Late (CentralConfig Port)", "IMPORTANT: This setting will make LunarConfig initialize later than usual, breaking some of it's functionality.\nThis should only be used if you are trying to port settings from a mod like CentralConfig, and should be turned off after the first use.\nLunar Config isn't perfect at porting, but it can get most things right, also remember to delete all Lunar Config files before trying this for the best result!", false);
+            configEntry.AddField("Clear Orphaned Entries", "WARNING: Enabling this will delete any config entries that get disabled when the configuration is refreshed!", false);
+            clearOrphans = configEntry.GetValue<bool>("Clear Orphaned Entries");
 
             if (configEntry.GetValue<bool>("Configure Items"))
             {
@@ -310,6 +326,7 @@ namespace LunarConfig.Objects.Config
                 }
             }
 
+            ClearOrphanedEntries(centralFile.file);
             centralFile.file.Save();
             centralFile.file.SaveOnConfigSet = true;
         }
@@ -428,6 +445,7 @@ namespace LunarConfig.Objects.Config
                 }
             }
 
+            ClearOrphanedEntries(itemFile.file);
             itemFile.file.Save();
             itemFile.file.SaveOnConfigSet = true;
 
@@ -544,6 +562,7 @@ namespace LunarConfig.Objects.Config
                 }
             }
 
+            ClearOrphanedEntries(enemyFile.file);
             enemyFile.file.Save();
             enemyFile.file.SaveOnConfigSet = true;
 
@@ -705,6 +724,7 @@ namespace LunarConfig.Objects.Config
                 }
             }
 
+            ClearOrphanedEntries(moonFile.file);
             moonFile.file.Save();
             moonFile.file.SaveOnConfigSet = true;
 
@@ -735,6 +755,7 @@ namespace LunarConfig.Objects.Config
                 }
             }
 
+            ClearOrphanedEntries(dungeonFile.file);
             dungeonFile.file.Save();
             dungeonFile.file.SaveOnConfigSet = true;
 
@@ -839,6 +860,7 @@ namespace LunarConfig.Objects.Config
                 }
             }
 
+            ClearOrphanedEntries(mapObjectFile.file);
             mapObjectFile.file.Save();
             mapObjectFile.file.SaveOnConfigSet = true;
 
@@ -921,6 +943,7 @@ namespace LunarConfig.Objects.Config
                 }
             }
 
+            ClearOrphanedEntries(mapObjectFile.file);
             mapObjectFile.file.Save();
             mapObjectFile.file.SaveOnConfigSet = true;
 
