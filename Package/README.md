@@ -41,6 +41,7 @@ If you need any help you are free to ask in this mod's thread in the [Lethal Com
 
 Hopefully as I have time I intend to add some of the following:
 
+* Relying on primarily DawnLib as opposed to 4 different libraries.
 * CSync integration, so host configuration is used by all clients automatically.
 * Cleaner and more optimized code (please don't look at my mess now).
 * Injection and modification of any setting based on the current moon, LLL tags, current interior, or current weather.

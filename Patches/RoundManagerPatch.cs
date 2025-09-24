@@ -64,7 +64,18 @@ namespace LunarConfig.Patches
 
                         if (configuredItem.GetValue<bool>("Configure Content"))
                         {
+                            ScanNodeProperties itemScanNode = null;
+
+                            if (item.spawnPrefab != null)
+                            {
+                                itemScanNode = item.spawnPrefab.GetComponentInChildren<ScanNodeProperties>();
+                            }
+
                             if (enabledSettings.Contains("Display Name")) { configuredItem.SetValue("Display Name", ref item.itemName, overridenSettings.Contains("Display Name")); }
+                            if (itemScanNode != null && enabledSettings.Contains("Scan Name")) { configuredItem.SetValue("Scan Name", ref itemScanNode.headerText); }
+                            if (itemScanNode != null && enabledSettings.Contains("Scan Subtext")) { configuredItem.SetValue("Scan Subtext", ref itemScanNode.subText); }
+                            if (itemScanNode != null && enabledSettings.Contains("Scan Min Range")) { configuredItem.SetValue("Scan Min Range", ref itemScanNode.minRange); }
+                            if (itemScanNode != null && enabledSettings.Contains("Scan Max Range")) { configuredItem.SetValue("Scan Max Range", ref itemScanNode.maxRange); }
                             if (enabledSettings.Contains("Minimum Value")) { configuredItem.SetValue("Minimum Value", ref item.minValue, overridenSettings.Contains("Minimum Value")); }
                             if (enabledSettings.Contains("Maximum Value")) { configuredItem.SetValue("Maximum Value", ref item.maxValue, overridenSettings.Contains("Maximum Value")); }
                             if (enabledSettings.Contains("Credits Worth")) { configuredItem.SetValue("Credits Worth", ref item.creditsWorth, overridenSettings.Contains("Credits Worth")); }
@@ -90,7 +101,18 @@ namespace LunarConfig.Patches
 
                         if (configuredItem.GetValue<bool>("Configure Content"))
                         {
+                            ScanNodeProperties itemScanNode = null;
+
+                            if (item.spawnPrefab != null)
+                            {
+                                itemScanNode = item.spawnPrefab.GetComponentInChildren<ScanNodeProperties>();
+                            }
+
                             if (enabledSettings.Contains("Display Name")) { configuredItem.SetValue("Display Name", ref item.itemName, overridenSettings.Contains("Display Name")); }
+                            if (itemScanNode != null && enabledSettings.Contains("Scan Name")) { configuredItem.SetValue("Scan Name", ref itemScanNode.headerText); }
+                            if (itemScanNode != null && enabledSettings.Contains("Scan Subtext")) { configuredItem.SetValue("Scan Subtext", ref itemScanNode.subText); }
+                            if (itemScanNode != null && enabledSettings.Contains("Scan Min Range")) { configuredItem.SetValue("Scan Min Range", ref itemScanNode.minRange); }
+                            if (itemScanNode != null && enabledSettings.Contains("Scan Max Range")) { configuredItem.SetValue("Scan Max Range", ref itemScanNode.maxRange); }
                             if (enabledSettings.Contains("Minimum Value")) { configuredItem.SetValue("Minimum Value", ref item.minValue, overridenSettings.Contains("Minimum Value")); }
                             if (enabledSettings.Contains("Maximum Value")) { configuredItem.SetValue("Maximum Value", ref item.maxValue, overridenSettings.Contains("Maximum Value")); }
                             if (enabledSettings.Contains("Credits Worth")) { configuredItem.SetValue("Credits Worth", ref item.creditsWorth, overridenSettings.Contains("Credits Worth")); }
@@ -115,7 +137,18 @@ namespace LunarConfig.Patches
 
                         if (configuredItem.GetValue<bool>("Configure Content"))
                         {
+                            ScanNodeProperties itemScanNode = null;
+
+                            if (item.spawnPrefab != null)
+                            {
+                                itemScanNode = item.spawnPrefab.GetComponentInChildren<ScanNodeProperties>();
+                            }
+
                             if (enabledSettings.Contains("Display Name")) { configuredItem.SetValue("Display Name", ref item.itemName, overridenSettings.Contains("Display Name")); }
+                            if (itemScanNode != null && enabledSettings.Contains("Scan Name")) { configuredItem.SetValue("Scan Name", ref itemScanNode.headerText); }
+                            if (itemScanNode != null && enabledSettings.Contains("Scan Subtext")) { configuredItem.SetValue("Scan Subtext", ref itemScanNode.subText); }
+                            if (itemScanNode != null && enabledSettings.Contains("Scan Min Range")) { configuredItem.SetValue("Scan Min Range", ref itemScanNode.minRange); }
+                            if (itemScanNode != null && enabledSettings.Contains("Scan Max Range")) { configuredItem.SetValue("Scan Max Range", ref itemScanNode.maxRange); }
                             if (enabledSettings.Contains("Minimum Value")) { configuredItem.SetValue("Minimum Value", ref item.minValue, overridenSettings.Contains("Minimum Value")); }
                             if (enabledSettings.Contains("Maximum Value")) { configuredItem.SetValue("Maximum Value", ref item.maxValue, overridenSettings.Contains("Maximum Value")); }
                             if (enabledSettings.Contains("Credits Worth")) { configuredItem.SetValue("Credits Worth", ref item.creditsWorth, overridenSettings.Contains("Credits Worth")); }
@@ -140,7 +173,18 @@ namespace LunarConfig.Patches
 
                         if (configuredItem.GetValue<bool>("Configure Content"))
                         {
+                            ScanNodeProperties itemScanNode = null;
+
+                            if (item.spawnPrefab != null)
+                            {
+                                itemScanNode = item.spawnPrefab.GetComponentInChildren<ScanNodeProperties>();
+                            }
+
                             if (enabledSettings.Contains("Display Name")) { configuredItem.SetValue("Display Name", ref item.itemName, overridenSettings.Contains("Display Name")); }
+                            if (itemScanNode != null && enabledSettings.Contains("Scan Name")) { configuredItem.SetValue("Scan Name", ref itemScanNode.headerText); }
+                            if (itemScanNode != null && enabledSettings.Contains("Scan Subtext")) { configuredItem.SetValue("Scan Subtext", ref itemScanNode.subText); }
+                            if (itemScanNode != null && enabledSettings.Contains("Scan Min Range")) { configuredItem.SetValue("Scan Min Range", ref itemScanNode.minRange); }
+                            if (itemScanNode != null && enabledSettings.Contains("Scan Max Range")) { configuredItem.SetValue("Scan Max Range", ref itemScanNode.maxRange); }
                             if (enabledSettings.Contains("Minimum Value")) { configuredItem.SetValue("Minimum Value", ref item.minValue, overridenSettings.Contains("Minimum Value")); }
                             if (enabledSettings.Contains("Maximum Value")) { configuredItem.SetValue("Maximum Value", ref item.maxValue, overridenSettings.Contains("Maximum Value")); }
                             if (enabledSettings.Contains("Credits Worth")) { configuredItem.SetValue("Credits Worth", ref item.creditsWorth, overridenSettings.Contains("Credits Worth")); }
@@ -184,7 +228,18 @@ namespace LunarConfig.Patches
 
                         if (configuredEnemy.GetValue<bool>("Configure Content"))
                         {
+                            ScanNodeProperties enemyScanNode = null;
+
+                            if (enemy.enemyPrefab != null)
+                            {
+                                enemyScanNode = enemy.enemyPrefab.GetComponentInChildren<ScanNodeProperties>();
+                            }
+
                             if (enabledSettings.Contains("Display Name")) { extendedEnemy.EnemyDisplayName = configuredEnemy.GetValue<string>("Display Name"); }
+                            if (enemyScanNode != null && enabledSettings.Contains("Scan Name")) { configuredEnemy.SetValue("Scan Name", ref enemyScanNode.headerText); }
+                            if (enemyScanNode != null && enabledSettings.Contains("Scan Subtext")) { configuredEnemy.SetValue("Scan Subtext", ref enemyScanNode.subText); }
+                            if (enemyScanNode != null && enabledSettings.Contains("Scan Min Range")) { configuredEnemy.SetValue("Scan Min Range", ref enemyScanNode.minRange); }
+                            if (enemyScanNode != null && enabledSettings.Contains("Scan Max Range")) { configuredEnemy.SetValue("Scan Max Range", ref enemyScanNode.maxRange); }
                             if (enabledSettings.Contains("Can See Through Fog?")) { configuredEnemy.SetValue("Can See Through Fog?", ref enemy.canSeeThroughFog, overridenSettings.Contains("Can See Through Fog?")); }
                             if (enabledSettings.Contains("Door Speed Multiplier")) { configuredEnemy.SetValue("Door Speed Multiplier", ref enemy.doorSpeedMultiplier, overridenSettings.Contains("Door Speed Multiplier")); }
                             if (enabledSettings.Contains("Is Daytime Enemy?")) { configuredEnemy.SetValue("Is Daytime Enemy?", ref enemy.isDaytimeEnemy, overridenSettings.Contains("Is Daytime Enemy?")); }
@@ -195,8 +250,9 @@ namespace LunarConfig.Patches
                             if (enabledSettings.Contains("Probability Curve")) { configuredEnemy.SetCurve("Probability Curve", ref enemy.probabilityCurve, overridenSettings.Contains("Probability Curve")); }
                             if (enabledSettings.Contains("Use Falloff?")) { configuredEnemy.SetValue("Use Falloff?", ref enemy.useNumberSpawnedFalloff, overridenSettings.Contains("Use Falloff?")); }
                             if (enabledSettings.Contains("Falloff Curve")) { configuredEnemy.SetCurve("Falloff Curve", ref enemy.numberSpawnedFalloff, overridenSettings.Contains("Falloff Curve")); }
+                            if (enabledSettings.Contains("Group Spawn Count")) { configuredEnemy.SetValue("Group Spawn Count", ref enemy.spawnInGroupsOf, overridenSettings.Contains("Group Spawn Count")); }
                             if (enabledSettings.Contains("Normalized Time To Leave")) { configuredEnemy.SetValue("Normalized Time To Leave", ref enemy.normalizedTimeInDayToLeave, overridenSettings.Contains("Normalized Time To Leave")); }
-                            if (enabledSettings.Contains("Enemy HP")) { configuredEnemy.SetValue("Enemy HP", ref enemy.enemyPrefab.GetComponent<EnemyAI>().enemyHP, overridenSettings.Contains("Enemy HP")); }
+                            if (configuredEnemy.fields.Keys.Contains("Enemy HP") && enabledSettings.Contains("Enemy HP")) { configuredEnemy.SetValue("Enemy HP", ref enemy.enemyPrefab.GetComponent<EnemyAI>().enemyHP, overridenSettings.Contains("Enemy HP")); }
                             if (enabledSettings.Contains("Can Die?")) { configuredEnemy.SetValue("Can Die?", ref enemy.canDie, overridenSettings.Contains("Can Die?")); }
                             if (enabledSettings.Contains("Destroy On Death?")) { configuredEnemy.SetValue("Destroy On Death?", ref enemy.destroyOnDeath, overridenSettings.Contains("Destroy On Death?")); }
                             if (enabledSettings.Contains("Can Destroy?")) { configuredEnemy.SetValue("Can Destroy?", ref enemy.canBeDestroyed, overridenSettings.Contains("Can Destroy?")); }
@@ -221,7 +277,18 @@ namespace LunarConfig.Patches
 
                         if (configuredEnemy.GetValue<bool>("Configure Content"))
                         {
+                            ScanNodeProperties enemyScanNode = null;
+
+                            if (enemy.enemyPrefab != null)
+                            {
+                                enemyScanNode = enemy.enemyPrefab.GetComponentInChildren<ScanNodeProperties>();
+                            }
+
                             if (enabledSettings.Contains("Display Name")) { enemy.enemyName = configuredEnemy.GetValue<string>("Display Name"); }
+                            if (enemyScanNode != null && enabledSettings.Contains("Scan Name")) { configuredEnemy.SetValue("Scan Name", ref enemyScanNode.headerText); }
+                            if (enemyScanNode != null && enabledSettings.Contains("Scan Subtext")) { configuredEnemy.SetValue("Scan Subtext", ref enemyScanNode.subText); }
+                            if (enemyScanNode != null && enabledSettings.Contains("Scan Min Range")) { configuredEnemy.SetValue("Scan Min Range", ref enemyScanNode.minRange); }
+                            if (enemyScanNode != null && enabledSettings.Contains("Scan Max Range")) { configuredEnemy.SetValue("Scan Max Range", ref enemyScanNode.maxRange); }
                             if (enabledSettings.Contains("Can See Through Fog?")) { configuredEnemy.SetValue("Can See Through Fog?", ref enemy.canSeeThroughFog, overridenSettings.Contains("Can See Through Fog?")); }
                             if (enabledSettings.Contains("Door Speed Multiplier")) { configuredEnemy.SetValue("Door Speed Multiplier", ref enemy.doorSpeedMultiplier, overridenSettings.Contains("Door Speed Multiplier")); }
                             if (enabledSettings.Contains("Is Daytime Enemy?")) { configuredEnemy.SetValue("Is Daytime Enemy?", ref enemy.isDaytimeEnemy, overridenSettings.Contains("Is Daytime Enemy?")); }
@@ -232,8 +299,9 @@ namespace LunarConfig.Patches
                             if (enabledSettings.Contains("Probability Curve")) { configuredEnemy.SetCurve("Probability Curve", ref enemy.probabilityCurve, overridenSettings.Contains("Probability Curve")); }
                             if (enabledSettings.Contains("Use Falloff?")) { configuredEnemy.SetValue("Use Falloff?", ref enemy.useNumberSpawnedFalloff, overridenSettings.Contains("Use Falloff?")); }
                             if (enabledSettings.Contains("Falloff Curve")) { configuredEnemy.SetCurve("Falloff Curve", ref enemy.numberSpawnedFalloff, overridenSettings.Contains("Falloff Curve")); }
+                            if (enabledSettings.Contains("Group Spawn Count")) { configuredEnemy.SetValue("Group Spawn Count", ref enemy.spawnInGroupsOf, overridenSettings.Contains("Group Spawn Count")); }
                             if (enabledSettings.Contains("Normalized Time To Leave")) { configuredEnemy.SetValue("Normalized Time To Leave", ref enemy.normalizedTimeInDayToLeave, overridenSettings.Contains("Normalized Time To Leave")); }
-                            if (enabledSettings.Contains("Enemy HP")) { configuredEnemy.SetValue("Enemy HP", ref enemy.enemyPrefab.GetComponent<EnemyAI>().enemyHP, overridenSettings.Contains("Enemy HP")); }
+                            if (configuredEnemy.fields.Keys.Contains("Enemy HP") && enabledSettings.Contains("Enemy HP")) { configuredEnemy.SetValue("Enemy HP", ref enemy.enemyPrefab.GetComponent<EnemyAI>().enemyHP, overridenSettings.Contains("Enemy HP")); }
                             if (enabledSettings.Contains("Can Die?")) { configuredEnemy.SetValue("Can Die?", ref enemy.canDie, overridenSettings.Contains("Can Die?")); }
                             if (enabledSettings.Contains("Destroy On Death?")) { configuredEnemy.SetValue("Destroy On Death?", ref enemy.destroyOnDeath, overridenSettings.Contains("Destroy On Death?")); }
                             if (enabledSettings.Contains("Can Destroy?")) { configuredEnemy.SetValue("Can Destroy?", ref enemy.canBeDestroyed, overridenSettings.Contains("Can Destroy?")); }
@@ -245,6 +313,46 @@ namespace LunarConfig.Patches
                     catch (Exception e)
                     {
                         MiniLogger.LogError($"An error occured while setting enemy values, please report this!\n{e}");
+                    }
+                }
+            }
+
+            if (centralConfig.GetValue<bool>("Configure Dungeons"))
+            {
+                LunarConfigFile dungeonFile = lunarCentral.files[LunarConfig.DUNGEON_FILE_NAME];
+
+                LunarConfigEntry enabledEntry = centralFile.entries["Enabled Dungeon Settings"];
+                HashSet<string> enabledSettings = new HashSet<string>();
+
+                foreach (var setting in enabledEntry.fields.Keys)
+                {
+                    if (enabledEntry.GetValue<bool>(setting))
+                    {
+                        enabledSettings.Add(setting);
+                    }
+                }
+
+                // LLL/Vanilla Items
+                foreach (var extendedDungeon in PatchedContent.ExtendedDungeonFlows)
+                {
+                    try
+                    {
+                        LunarConfigEntry configuredDungeon = dungeonFile.entries[lunarCentral.UUIDify($"LLL - {extendedDungeon.DungeonName} ({extendedDungeon.UniqueIdentificationName})")];
+
+                        if (configuredDungeon.GetValue<bool>("Configure Content"))
+                        {
+                            if (enabledSettings.Contains("Enable Dynamic Restriction")) { extendedDungeon.IsDynamicDungeonSizeRestrictionEnabled = configuredDungeon.GetValue<bool>("Enable Dynamic Restriction"); }
+                            if (enabledSettings.Contains("Dynamic Dungeon Size Lerp Rate")) { extendedDungeon.DynamicDungeonSizeLerpRate = configuredDungeon.GetValue<float>("Dungeon Size Lerp Rate"); }
+                            if (enabledSettings.Contains("Dynamic Dungeon Size Min")) { extendedDungeon.DynamicDungeonSizeMinMax = new Vector2(configuredDungeon.GetValue<int>("Dungeon Size Min"), extendedDungeon.DynamicDungeonSizeMinMax.y); }
+                            if (enabledSettings.Contains("Dynamic Dungeon Size Max")) { extendedDungeon.DynamicDungeonSizeMinMax = new Vector2(extendedDungeon.DynamicDungeonSizeMinMax.x, configuredDungeon.GetValue<int>("Dungeon Size Max")); }
+                            if (enabledSettings.Contains("Random Size Min")) { configuredDungeon.SetValue("Dungeon Size Min", ref extendedDungeon.DungeonFlow.Length.Min); }
+                            if (enabledSettings.Contains("Random Size Max")) { configuredDungeon.SetValue("Dungeon Size Max", ref extendedDungeon.DungeonFlow.Length.Max); }
+                            if (enabledSettings.Contains("Map Tile Size")) { extendedDungeon.MapTileSize = configuredDungeon.GetValue<float>("Map Tile Size"); }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        MiniLogger.LogError($"An error occured while setting dungeon values, please report this!\n{e}");
                     }
                 }
             }
@@ -432,64 +540,6 @@ namespace LunarConfig.Patches
             catch (Exception e) 
             {
                 MiniLogger.LogError($"An error occured, please report this!\n{e}");
-            }
-        }
-
-        [HarmonyPatch(typeof(RoundManager), nameof(RoundManager.LoadNewLevel))]
-        [HarmonyPriority(800)]
-        [HarmonyPrefix]
-        private static void onLoadNewLevelPrefix(RoundManager __instance)
-        {
-            try
-            {
-                LunarCentral lunarCentral = LunarConfig.central;
-                LunarConfigEntry centralConfig = lunarCentral.files[LunarConfig.CENTRAL_FILE_NAME].entries["Configuration"];
-
-                if (centralConfig.GetValue<bool>("Configure Moons"))
-                {
-                    LunarConfigFile moonFile = lunarCentral.files[LunarConfig.MOON_FILE_NAME];
-
-                    LunarConfigEntry enabledEntry = lunarCentral.files[LunarConfig.CENTRAL_FILE_NAME].entries["Enabled Moon Settings"];
-                    HashSet<string> enabledSettings = new HashSet<string>();
-
-                    foreach (var setting in enabledEntry.fields.Keys)
-                    {
-                        if (enabledEntry.GetValue<bool>(setting))
-                        {
-                            enabledSettings.Add(setting);
-                        }
-                    }
-
-                    List<string> overridenSettings = new List<string>();
-
-                    ExtendedLevel extendedMoon = LevelManager.CurrentExtendedLevel;
-                    SelectableLevel moon = extendedMoon.SelectableLevel;
-                    LunarConfigEntry configuredMoon = moonFile.entries[lunarCentral.UUIDify($"LLL - {extendedMoon.NumberlessPlanetName} ({extendedMoon.UniqueIdentificationName})")];
-
-                    if (configuredMoon.GetValue<bool>("Configure Content"))
-                    {
-                        if (enabledSettings.Contains("Tags"))
-                        {
-                            extendedMoon.ContentTags.Clear();
-
-                            foreach (var tag in configuredMoon.GetValue<string>("Tags").Split(','))
-                            {
-                                string fixedTag = lunarCentral.UUIDify(tag).RemoveWhitespace();
-
-                                extendedMoon.ContentTags.Add(ContentTag.Create(fixedTag));
-                            }
-                        }
-
-                        LunarCentral.RefreshMatchers();
-
-                        if (enabledSettings.Contains("Interior Multiplier")) { configuredMoon.SetValue("Interior Multiplier", ref moon.factorySizeMultiplier, overridenSettings.Contains("Interior Multiplier")); }
-                        if (enabledSettings.Contains("Possible Interiors")) { configuredMoon.SetDungeons("Possible Interiors", lunarCentral, extendedMoon, overridenSettings.Contains("Possible Interiors")); }
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                MiniLogger.LogError($"An error occured while setting interior values, please report this!\n{e}");
             }
         }
 

@@ -210,7 +210,7 @@ namespace LunarConfig.Objects.Config
                 {
                     dungeons[ConfigHelper.SanitizeString(extendedDungeon.DungeonName)] = extendedDungeon;
                 }
-                dungeons[ConfigHelper.SanitizeString(extendedDungeon.name)] = extendedDungeon;
+                dungeons[ConfigHelper.SanitizeString(extendedDungeon.DungeonFlow.name)] = extendedDungeon;
             }
         }
 
@@ -234,6 +234,10 @@ namespace LunarConfig.Objects.Config
             {
                 LunarConfigEntry configItems = centralFile.AddEntry("Enabled Item Settings");
                 configItems.AddField("Display Name", "Disable this to disable configuring this property in item config entries.", true);
+                configItems.AddField("Scan Name", "Disable this to disable configuring this property in item config entries.", true);
+                configItems.AddField("Scan Subtext", "Disable this to disable configuring this property in item config entries.", true);
+                configItems.AddField("Scan Min Range", "Disable this to disable configuring this property in item config entries.", true);
+                configItems.AddField("Scan Max Range", "Disable this to disable configuring this property in item config entries.", true);
                 configItems.AddField("Minimum Value", "Disable this to disable configuring this property in item config entries.", true);
                 configItems.AddField("Maximum Value", "Disable this to disable configuring this property in item config entries.", true);
                 configItems.AddField("Credits Worth", "Disable this to disable configuring this property in item config entries.", true);
@@ -247,6 +251,10 @@ namespace LunarConfig.Objects.Config
             {
                 LunarConfigEntry configEnemies = centralFile.AddEntry("Enabled Enemy Settings");
                 configEnemies.AddField("Display Name", "Disable this to disable configuring this property in enemy config entries.", true);
+                configEnemies.AddField("Scan Name", "Disable this to disable configuring this property in enemy config entries.", true);
+                configEnemies.AddField("Scan Subtext", "Disable this to disable configuring this property in enemy config entries.", true);
+                configEnemies.AddField("Scan Min Range", "Disable this to disable configuring this property in enemy config entries.", true);
+                configEnemies.AddField("Scan Max Range", "Disable this to disable configuring this property in enemy config entries.", true);
                 configEnemies.AddField("Can See Through Fog?", "Disable this to disable configuring this property in enemy config entries.", true);
                 configEnemies.AddField("Door Speed Multiplier", "Disable this to disable configuring this property in enemy config entries.", true);
                 configEnemies.AddField("Is Daytime Enemy?", "Disable this to disable configuring this property in enemy config entries.", true);
@@ -257,6 +265,7 @@ namespace LunarConfig.Objects.Config
                 configEnemies.AddField("Probability Curve", "Disable this to disable configuring this property in enemy config entries.", true);
                 configEnemies.AddField("Use Falloff?", "Disable this to disable configuring this property in enemy config entries.", true);
                 configEnemies.AddField("Falloff Curve", "Disable this to disable configuring this property in enemy config entries.", true);
+                configEnemies.AddField("Group Spawn Count", "Disable this to disable configuring this property in enemy config entries.", true);
                 configEnemies.AddField("Normalized Time To Leave", "Disable this to disable configuring this property in enemy config entries.", true);
                 configEnemies.AddField("Enemy HP", "Disable this to disable configuring this property in enemy config entries.", true);
                 configEnemies.AddField("Can Die?", "Disable this to disable configuring this property in enemy config entries.", true);
@@ -295,9 +304,21 @@ namespace LunarConfig.Objects.Config
                 configMoons.AddField("Value Multiplier", "Disable this to disable configuring this property in moon config entries.", true);
                 configMoons.AddField("Amount Multiplier", "Disable this to disable configuring this property in moon config entries.", true);
                 configMoons.AddField("Spawnable Scrap", "Disable this to disable configuring this property in moon config entries.", true);
-                configMoons.AddField("Interior Multiplier", "Disable this to disable configuring this property in moon config entries.", true);
+                configMoons.AddField("Interior Multiplier", "WARNING: This setting has been known to cause desyncs in interiors, proceed with caution until a fix is released!\nDisable this to disable configuring this property in moon config entries.", true);
                 configMoons.AddField("Possible Interiors", "Disable this to disable configuring this property in moon config entries.", true);
                 configMoons.AddField("Tags", "Disable this to disable configuring this property in moon config entries.", true);
+            }
+
+            if (configEntry.GetValue<bool>("Configure Dungeons"))
+            {
+                LunarConfigEntry configDungeons = centralFile.AddEntry("Enabled Dungeon Settings");
+                configDungeons.AddField("Enable Dynamic Restriction", "Disable this to disable configuring this property in item config entries.", true);
+                configDungeons.AddField("Dynamic Dungeon Size Lerp Rate", "Disable this to disable configuring this property in item config entries.", true);
+                configDungeons.AddField("Dynamic Dungeon Size Min", "Disable this to disable configuring this property in item config entries.", true);
+                configDungeons.AddField("Dynamic Dungeon Size Max", "Disable this to disable configuring this property in item config entries.", true);
+                configDungeons.AddField("Random Size Min", "Disable this to disable configuring this property in item config entries.", true);
+                configDungeons.AddField("Random Size Max", "Disable this to disable configuring this property in item config entries.", true);
+                configDungeons.AddField("Map Tile Size", "Disable this to disable configuring this property in item config entries.", true);
             }
 
             if (configEntry.GetValue<bool>("Configure Map Objects"))
@@ -358,11 +379,22 @@ namespace LunarConfig.Objects.Config
                 if (!registeredItems.Contains(itemUUID))
                 {
                     Item itemObj = item.Item;
+                    ScanNodeProperties itemScanNode = null;
+
+                    if (itemObj.spawnPrefab != null)
+                    {
+                        itemScanNode = itemObj.spawnPrefab.GetComponentInChildren<ScanNodeProperties>();
+                    }
+
                     LunarConfigEntry itemEntry = itemFile.AddEntry(itemUUID);
                     MiniLogger.LogInfo($"Recording {item.name}...");
                     itemEntry.AddField("Configure Content", "Enable to change any of the settings below.", false);
                     itemEntry.AddField("Appropriate Aliases", "Changing this setting will do nothing, these are the names which LunarConfig will recognize as this object in other config options.\nThey are case-insensitve and do not regard whitespace.", $"{ConfigHelper.SanitizeString(item.Item.itemName)}, {ConfigHelper.SanitizeString(item.Item.name)}");
                     if (enabledSettings.Contains("Display Name")) { itemEntry.AddField("Display Name", "Specifies the name that appears when scanning the item.", itemObj.itemName); }
+                    if (itemScanNode != null && enabledSettings.Contains("Scan Name")) { itemEntry.AddField("Scan Name", "Specifies the name of the item that appears on its scan node.", itemScanNode.headerText); }
+                    if (itemScanNode != null && enabledSettings.Contains("Scan Subtext")) { itemEntry.AddField("Scan Subtext", "Specifies the subtext that appears on the item's scan node. NOTE: This setting may be overridden if the item has a scrap value.", itemScanNode.subText); }
+                    if (itemScanNode != null && enabledSettings.Contains("Scan Min Range")) { itemEntry.AddField("Scan Min Range", "Specifies the minimum distance the scan node can be scanned.", itemScanNode.minRange); }
+                    if (itemScanNode != null && enabledSettings.Contains("Scan Max Range")) { itemEntry.AddField("Scan Max Range", "Specifies the maximum distance the scan node can be scanned.", itemScanNode.maxRange); }
                     if (enabledSettings.Contains("Minimum Value")) { itemEntry.AddField("Minimum Value", "The minimum scrap value and item can have.\nTypically multiplied by 0.4, setting not applicable to non-scrap.\nDoes not work on items like Apparatus and items from enemies (Hives, Double-barrel).", itemObj.minValue); }
                     if (enabledSettings.Contains("Maximum Value")) { itemEntry.AddField("Maximum Value", "The maximum scrap value and item can have.\nTypically multiplied by 0.4, setting not applicable to non-scrap.\nDoes not work on items like Apparatus and items from enemies (Hives, Double-barrel).", itemObj.maxValue); }
                     if (enabledSettings.Contains("Credits Worth")) { itemEntry.AddField("Credits Worth", "The value of an item if it is sold in the shop.", itemObj.creditsWorth); }
@@ -382,11 +414,22 @@ namespace LunarConfig.Objects.Config
                 if (!registeredItems.Contains(itemUUID))
                 {
                     Item itemObj = item.item;
+                    ScanNodeProperties itemScanNode = null;
+
+                    if (itemObj.spawnPrefab != null)
+                    {
+                        itemScanNode = itemObj.spawnPrefab.GetComponentInChildren<ScanNodeProperties>();
+                    }
+
                     LunarConfigEntry itemEntry = itemFile.AddEntry(itemUUID);
                     MiniLogger.LogInfo($"Recording {itemObj.name}...");
                     itemEntry.AddField("Configure Content", "Enable to change any of the settings below.", false);
                     itemEntry.AddField("Appropriate Aliases", "Changing this setting will do nothing, these are the names which LunarConfig will recognize as this object in other config options.\nThey are case-insensitve and do not regard whitespace.", $"{ConfigHelper.SanitizeString(item.item.itemName)}, {ConfigHelper.SanitizeString(item.item.name)}");
                     if (enabledSettings.Contains("Display Name")) { itemEntry.AddField("Display Name", "Specifies the name that appears when scanning the item.", itemObj.itemName); }
+                    if (itemScanNode != null && enabledSettings.Contains("Scan Name")) { itemEntry.AddField("Scan Name", "Specifies the name of the item that appears on its scan node.", itemScanNode.headerText); }
+                    if (itemScanNode != null && enabledSettings.Contains("Scan Subtext")) { itemEntry.AddField("Scan Subtext", "Specifies the subtext that appears on the item's scan node. NOTE: This setting may be overridden if the item has a scrap value.", itemScanNode.subText); }
+                    if (itemScanNode != null && enabledSettings.Contains("Scan Min Range")) { itemEntry.AddField("Scan Min Range", "Specifies the minimum distance the scan node can be scanned.", itemScanNode.minRange); }
+                    if (itemScanNode != null && enabledSettings.Contains("Scan Max Range")) { itemEntry.AddField("Scan Max Range", "Specifies the maximum distance the scan node can be scanned.", itemScanNode.maxRange); }
                     if (enabledSettings.Contains("Minimum Value")) { itemEntry.AddField("Minimum Value", "The minimum scrap value and item can have.\nTypically multiplied by 0.4, setting not applicable to non-scrap.\nDoes not work on items like Apparatus and items from enemies (Hives, Double-barrel).", itemObj.minValue); }
                     if (enabledSettings.Contains("Maximum Value")) { itemEntry.AddField("Maximum Value", "The maximum scrap value and item can have.\nTypically multiplied by 0.4, setting not applicable to non-scrap.\nDoes not work on items like Apparatus and items from enemies (Hives, Double-barrel).", itemObj.maxValue); }
                     if (enabledSettings.Contains("Credits Worth")) { itemEntry.AddField("Credits Worth", "The value of an item if it is sold in the shop.", itemObj.creditsWorth); }
@@ -405,11 +448,22 @@ namespace LunarConfig.Objects.Config
                 if (!registeredItems.Contains(itemUUID))
                 {
                     Item itemObj = item.item;
+                    ScanNodeProperties itemScanNode = null;
+
+                    if (itemObj.spawnPrefab != null)
+                    {
+                        itemScanNode = itemObj.spawnPrefab.GetComponentInChildren<ScanNodeProperties>();
+                    }
+
                     LunarConfigEntry itemEntry = itemFile.AddEntry(itemUUID);
                     MiniLogger.LogInfo($"Recording {itemObj.name}...");
                     itemEntry.AddField("Configure Content", "Enable to change any of the settings below.", false);
                     itemEntry.AddField("Appropriate Aliases", "Changing this setting will do nothing, these are the names which LunarConfig will recognize as this object in other config options.\nThey are case-insensitve and do not regard whitespace.", $"{ConfigHelper.SanitizeString(item.item.itemName)}, {ConfigHelper.SanitizeString(item.item.name)}");
                     if (enabledSettings.Contains("Display Name")) { itemEntry.AddField("Display Name", "Specifies the name that appears when scanning the item.", itemObj.itemName); }
+                    if (itemScanNode != null && enabledSettings.Contains("Scan Name")) { itemEntry.AddField("Scan Name", "Specifies the name of the item that appears on its scan node.", itemScanNode.headerText); }
+                    if (itemScanNode != null && enabledSettings.Contains("Scan Subtext")) { itemEntry.AddField("Scan Subtext", "Specifies the subtext that appears on the item's scan node. NOTE: This setting may be overridden if the item has a scrap value.", itemScanNode.subText); }
+                    if (itemScanNode != null && enabledSettings.Contains("Scan Min Range")) { itemEntry.AddField("Scan Min Range", "Specifies the minimum distance the scan node can be scanned.", itemScanNode.minRange); }
+                    if (itemScanNode != null && enabledSettings.Contains("Scan Max Range")) { itemEntry.AddField("Scan Max Range", "Specifies the maximum distance the scan node can be scanned.", itemScanNode.maxRange); }
                     if (enabledSettings.Contains("Minimum Value")) { itemEntry.AddField("Minimum Value", "The minimum scrap value and item can have.\nTypically multiplied by 0.4, setting not applicable to non-scrap.\nDoes not work on items like Apparatus and items from enemies (Hives, Double-barrel).", itemObj.minValue); }
                     if (enabledSettings.Contains("Maximum Value")) { itemEntry.AddField("Maximum Value", "The maximum scrap value and item can have.\nTypically multiplied by 0.4, setting not applicable to non-scrap.\nDoes not work on items like Apparatus and items from enemies (Hives, Double-barrel).", itemObj.maxValue); }
                     if (enabledSettings.Contains("Credits Worth")) { itemEntry.AddField("Credits Worth", "The value of an item if it is sold in the shop.", itemObj.creditsWorth); }
@@ -428,11 +482,22 @@ namespace LunarConfig.Objects.Config
                 if (!registeredItems.Contains(itemUUID))
                 {
                     Item itemObj = item.item;
+                    ScanNodeProperties itemScanNode = null;
+
+                    if (itemObj.spawnPrefab != null)
+                    {
+                        itemScanNode = itemObj.spawnPrefab.GetComponentInChildren<ScanNodeProperties>();
+                    }
+
                     LunarConfigEntry itemEntry = itemFile.AddEntry(itemUUID);
                     MiniLogger.LogInfo($"Recording {itemObj.name}...");
                     itemEntry.AddField("Configure Content", "Enable to change any of the settings below.", false);
                     itemEntry.AddField("Appropriate Aliases", "Changing this setting will do nothing, these are the names which LunarConfig will recognize as this object in other config options.\nThey are case-insensitve and do not regard whitespace.", $"{ConfigHelper.SanitizeString(item.item.itemName)}, {ConfigHelper.SanitizeString(item.item.name)}");
                     if (enabledSettings.Contains("Display Name")) { itemEntry.AddField("Display Name", "Specifies the name that appears when scanning the item.", itemObj.itemName); }
+                    if (itemScanNode != null && enabledSettings.Contains("Scan Name")) { itemEntry.AddField("Scan Name", "Specifies the name of the item that appears on its scan node.", itemScanNode.headerText); }
+                    if (itemScanNode != null && enabledSettings.Contains("Scan Subtext")) { itemEntry.AddField("Scan Subtext", "Specifies the subtext that appears on the item's scan node. NOTE: This setting may be overridden if the item has a scrap value.", itemScanNode.subText); }
+                    if (itemScanNode != null && enabledSettings.Contains("Scan Min Range")) { itemEntry.AddField("Scan Min Range", "Specifies the minimum distance the scan node can be scanned.", itemScanNode.minRange); }
+                    if (itemScanNode != null && enabledSettings.Contains("Scan Max Range")) { itemEntry.AddField("Scan Max Range", "Specifies the maximum distance the scan node can be scanned.", itemScanNode.maxRange); }
                     if (enabledSettings.Contains("Minimum Value")) { itemEntry.AddField("Minimum Value", "The minimum scrap value and item can have.\nTypically multiplied by 0.4, setting not applicable to non-scrap.\nDoes not work on items like Apparatus and items from enemies (Hives, Double-barrel).", itemObj.minValue); }
                     if (enabledSettings.Contains("Maximum Value")) { itemEntry.AddField("Maximum Value", "The maximum scrap value and item can have.\nTypically multiplied by 0.4, setting not applicable to non-scrap.\nDoes not work on items like Apparatus and items from enemies (Hives, Double-barrel).", itemObj.maxValue); }
                     if (enabledSettings.Contains("Credits Worth")) { itemEntry.AddField("Credits Worth", "The value of an item if it is sold in the shop.", itemObj.creditsWorth); }
@@ -483,10 +548,11 @@ namespace LunarConfig.Objects.Config
                     MiniLogger.LogInfo($"Recording {enemy.name}...");
 
                     string scanName = "";
+                    ScanNodeProperties enemyScanNode = null;
 
                     if (enemy.EnemyType.enemyPrefab != null)
                     {
-                        ScanNodeProperties enemyScanNode = enemy.EnemyType.enemyPrefab.GetComponentInChildren<ScanNodeProperties>();
+                        enemyScanNode = enemy.EnemyType.enemyPrefab.GetComponentInChildren<ScanNodeProperties>();
                         if (enemyScanNode != null)
                             scanName = enemyScanNode.headerText;
                     }
@@ -495,6 +561,10 @@ namespace LunarConfig.Objects.Config
                     enemyEntry.AddField("Appropriate Aliases", "Changing this setting will do nothing, these are the names which LunarConfig will recognize as this object in other config options.\nThey are case-insensitve and do not regard whitespace.", $"{enemy.EnemyType.enemyName}, {scanName}");
 
                     if (enabledSettings.Contains("Display Name")) { enemyEntry.AddField("Display Name", "Specifies the name of the enemy.", enemy.EnemyDisplayName); }
+                    if (enemyScanNode != null && enabledSettings.Contains("Scan Name")) { enemyEntry.AddField("Scan Name", "Specifies the name of the enemy that appears on its scan node.", enemyScanNode.headerText); }
+                    if (enemyScanNode != null && enabledSettings.Contains("Scan Subtext")) { enemyEntry.AddField("Scan Subtext", "Specifies the subtext that appears on the enemy's scan node.", enemyScanNode.subText); }
+                    if (enemyScanNode != null && enabledSettings.Contains("Scan Min Range")) { enemyEntry.AddField("Scan Min Range", "Specifies the minimum distance the scan node can be scanned.", enemyScanNode.minRange); }
+                    if (enemyScanNode != null && enabledSettings.Contains("Scan Max Range")) { enemyEntry.AddField("Scan Max Range", "Specifies the maximum distance the scan node can be scanned.", enemyScanNode.maxRange); }
                     if (enabledSettings.Contains("Can See Through Fog?")) { enemyEntry.AddField("Can See Through Fog?", "Specifies if an enemy can see through fog in foggy weather.", enemyObj.canSeeThroughFog); }
                     if (enabledSettings.Contains("Door Speed Multiplier")) { enemyEntry.AddField("Door Speed Multiplier", "Decides the speed at which enemies can open doors.\nCalculated with: 1 / x = time to open door in seconds.", enemyObj.doorSpeedMultiplier); }
                     if (enabledSettings.Contains("Is Daytime Enemy?")) { enemyEntry.AddField("Is Daytime Enemy?", "Whether an enemy is a daytime enemy.", enemyObj.isDaytimeEnemy); }
@@ -505,8 +575,12 @@ namespace LunarConfig.Objects.Config
                     if (enabledSettings.Contains("Probability Curve")) { enemyEntry.AddField("Probability Curve", "Multiplies enemy spawn weight depending on time of day.\nKeyframes represented by x,y and separated by semicolons.", CurveToString(enemyObj.probabilityCurve)); }
                     if (enabledSettings.Contains("Use Falloff?")) { enemyEntry.AddField("Use Falloff?", "Whether or not to use the falloff curve.", enemyObj.useNumberSpawnedFalloff); }
                     if (enabledSettings.Contains("Falloff Curve")) { enemyEntry.AddField("Falloff Curve", "Multiplier to enemy spawn weight depending on how many are already spawned.\nKeyframes represented by x,y and separated by semicolons.", CurveToString(enemyObj.numberSpawnedFalloff)); }
+                    if (enabledSettings.Contains("Group Spawn Count")) { enemyEntry.AddField("Group Spawn Count", "The amount of entities that will spawn of this type at once.", enemyObj.spawnInGroupsOf); }
                     if (enabledSettings.Contains("Normalized Time To Leave")) { enemyEntry.AddField("Normalized Time To Leave", "The time that an enemy leaves represented between 0 and 1 for the start and end of the day respectively.\nWARNING: Changing this for enemies that do not normally leave during the day may cause issues.", enemyObj.normalizedTimeInDayToLeave); }
-                    if (enabledSettings.Contains("Enemy HP")) { enemyEntry.AddField("Enemy HP", "The amount of HP an enemy has.", enemyObj.enemyPrefab.GetComponent<EnemyAI>().enemyHP); }
+
+                    EnemyAI enemyAI = enemyObj.enemyPrefab.GetComponent<EnemyAI>();
+                    if (enemyAI != null && enabledSettings.Contains("Enemy HP")) { enemyEntry.AddField("Enemy HP", "The amount of HP an enemy has.", enemyAI.enemyHP); }
+                    
                     if (enabledSettings.Contains("Can Die?")) { enemyEntry.AddField("Can Die?", "Whether or not an enemy can die.", enemyObj.canDie); }
                     if (enabledSettings.Contains("Destroy On Death?")) { enemyEntry.AddField("Destroy On Death?", "Whether or not an enemy is destroyed on death.", enemyObj.destroyOnDeath); }
                     if (enabledSettings.Contains("Can Destroy?")) { enemyEntry.AddField("Can Destroy?", "Whether or not an enemy can be destroyed.", enemyObj.canBeDestroyed); }
@@ -528,10 +602,11 @@ namespace LunarConfig.Objects.Config
                     MiniLogger.LogInfo($"Recording {enemyObj.name}...");
 
                     string scanName = "";
+                    ScanNodeProperties enemyScanNode = null;
 
                     if (enemy.enemy.enemyPrefab != null)
                     {
-                        ScanNodeProperties enemyScanNode = enemy.enemy.enemyPrefab.GetComponentInChildren<ScanNodeProperties>();
+                        enemyScanNode = enemy.enemy.enemyPrefab.GetComponentInChildren<ScanNodeProperties>();
                         if (enemyScanNode != null)
                             scanName = enemyScanNode.headerText;
                     }
@@ -540,6 +615,10 @@ namespace LunarConfig.Objects.Config
                     enemyEntry.AddField("Appropriate Aliases", "Changing this setting will do nothing, these are the names which LunarConfig will recognize as this object in other config options.\nThey are case-insensitve and do not regard whitespace.", $"{enemy.enemy.enemyName}, {scanName}");
 
                     if (enabledSettings.Contains("Display Name")) { enemyEntry.AddField("Display Name", "Specifies the name of the enemy.", enemyObj.enemyName); }
+                    if (enemyScanNode != null && enabledSettings.Contains("Scan Name")) { enemyEntry.AddField("Scan Name", "Specifies the name of the enemy that appears on its scan node.", enemyScanNode.headerText); }
+                    if (enemyScanNode != null && enabledSettings.Contains("Scan Subtext")) { enemyEntry.AddField("Scan Subtext", "Specifies the subtext that appears on the enemy's scan node.", enemyScanNode.subText); }
+                    if (enemyScanNode != null && enabledSettings.Contains("Scan Min Range")) { enemyEntry.AddField("Scan Min Range", "Specifies the minimum distance the scan node can be scanned.", enemyScanNode.minRange); }
+                    if (enemyScanNode != null && enabledSettings.Contains("Scan Max Range")) { enemyEntry.AddField("Scan Max Range", "Specifies the maximum distance the scan node can be scanned.", enemyScanNode.maxRange); }
                     if (enabledSettings.Contains("Can See Through Fog?")) { enemyEntry.AddField("Can See Through Fog?", "Specifies if an enemy can see through fog in foggy weather.", enemyObj.canSeeThroughFog); }
                     if (enabledSettings.Contains("Door Speed Multiplier")) { enemyEntry.AddField("Door Speed Multiplier", "Decides the speed at which enemies can open doors.\nCalculated with: 1 / x = time to open door in seconds.", enemyObj.doorSpeedMultiplier); }
                     if (enabledSettings.Contains("Is Daytime Enemy?")) { enemyEntry.AddField("Is Daytime Enemy?", "Whether an enemy is a daytime enemy.", enemyObj.isDaytimeEnemy); }
@@ -550,8 +629,12 @@ namespace LunarConfig.Objects.Config
                     if (enabledSettings.Contains("Probability Curve")) { enemyEntry.AddField("Probability Curve", "Multiplies enemy spawn weight depending on time of day.\nKeyframes represented by x,y and separated by semicolons.", CurveToString(enemyObj.probabilityCurve)); }
                     if (enabledSettings.Contains("Use Falloff?")) { enemyEntry.AddField("Use Falloff?", "Whether or not to use the falloff curve.", enemyObj.useNumberSpawnedFalloff); }
                     if (enabledSettings.Contains("Falloff Curve")) { enemyEntry.AddField("Falloff Curve", "Multiplier to enemy spawn weight depending on how many are already spawned.\nKeyframes represented by x,y and separated by semicolons.", CurveToString(enemyObj.numberSpawnedFalloff)); }
+                    if (enabledSettings.Contains("Group Spawn Count")) { enemyEntry.AddField("Group Spawn Count", "The amount of entities that will spawn of this type at once.", enemyObj.spawnInGroupsOf); }
                     if (enabledSettings.Contains("Normalized Time To Leave")) { enemyEntry.AddField("Normalized Time To Leave", "The time that an enemy leaves represented between 0 and 1 for the start and end of the day respectively.\nWARNING: Changing this for enemies that do not normally leave during the day may cause issues.", enemyObj.normalizedTimeInDayToLeave); }
-                    if (enabledSettings.Contains("Enemy HP")) { enemyEntry.AddField("Enemy HP", "The amount of HP an enemy has.", enemyObj.enemyPrefab.GetComponent<EnemyAI>().enemyHP); }
+
+                    EnemyAI enemyAI = enemyObj.enemyPrefab.GetComponent<EnemyAI>();
+                    if (enemyAI != null && enabledSettings.Contains("Enemy HP")) { enemyEntry.AddField("Enemy HP", "The amount of HP an enemy has.", enemyAI.enemyHP); }
+
                     if (enabledSettings.Contains("Can Die?")) { enemyEntry.AddField("Can Die?", "Whether or not an enemy can die.", enemyObj.canDie); }
                     if (enabledSettings.Contains("Destroy On Death?")) { enemyEntry.AddField("Destroy On Death?", "Whether or not an enemy is destroyed on death.", enemyObj.destroyOnDeath); }
                     if (enabledSettings.Contains("Can Destroy?")) { enemyEntry.AddField("Can Destroy?", "Whether or not an enemy can be destroyed.", enemyObj.canBeDestroyed); }
@@ -702,7 +785,7 @@ namespace LunarConfig.Objects.Config
                         }
                     }
 
-                    if (enabledSettings.Contains("Interior Multiplier")) { moonEntry.AddField("Interior Multiplier", "Changes the size of the interior generated.", moonObj.factorySizeMultiplier); }
+                    if (enabledSettings.Contains("Interior Multiplier")) { moonEntry.AddField("Interior Multiplier", "WARNING: This setting has been known to cause desyncs in interiors, proceed with caution until a fix is released!\nChanges the size of the interior generated.", moonObj.factorySizeMultiplier); }
                     if (enabledSettings.Contains("Possible Interiors")) { moonEntry.AddField("Possible Interiors", "The base interiors that can spawn on the moon.\nDenoted with NAME:RARITY, separated with commas.", defaultDungeons); }
 
                     string defaultTags = "";
@@ -738,6 +821,17 @@ namespace LunarConfig.Objects.Config
             LunarConfigFile dungeonFile = AddFile(LunarConfig.DUNGEON_FILE, LunarConfig.DUNGEON_FILE_NAME);
             dungeonFile.file.SaveOnConfigSet = false;
 
+            LunarConfigEntry enabledEntry = files[LunarConfig.CENTRAL_FILE_NAME].entries["Enabled Dungeon Settings"];
+            HashSet<string> enabledSettings = new HashSet<string>();
+
+            foreach (var setting in enabledEntry.fields.Keys)
+            {
+                if (enabledEntry.GetValue<bool>(setting))
+                {
+                    enabledSettings.Add(setting);
+                }
+            }
+
             HashSet<string> registeredDungeons = new HashSet<string>();
 
             // LLL/Vanilla Content
@@ -749,7 +843,16 @@ namespace LunarConfig.Objects.Config
                     DungeonFlow dungeonObj = dungeon.DungeonFlow;
                     LunarConfigEntry dungeonEntry = dungeonFile.AddEntry(dungeonUUID);
                     MiniLogger.LogInfo($"Recording {dungeon.name}...");
+                    dungeonEntry.AddField("Configure Content", "Enable to change any of the settings below.", false);
                     dungeonEntry.AddField("Appropriate Aliases", "Changing this setting will do nothing, these are the names which LunarConfig will recognize as this object in other config options.\nThey are case-insensitve and do not regard whitespace.", $"{dungeon.DungeonName}, {dungeon.DungeonFlow.name}");
+
+                    if (enabledSettings.Contains("Enable Dynamic Restriction")) { dungeonEntry.AddField("Enable Dynamic Restriction", "I don't know.", dungeon.IsDynamicDungeonSizeRestrictionEnabled); }
+                    if (enabledSettings.Contains("Dynamic Dungeon Size Lerp Rate")) { dungeonEntry.AddField("Dynamic Dungeon Size Lerp Rate", "I don't know.", dungeon.DynamicDungeonSizeLerpRate); }
+                    if (enabledSettings.Contains("Dynamic Dungeon Size Min")) { dungeonEntry.AddField("Dynamic Dungeon Size Min", "I don't know.", dungeon.DynamicDungeonSizeMinMax.x); }
+                    if (enabledSettings.Contains("Dynamic Dungeon Size Max")) { dungeonEntry.AddField("Dynamic Dungeon Size Max", "I don't know.", dungeon.DynamicDungeonSizeMinMax.y); }
+                    if (enabledSettings.Contains("Random Size Min")) { dungeonEntry.AddField("Random Size Min", "I don't know.", dungeon.DungeonFlow.Length.Min); }
+                    if (enabledSettings.Contains("Random Size Max")) { dungeonEntry.AddField("Random Size Max", "I don't know.", dungeon.DungeonFlow.Length.Max); }
+                    if (enabledSettings.Contains("Map Tile Size")) { dungeonEntry.AddField("Map Tile Size", "I don't know.", dungeon.MapTileSize); }
                     MiniLogger.LogInfo($"Recorded {dungeon.name}");
                     registeredDungeons.Add(dungeonUUID);
                 }

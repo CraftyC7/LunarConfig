@@ -144,6 +144,64 @@ namespace LunarConfig.Patches
             }
         }
 
+        [HarmonyPatch(typeof(StartOfRound), nameof(StartOfRound.OpenShipDoors))]
+        [HarmonyPriority(800)]
+        [HarmonyPostfix]
+        private static void onOpenShipDoorsPostfix(StartOfRound __instance)
+        {
+            try
+            {
+                LunarCentral lunarCentral = LunarConfig.central;
+                LunarConfigEntry centralConfig = lunarCentral.files[LunarConfig.CENTRAL_FILE_NAME].entries["Configuration"];
+
+                if (centralConfig.GetValue<bool>("Configure Moons"))
+                {
+                    LunarConfigFile moonFile = lunarCentral.files[LunarConfig.MOON_FILE_NAME];
+
+                    LunarConfigEntry enabledEntry = lunarCentral.files[LunarConfig.CENTRAL_FILE_NAME].entries["Enabled Moon Settings"];
+                    HashSet<string> enabledSettings = new HashSet<string>();
+
+                    foreach (var setting in enabledEntry.fields.Keys)
+                    {
+                        if (enabledEntry.GetValue<bool>(setting))
+                        {
+                            enabledSettings.Add(setting);
+                        }
+                    }
+
+                    List<string> overridenSettings = new List<string>();
+
+                    ExtendedLevel extendedMoon = LevelManager.CurrentExtendedLevel;
+                    SelectableLevel moon = extendedMoon.SelectableLevel;
+                    LunarConfigEntry configuredMoon = moonFile.entries[lunarCentral.UUIDify($"LLL - {extendedMoon.NumberlessPlanetName} ({extendedMoon.UniqueIdentificationName})")];
+
+                    if (configuredMoon.GetValue<bool>("Configure Content"))
+                    {
+                        if (enabledSettings.Contains("Tags"))
+                        {
+                            extendedMoon.ContentTags.Clear();
+
+                            foreach (var tag in configuredMoon.GetValue<string>("Tags").Split(','))
+                            {
+                                string fixedTag = lunarCentral.UUIDify(tag).RemoveWhitespace();
+
+                                extendedMoon.ContentTags.Add(ContentTag.Create(fixedTag));
+                            }
+                        }
+
+                        LunarCentral.RefreshMatchers();
+
+                        if (enabledSettings.Contains("Interior Multiplier")) { configuredMoon.SetValue("Interior Multiplier", ref moon.factorySizeMultiplier, overridenSettings.Contains("Interior Multiplier")); }
+                        if (enabledSettings.Contains("Possible Interiors")) { configuredMoon.SetDungeons("Possible Interiors", lunarCentral, extendedMoon, overridenSettings.Contains("Possible Interiors")); }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                MiniLogger.LogError($"An error occured while setting interior values, please report this!\n{e}");
+            }
+        }
+
         [HarmonyPatch(typeof(StartOfRound), "SetTimeAndPlanetToSavedSettings")]
         [HarmonyPriority(-2000)]
         [HarmonyPrefix]
