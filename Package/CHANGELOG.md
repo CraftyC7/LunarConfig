@@ -1,3 +1,8 @@
+## Version 0.1.9
+
+Fixes
+- Fixed an issue where changing the interior multiplier would cause desyncs in interiors. (Finally!)
+
 ## Version 0.1.8
 
 Features

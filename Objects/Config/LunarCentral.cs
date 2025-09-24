@@ -304,7 +304,7 @@ namespace LunarConfig.Objects.Config
                 configMoons.AddField("Value Multiplier", "Disable this to disable configuring this property in moon config entries.", true);
                 configMoons.AddField("Amount Multiplier", "Disable this to disable configuring this property in moon config entries.", true);
                 configMoons.AddField("Spawnable Scrap", "Disable this to disable configuring this property in moon config entries.", true);
-                configMoons.AddField("Interior Multiplier", "WARNING: This setting has been known to cause desyncs in interiors, proceed with caution until a fix is released!\nDisable this to disable configuring this property in moon config entries.", true);
+                configMoons.AddField("Interior Multiplier", "Disable this to disable configuring this property in moon config entries.", true);
                 configMoons.AddField("Possible Interiors", "Disable this to disable configuring this property in moon config entries.", true);
                 configMoons.AddField("Tags", "Disable this to disable configuring this property in moon config entries.", true);
             }
@@ -785,7 +785,7 @@ namespace LunarConfig.Objects.Config
                         }
                     }
 
-                    if (enabledSettings.Contains("Interior Multiplier")) { moonEntry.AddField("Interior Multiplier", "WARNING: This setting has been known to cause desyncs in interiors, proceed with caution until a fix is released!\nChanges the size of the interior generated.", moonObj.factorySizeMultiplier); }
+                    if (enabledSettings.Contains("Interior Multiplier")) { moonEntry.AddField("Interior Multiplier", "Changes the size of the interior generated.", moonObj.factorySizeMultiplier); }
                     if (enabledSettings.Contains("Possible Interiors")) { moonEntry.AddField("Possible Interiors", "The base interiors that can spawn on the moon.\nDenoted with NAME:RARITY, separated with commas.", defaultDungeons); }
 
                     string defaultTags = "";
