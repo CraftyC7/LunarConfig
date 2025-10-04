@@ -1,5 +1,6 @@
 ﻿using BepInEx.Configuration;
 using CodeRebirthLib;
+using Dawn;
 using DunGen.Graph;
 using HarmonyLib;
 using LethalLevelLoader;
@@ -118,8 +119,7 @@ namespace LunarConfig.Objects.Config
             FixDungeons();
 
             LunarConfigEntry centralConfig = files[LunarConfig.CENTRAL_FILE_NAME].entries["Configuration"];
-
-            if (centralConfig.GetValue<bool>("Configure Items")) { InitItems(); }
+            
             if (centralConfig.GetValue<bool>("Configure Enemies")) { InitEnemies(); }
             if (centralConfig.GetValue<bool>("Configure Moons")) { InitMoons(); }
             if (centralConfig.GetValue<bool>("Configure Dungeons")) { InitDungeons(); }
@@ -240,7 +240,7 @@ namespace LunarConfig.Objects.Config
                 configItems.AddField("Scan Max Range", "Disable this to disable configuring this property in item config entries.", true);
                 configItems.AddField("Minimum Value", "Disable this to disable configuring this property in item config entries.", true);
                 configItems.AddField("Maximum Value", "Disable this to disable configuring this property in item config entries.", true);
-                configItems.AddField("Credits Worth", "Disable this to disable configuring this property in item config entries.", true);
+                configItems.AddField("Cost", "Disable this to disable configuring this property in item config entries.", true);
                 configItems.AddField("Weight", "Disable this to disable configuring this property in item config entries.", true);
                 configItems.AddField("Conductivity", "Disable this to disable configuring this property in item config entries.", true);
                 configItems.AddField("Two-Handed", "Disable this to disable configuring this property in item config entries.", true);
@@ -371,15 +371,17 @@ namespace LunarConfig.Objects.Config
             }
 
             HashSet<string> registeredItems = new HashSet<string>();
-            
+
             // LLL/Vanilla Content
-            foreach (var item in PatchedContent.ExtendedItems)
+            foreach (var dawnItem in LethalContent.Items)
             {
-                string itemUUID = UUIDify($"LLL - {item.Item.itemName} ({item.UniqueIdentificationName})");
+                string itemUUID = UUIDify(dawnItem.Key.ToString());
+                DawnItemInfo item = dawnItem.Value;
                 if (!registeredItems.Contains(itemUUID))
                 {
                     Item itemObj = item.Item;
                     ScanNodeProperties itemScanNode = null;
+                    DawnShopItemInfo? shopInfo = item.ShopInfo;
 
                     if (itemObj.spawnPrefab != null)
                     {
@@ -387,7 +389,7 @@ namespace LunarConfig.Objects.Config
                     }
 
                     LunarConfigEntry itemEntry = itemFile.AddEntry(itemUUID);
-                    MiniLogger.LogInfo($"Recording {item.name}...");
+                    MiniLogger.LogInfo($"Recording {itemUUID}...");
                     itemEntry.AddField("Configure Content", "Enable to change any of the settings below.", false);
                     itemEntry.AddField("Appropriate Aliases", "Changing this setting will do nothing, these are the names which LunarConfig will recognize as this object in other config options.\nThey are case-insensitve and do not regard whitespace.", $"{ConfigHelper.SanitizeString(item.Item.itemName)}, {ConfigHelper.SanitizeString(item.Item.name)}");
                     if (enabledSettings.Contains("Display Name")) { itemEntry.AddField("Display Name", "Specifies the name that appears when scanning the item.", itemObj.itemName); }
@@ -397,115 +399,13 @@ namespace LunarConfig.Objects.Config
                     if (itemScanNode != null && enabledSettings.Contains("Scan Max Range")) { itemEntry.AddField("Scan Max Range", "Specifies the maximum distance the scan node can be scanned.", itemScanNode.maxRange); }
                     if (enabledSettings.Contains("Minimum Value")) { itemEntry.AddField("Minimum Value", "The minimum scrap value and item can have.\nTypically multiplied by 0.4, setting not applicable to non-scrap.\nDoes not work on items like Apparatus and items from enemies (Hives, Double-barrel).", itemObj.minValue); }
                     if (enabledSettings.Contains("Maximum Value")) { itemEntry.AddField("Maximum Value", "The maximum scrap value and item can have.\nTypically multiplied by 0.4, setting not applicable to non-scrap.\nDoes not work on items like Apparatus and items from enemies (Hives, Double-barrel).", itemObj.maxValue); }
-                    if (enabledSettings.Contains("Credits Worth")) { itemEntry.AddField("Credits Worth", "The value of an item if it is sold in the shop.", itemObj.creditsWorth); }
+                    if (shopInfo != null && enabledSettings.Contains("Cost")) { itemEntry.AddField("Cost", "The price of an item in the shop.", shopInfo.Cost); }
+                    //if (enabledSettings.Contains("Credits Worth")) { itemEntry.AddField("Credits Worth", "The value of an item if it is sold in the shop.", item.ShopInfo.Cost); }
                     if (enabledSettings.Contains("Weight")) { itemEntry.AddField("Weight", "Specifies the weight of an item.\nCalculated with: (x - 1) * 105 = weight in pounds.", itemObj.weight); }
                     if (enabledSettings.Contains("Conductivity")) { itemEntry.AddField("Conductivity", "Specifies whether an item is conductive.", itemObj.isConductiveMetal); }
                     if (enabledSettings.Contains("Two-Handed")) { itemEntry.AddField("Two-Handed", "Specifies whether an item is two-handed.", itemObj.twoHanded); }
                     if (enabledSettings.Contains("Is Scrap?")) { itemEntry.AddField("Is Scrap?", "Specifies if an item is scrap or gear.\nThis decides whether an item can be sold to the company for credits.", itemObj.isScrap); }
-                    MiniLogger.LogInfo($"Recorded {item.name}");
-                    registeredItems.Add(itemUUID);
-                }
-            }
-
-            // LL/CRLib Content
-            foreach (var item in Items.scrapItems)
-            {
-                string itemUUID = UUIDify($"LL - {item.item.itemName} ({item.modName}.{item.item.name})");
-                if (!registeredItems.Contains(itemUUID))
-                {
-                    Item itemObj = item.item;
-                    ScanNodeProperties itemScanNode = null;
-
-                    if (itemObj.spawnPrefab != null)
-                    {
-                        itemScanNode = itemObj.spawnPrefab.GetComponentInChildren<ScanNodeProperties>();
-                    }
-
-                    LunarConfigEntry itemEntry = itemFile.AddEntry(itemUUID);
-                    MiniLogger.LogInfo($"Recording {itemObj.name}...");
-                    itemEntry.AddField("Configure Content", "Enable to change any of the settings below.", false);
-                    itemEntry.AddField("Appropriate Aliases", "Changing this setting will do nothing, these are the names which LunarConfig will recognize as this object in other config options.\nThey are case-insensitve and do not regard whitespace.", $"{ConfigHelper.SanitizeString(item.item.itemName)}, {ConfigHelper.SanitizeString(item.item.name)}");
-                    if (enabledSettings.Contains("Display Name")) { itemEntry.AddField("Display Name", "Specifies the name that appears when scanning the item.", itemObj.itemName); }
-                    if (itemScanNode != null && enabledSettings.Contains("Scan Name")) { itemEntry.AddField("Scan Name", "Specifies the name of the item that appears on its scan node.", itemScanNode.headerText); }
-                    if (itemScanNode != null && enabledSettings.Contains("Scan Subtext")) { itemEntry.AddField("Scan Subtext", "Specifies the subtext that appears on the item's scan node. NOTE: This setting may be overridden if the item has a scrap value.", itemScanNode.subText); }
-                    if (itemScanNode != null && enabledSettings.Contains("Scan Min Range")) { itemEntry.AddField("Scan Min Range", "Specifies the minimum distance the scan node can be scanned.", itemScanNode.minRange); }
-                    if (itemScanNode != null && enabledSettings.Contains("Scan Max Range")) { itemEntry.AddField("Scan Max Range", "Specifies the maximum distance the scan node can be scanned.", itemScanNode.maxRange); }
-                    if (enabledSettings.Contains("Minimum Value")) { itemEntry.AddField("Minimum Value", "The minimum scrap value and item can have.\nTypically multiplied by 0.4, setting not applicable to non-scrap.\nDoes not work on items like Apparatus and items from enemies (Hives, Double-barrel).", itemObj.minValue); }
-                    if (enabledSettings.Contains("Maximum Value")) { itemEntry.AddField("Maximum Value", "The maximum scrap value and item can have.\nTypically multiplied by 0.4, setting not applicable to non-scrap.\nDoes not work on items like Apparatus and items from enemies (Hives, Double-barrel).", itemObj.maxValue); }
-                    if (enabledSettings.Contains("Credits Worth")) { itemEntry.AddField("Credits Worth", "The value of an item if it is sold in the shop.", itemObj.creditsWorth); }
-                    if (enabledSettings.Contains("Weight")) { itemEntry.AddField("Weight", "Specifies the weight of an item.\nCalculated with: (x - 1) * 105 = weight in pounds.", itemObj.weight); }
-                    if (enabledSettings.Contains("Conductivity")) { itemEntry.AddField("Conductivity", "Specifies whether an item is conductive.", itemObj.isConductiveMetal); }
-                    if (enabledSettings.Contains("Two-Handed")) { itemEntry.AddField("Two-Handed", "Specifies whether an item is two-handed.", itemObj.twoHanded); }
-                    if (enabledSettings.Contains("Is Scrap?")) { itemEntry.AddField("Is Scrap?", "Specifies if an item is scrap or gear.\nThis decides whether an item can be sold to the company for credits.", itemObj.isScrap); }
-                    MiniLogger.LogInfo($"Recorded {itemObj.name}");
-                    registeredItems.Add(itemUUID);
-                }
-            }
-
-            foreach (var item in Items.shopItems)
-            {
-                string itemUUID = UUIDify($"LL - {item.item.itemName} ({item.modName}.{item.item.name})");
-                if (!registeredItems.Contains(itemUUID))
-                {
-                    Item itemObj = item.item;
-                    ScanNodeProperties itemScanNode = null;
-
-                    if (itemObj.spawnPrefab != null)
-                    {
-                        itemScanNode = itemObj.spawnPrefab.GetComponentInChildren<ScanNodeProperties>();
-                    }
-
-                    LunarConfigEntry itemEntry = itemFile.AddEntry(itemUUID);
-                    MiniLogger.LogInfo($"Recording {itemObj.name}...");
-                    itemEntry.AddField("Configure Content", "Enable to change any of the settings below.", false);
-                    itemEntry.AddField("Appropriate Aliases", "Changing this setting will do nothing, these are the names which LunarConfig will recognize as this object in other config options.\nThey are case-insensitve and do not regard whitespace.", $"{ConfigHelper.SanitizeString(item.item.itemName)}, {ConfigHelper.SanitizeString(item.item.name)}");
-                    if (enabledSettings.Contains("Display Name")) { itemEntry.AddField("Display Name", "Specifies the name that appears when scanning the item.", itemObj.itemName); }
-                    if (itemScanNode != null && enabledSettings.Contains("Scan Name")) { itemEntry.AddField("Scan Name", "Specifies the name of the item that appears on its scan node.", itemScanNode.headerText); }
-                    if (itemScanNode != null && enabledSettings.Contains("Scan Subtext")) { itemEntry.AddField("Scan Subtext", "Specifies the subtext that appears on the item's scan node. NOTE: This setting may be overridden if the item has a scrap value.", itemScanNode.subText); }
-                    if (itemScanNode != null && enabledSettings.Contains("Scan Min Range")) { itemEntry.AddField("Scan Min Range", "Specifies the minimum distance the scan node can be scanned.", itemScanNode.minRange); }
-                    if (itemScanNode != null && enabledSettings.Contains("Scan Max Range")) { itemEntry.AddField("Scan Max Range", "Specifies the maximum distance the scan node can be scanned.", itemScanNode.maxRange); }
-                    if (enabledSettings.Contains("Minimum Value")) { itemEntry.AddField("Minimum Value", "The minimum scrap value and item can have.\nTypically multiplied by 0.4, setting not applicable to non-scrap.\nDoes not work on items like Apparatus and items from enemies (Hives, Double-barrel).", itemObj.minValue); }
-                    if (enabledSettings.Contains("Maximum Value")) { itemEntry.AddField("Maximum Value", "The maximum scrap value and item can have.\nTypically multiplied by 0.4, setting not applicable to non-scrap.\nDoes not work on items like Apparatus and items from enemies (Hives, Double-barrel).", itemObj.maxValue); }
-                    if (enabledSettings.Contains("Credits Worth")) { itemEntry.AddField("Credits Worth", "The value of an item if it is sold in the shop.", itemObj.creditsWorth); }
-                    if (enabledSettings.Contains("Weight")) { itemEntry.AddField("Weight", "Specifies the weight of an item.\nCalculated with: (x - 1) * 105 = weight in pounds.", itemObj.weight); }
-                    if (enabledSettings.Contains("Conductivity")) { itemEntry.AddField("Conductivity", "Specifies whether an item is conductive.", itemObj.isConductiveMetal); }
-                    if (enabledSettings.Contains("Two-Handed")) { itemEntry.AddField("Two-Handed", "Specifies whether an item is two-handed.", itemObj.twoHanded); }
-                    if (enabledSettings.Contains("Is Scrap?")) { itemEntry.AddField("Is Scrap?", "Specifies if an item is scrap or gear.\nThis decides whether an item can be sold to the company for credits.", itemObj.isScrap); }
-                    MiniLogger.LogInfo($"Recorded {itemObj.name}");
-                    registeredItems.Add(itemUUID);
-                }
-            }
-
-            foreach (var item in Items.plainItems)
-            {
-                string itemUUID = UUIDify($"LL - {item.item.itemName} ({item.modName}.{item.item.name})");
-                if (!registeredItems.Contains(itemUUID))
-                {
-                    Item itemObj = item.item;
-                    ScanNodeProperties itemScanNode = null;
-
-                    if (itemObj.spawnPrefab != null)
-                    {
-                        itemScanNode = itemObj.spawnPrefab.GetComponentInChildren<ScanNodeProperties>();
-                    }
-
-                    LunarConfigEntry itemEntry = itemFile.AddEntry(itemUUID);
-                    MiniLogger.LogInfo($"Recording {itemObj.name}...");
-                    itemEntry.AddField("Configure Content", "Enable to change any of the settings below.", false);
-                    itemEntry.AddField("Appropriate Aliases", "Changing this setting will do nothing, these are the names which LunarConfig will recognize as this object in other config options.\nThey are case-insensitve and do not regard whitespace.", $"{ConfigHelper.SanitizeString(item.item.itemName)}, {ConfigHelper.SanitizeString(item.item.name)}");
-                    if (enabledSettings.Contains("Display Name")) { itemEntry.AddField("Display Name", "Specifies the name that appears when scanning the item.", itemObj.itemName); }
-                    if (itemScanNode != null && enabledSettings.Contains("Scan Name")) { itemEntry.AddField("Scan Name", "Specifies the name of the item that appears on its scan node.", itemScanNode.headerText); }
-                    if (itemScanNode != null && enabledSettings.Contains("Scan Subtext")) { itemEntry.AddField("Scan Subtext", "Specifies the subtext that appears on the item's scan node. NOTE: This setting may be overridden if the item has a scrap value.", itemScanNode.subText); }
-                    if (itemScanNode != null && enabledSettings.Contains("Scan Min Range")) { itemEntry.AddField("Scan Min Range", "Specifies the minimum distance the scan node can be scanned.", itemScanNode.minRange); }
-                    if (itemScanNode != null && enabledSettings.Contains("Scan Max Range")) { itemEntry.AddField("Scan Max Range", "Specifies the maximum distance the scan node can be scanned.", itemScanNode.maxRange); }
-                    if (enabledSettings.Contains("Minimum Value")) { itemEntry.AddField("Minimum Value", "The minimum scrap value and item can have.\nTypically multiplied by 0.4, setting not applicable to non-scrap.\nDoes not work on items like Apparatus and items from enemies (Hives, Double-barrel).", itemObj.minValue); }
-                    if (enabledSettings.Contains("Maximum Value")) { itemEntry.AddField("Maximum Value", "The maximum scrap value and item can have.\nTypically multiplied by 0.4, setting not applicable to non-scrap.\nDoes not work on items like Apparatus and items from enemies (Hives, Double-barrel).", itemObj.maxValue); }
-                    if (enabledSettings.Contains("Credits Worth")) { itemEntry.AddField("Credits Worth", "The value of an item if it is sold in the shop.", itemObj.creditsWorth); }
-                    if (enabledSettings.Contains("Weight")) { itemEntry.AddField("Weight", "Specifies the weight of an item.\nCalculated with: (x - 1) * 105 = weight in pounds.", itemObj.weight); }
-                    if (enabledSettings.Contains("Conductivity")) { itemEntry.AddField("Conductivity", "Specifies whether an item is conductive.", itemObj.isConductiveMetal); }
-                    if (enabledSettings.Contains("Two-Handed")) { itemEntry.AddField("Two-Handed", "Specifies whether an item is two-handed.", itemObj.twoHanded); }
-                    if (enabledSettings.Contains("Is Scrap?")) { itemEntry.AddField("Is Scrap?", "Specifies if an item is scrap or gear.\nThis decides whether an item can be sold to the company for credits.", itemObj.isScrap); }
-                    MiniLogger.LogInfo($"Recorded {itemObj.name}");
+                    MiniLogger.LogInfo($"Recorded {itemUUID}");
                     registeredItems.Add(itemUUID);
                 }
             }

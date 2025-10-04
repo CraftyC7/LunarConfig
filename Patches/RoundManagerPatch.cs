@@ -8,6 +8,7 @@ using LunarConfig.Objects.Config;
 using LethalLib.Modules;
 using CodeRebirthLib;
 using CodeRebirthLib.ContentManagement.MapObjects;
+using Dawn;
 
 namespace LunarConfig.Patches
 {
@@ -54,144 +55,36 @@ namespace LunarConfig.Patches
 
                 List<string> overridenSettings = new List<string>();
 
-                // LLL/Vanilla Items
-                foreach (var extendedItem in PatchedContent.ExtendedItems)
+                foreach (var dawnItem in Dawn.LethalContent.Items)
                 {
                     try
                     {
-                        Item item = extendedItem.Item;
-                        LunarConfigEntry configuredItem = itemFile.entries[lunarCentral.UUIDify($"LLL - {item.itemName} ({extendedItem.UniqueIdentificationName})")];
+                        DawnItemInfo item = dawnItem.Value;
+                        LunarConfigEntry configuredItem = itemFile.entries[lunarCentral.UUIDify(dawnItem.Key.ToString())];
 
                         if (configuredItem.GetValue<bool>("Configure Content"))
                         {
+                            Item itemObj = item.Item;
                             ScanNodeProperties itemScanNode = null;
+                            DawnShopItemInfo? shopInfo = item.ShopInfo;
 
-                            if (item.spawnPrefab != null)
+                            if (itemObj.spawnPrefab != null)
                             {
-                                itemScanNode = item.spawnPrefab.GetComponentInChildren<ScanNodeProperties>();
+                                itemScanNode = itemObj.spawnPrefab.GetComponentInChildren<ScanNodeProperties>();
                             }
 
-                            if (enabledSettings.Contains("Display Name")) { configuredItem.SetValue("Display Name", ref item.itemName, overridenSettings.Contains("Display Name")); }
+                            if (enabledSettings.Contains("Display Name")) { configuredItem.SetValue("Display Name", ref itemObj.itemName, overridenSettings.Contains("Display Name")); }
                             if (itemScanNode != null && enabledSettings.Contains("Scan Name")) { configuredItem.SetValue("Scan Name", ref itemScanNode.headerText); }
                             if (itemScanNode != null && enabledSettings.Contains("Scan Subtext")) { configuredItem.SetValue("Scan Subtext", ref itemScanNode.subText); }
                             if (itemScanNode != null && enabledSettings.Contains("Scan Min Range")) { configuredItem.SetValue("Scan Min Range", ref itemScanNode.minRange); }
                             if (itemScanNode != null && enabledSettings.Contains("Scan Max Range")) { configuredItem.SetValue("Scan Max Range", ref itemScanNode.maxRange); }
-                            if (enabledSettings.Contains("Minimum Value")) { configuredItem.SetValue("Minimum Value", ref item.minValue, overridenSettings.Contains("Minimum Value")); }
-                            if (enabledSettings.Contains("Maximum Value")) { configuredItem.SetValue("Maximum Value", ref item.maxValue, overridenSettings.Contains("Maximum Value")); }
-                            if (enabledSettings.Contains("Credits Worth")) { configuredItem.SetValue("Credits Worth", ref item.creditsWorth, overridenSettings.Contains("Credits Worth")); }
-                            if (enabledSettings.Contains("Weight")) { configuredItem.SetValue("Weight", ref item.weight, overridenSettings.Contains("Weight")); }
-                            if (enabledSettings.Contains("Conductivity")) { configuredItem.SetValue("Conductivity", ref item.isConductiveMetal, overridenSettings.Contains("Conductivity")); }
-                            if (enabledSettings.Contains("Two-Handed")) { configuredItem.SetValue("Two-Handed", ref item.twoHanded, overridenSettings.Contains("Two-Handed")); }
-                            if (enabledSettings.Contains("Is Scrap?")) { configuredItem.SetValue("Is Scrap?", ref item.isScrap, overridenSettings.Contains("Is Scrap?")); }
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        MiniLogger.LogError($"An error occured while setting item values, please report this!\n{e}");
-                    }
-                }
-
-                // LL/CRLib Items
-                foreach (var spawnableItem in Items.scrapItems)
-                {
-                    try
-                    {
-                        Item item = spawnableItem.item;
-                        LunarConfigEntry configuredItem = itemFile.entries[lunarCentral.UUIDify($"LL - {item.itemName} ({spawnableItem.modName}.{item.name})")];
-
-                        if (configuredItem.GetValue<bool>("Configure Content"))
-                        {
-                            ScanNodeProperties itemScanNode = null;
-
-                            if (item.spawnPrefab != null)
-                            {
-                                itemScanNode = item.spawnPrefab.GetComponentInChildren<ScanNodeProperties>();
-                            }
-
-                            if (enabledSettings.Contains("Display Name")) { configuredItem.SetValue("Display Name", ref item.itemName, overridenSettings.Contains("Display Name")); }
-                            if (itemScanNode != null && enabledSettings.Contains("Scan Name")) { configuredItem.SetValue("Scan Name", ref itemScanNode.headerText); }
-                            if (itemScanNode != null && enabledSettings.Contains("Scan Subtext")) { configuredItem.SetValue("Scan Subtext", ref itemScanNode.subText); }
-                            if (itemScanNode != null && enabledSettings.Contains("Scan Min Range")) { configuredItem.SetValue("Scan Min Range", ref itemScanNode.minRange); }
-                            if (itemScanNode != null && enabledSettings.Contains("Scan Max Range")) { configuredItem.SetValue("Scan Max Range", ref itemScanNode.maxRange); }
-                            if (enabledSettings.Contains("Minimum Value")) { configuredItem.SetValue("Minimum Value", ref item.minValue, overridenSettings.Contains("Minimum Value")); }
-                            if (enabledSettings.Contains("Maximum Value")) { configuredItem.SetValue("Maximum Value", ref item.maxValue, overridenSettings.Contains("Maximum Value")); }
-                            if (enabledSettings.Contains("Credits Worth")) { configuredItem.SetValue("Credits Worth", ref item.creditsWorth, overridenSettings.Contains("Credits Worth")); }
-                            if (enabledSettings.Contains("Weight")) { configuredItem.SetValue("Weight", ref item.weight, overridenSettings.Contains("Weight")); }
-                            if (enabledSettings.Contains("Conductivity")) { configuredItem.SetValue("Conductivity", ref item.isConductiveMetal, overridenSettings.Contains("Conductivity")); }
-                            if (enabledSettings.Contains("Two-Handed")) { configuredItem.SetValue("Two-Handed", ref item.twoHanded, overridenSettings.Contains("Two-Handed")); }
-                            if (enabledSettings.Contains("Is Scrap?")) { configuredItem.SetValue("Is Scrap?", ref item.isScrap, overridenSettings.Contains("Is Scrap?")); }
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        MiniLogger.LogError($"An error occured while setting item values, please report this!\n{e}");
-                    }
-                }
-
-                foreach (var spawnableItem in Items.shopItems)
-                {
-                    try
-                    {
-                        Item item = spawnableItem.item;
-                        LunarConfigEntry configuredItem = itemFile.entries[lunarCentral.UUIDify($"LL - {item.itemName} ({spawnableItem.modName}.{item.name})")];
-
-                        if (configuredItem.GetValue<bool>("Configure Content"))
-                        {
-                            ScanNodeProperties itemScanNode = null;
-
-                            if (item.spawnPrefab != null)
-                            {
-                                itemScanNode = item.spawnPrefab.GetComponentInChildren<ScanNodeProperties>();
-                            }
-
-                            if (enabledSettings.Contains("Display Name")) { configuredItem.SetValue("Display Name", ref item.itemName, overridenSettings.Contains("Display Name")); }
-                            if (itemScanNode != null && enabledSettings.Contains("Scan Name")) { configuredItem.SetValue("Scan Name", ref itemScanNode.headerText); }
-                            if (itemScanNode != null && enabledSettings.Contains("Scan Subtext")) { configuredItem.SetValue("Scan Subtext", ref itemScanNode.subText); }
-                            if (itemScanNode != null && enabledSettings.Contains("Scan Min Range")) { configuredItem.SetValue("Scan Min Range", ref itemScanNode.minRange); }
-                            if (itemScanNode != null && enabledSettings.Contains("Scan Max Range")) { configuredItem.SetValue("Scan Max Range", ref itemScanNode.maxRange); }
-                            if (enabledSettings.Contains("Minimum Value")) { configuredItem.SetValue("Minimum Value", ref item.minValue, overridenSettings.Contains("Minimum Value")); }
-                            if (enabledSettings.Contains("Maximum Value")) { configuredItem.SetValue("Maximum Value", ref item.maxValue, overridenSettings.Contains("Maximum Value")); }
-                            if (enabledSettings.Contains("Credits Worth")) { configuredItem.SetValue("Credits Worth", ref item.creditsWorth, overridenSettings.Contains("Credits Worth")); }
-                            if (enabledSettings.Contains("Weight")) { configuredItem.SetValue("Weight", ref item.weight, overridenSettings.Contains("Weight")); }
-                            if (enabledSettings.Contains("Conductivity")) { configuredItem.SetValue("Conductivity", ref item.isConductiveMetal, overridenSettings.Contains("Conductivity")); }
-                            if (enabledSettings.Contains("Two-Handed")) { configuredItem.SetValue("Two-Handed", ref item.twoHanded, overridenSettings.Contains("Two-Handed")); }
-                            if (enabledSettings.Contains("Is Scrap?")) { configuredItem.SetValue("Is Scrap?", ref item.isScrap, overridenSettings.Contains("Is Scrap?")); }
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        MiniLogger.LogError($"An error occured while setting item values, please report this!\n{e}");
-                    }
-                }
-
-                foreach (var spawnableItem in Items.plainItems)
-                {
-                    try
-                    {
-                        Item item = spawnableItem.item;
-                        LunarConfigEntry configuredItem = itemFile.entries[lunarCentral.UUIDify($"LL - {item.itemName} ({spawnableItem.modName}.{item.name})")];
-
-                        if (configuredItem.GetValue<bool>("Configure Content"))
-                        {
-                            ScanNodeProperties itemScanNode = null;
-
-                            if (item.spawnPrefab != null)
-                            {
-                                itemScanNode = item.spawnPrefab.GetComponentInChildren<ScanNodeProperties>();
-                            }
-
-                            if (enabledSettings.Contains("Display Name")) { configuredItem.SetValue("Display Name", ref item.itemName, overridenSettings.Contains("Display Name")); }
-                            if (itemScanNode != null && enabledSettings.Contains("Scan Name")) { configuredItem.SetValue("Scan Name", ref itemScanNode.headerText); }
-                            if (itemScanNode != null && enabledSettings.Contains("Scan Subtext")) { configuredItem.SetValue("Scan Subtext", ref itemScanNode.subText); }
-                            if (itemScanNode != null && enabledSettings.Contains("Scan Min Range")) { configuredItem.SetValue("Scan Min Range", ref itemScanNode.minRange); }
-                            if (itemScanNode != null && enabledSettings.Contains("Scan Max Range")) { configuredItem.SetValue("Scan Max Range", ref itemScanNode.maxRange); }
-                            if (enabledSettings.Contains("Minimum Value")) { configuredItem.SetValue("Minimum Value", ref item.minValue, overridenSettings.Contains("Minimum Value")); }
-                            if (enabledSettings.Contains("Maximum Value")) { configuredItem.SetValue("Maximum Value", ref item.maxValue, overridenSettings.Contains("Maximum Value")); }
-                            if (enabledSettings.Contains("Credits Worth")) { configuredItem.SetValue("Credits Worth", ref item.creditsWorth, overridenSettings.Contains("Credits Worth")); }
-                            if (enabledSettings.Contains("Weight")) { configuredItem.SetValue("Weight", ref item.weight, overridenSettings.Contains("Weight")); }
-                            if (enabledSettings.Contains("Conductivity")) { configuredItem.SetValue("Conductivity", ref item.isConductiveMetal, overridenSettings.Contains("Conductivity")); }
-                            if (enabledSettings.Contains("Two-Handed")) { configuredItem.SetValue("Two-Handed", ref item.twoHanded, overridenSettings.Contains("Two-Handed")); }
-                            if (enabledSettings.Contains("Is Scrap?")) { configuredItem.SetValue("Is Scrap?", ref item.isScrap, overridenSettings.Contains("Is Scrap?")); }
+                            if (enabledSettings.Contains("Minimum Value")) { configuredItem.SetValue("Minimum Value", ref itemObj.minValue, overridenSettings.Contains("Minimum Value")); }
+                            if (enabledSettings.Contains("Maximum Value")) { configuredItem.SetValue("Maximum Value", ref itemObj.maxValue, overridenSettings.Contains("Maximum Value")); }
+                            if (enabledSettings.Contains("Cost")) { shopInfo.Cost = configuredItem.GetValue<int>("Cost"); }
+                            if (enabledSettings.Contains("Weight")) { configuredItem.SetValue("Weight", ref itemObj.weight, overridenSettings.Contains("Weight")); }
+                            if (enabledSettings.Contains("Conductivity")) { configuredItem.SetValue("Conductivity", ref itemObj.isConductiveMetal, overridenSettings.Contains("Conductivity")); }
+                            if (enabledSettings.Contains("Two-Handed")) { configuredItem.SetValue("Two-Handed", ref itemObj.twoHanded, overridenSettings.Contains("Two-Handed")); }
+                            if (enabledSettings.Contains("Is Scrap?")) { configuredItem.SetValue("Is Scrap?", ref itemObj.isScrap, overridenSettings.Contains("Is Scrap?")); }
                         }
                     }
                     catch (Exception e)
@@ -504,6 +397,8 @@ namespace LunarConfig.Patches
             try
             {
                 LunarCentral lunarCentral = LunarConfig.central;
+
+                Dawn.LethalContent.Items.OnFreeze += lunarCentral.InitItems;
 
                 lunarCentral.InitCentral();
 

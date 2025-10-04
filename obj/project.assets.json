@@ -292,7 +292,7 @@
           }
         }
       },
-      "mrov.WeatherRegistry/0.7.3": {
+      "mrov.WeatherRegistry/0.7.4": {
         "type": "package",
         "dependencies": {
           "BepInEx.Core": "5.4.21",
@@ -730,6 +730,18 @@
         },
         "runtime": {
           "lib/netstandard2.1/BMX.LobbyCompatibility.dll": {}
+        }
+      },
+      "TeamXiaolan.DawnLib/0.2.3": {
+        "type": "package",
+        "dependencies": {
+          "Evaisa.LethalLib": "1.1.1"
+        },
+        "compile": {
+          "lib/netstandard2.1/com.github.teamxiaolan.dawnlib.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.1/com.github.teamxiaolan.dawnlib.dll": {}
         }
       },
       "UnityEngine.Modules/2022.3.9": {
@@ -1171,17 +1183,17 @@
         "monomod.utils.nuspec"
       ]
     },
-    "mrov.WeatherRegistry/0.7.3": {
-      "sha512": "fvI1r0WhgeQ/eMBMa38idvJB+aWkn538fVfWtISBJiI4J5WiN094sZxZD9n4NaPvO1eQw4iNLgq30InEy1SIVg==",
+    "mrov.WeatherRegistry/0.7.4": {
+      "sha512": "7y3IduLuQhuZ9MSSS2XfpJRygOvTpcxBr4FWm222LmQi9AEyDKzWLxo3TUx5CN0KRrcUhVogzjHz3kOHFXniew==",
       "type": "package",
-      "path": "mrov.weatherregistry/0.7.3",
+      "path": "mrov.weatherregistry/0.7.4",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "README.md",
         "icon.png",
         "lib/netstandard2.1/WeatherRegistry.dll",
-        "mrov.weatherregistry.0.7.3.nupkg.sha512",
+        "mrov.weatherregistry.0.7.4.nupkg.sha512",
         "mrov.weatherregistry.nuspec"
       ]
     },
@@ -2902,6 +2914,18 @@
         "teambmx.lobbycompatibility.nuspec"
       ]
     },
+    "TeamXiaolan.DawnLib/0.2.3": {
+      "sha512": "sCeuesSz7vgKjb5iWb35E4w6Cvu6Rp99SZktC5+RtpAeUarK8peoUvHtQCx7L5LvS8Fh9DS/hanvB3XsFlqxRA==",
+      "type": "package",
+      "path": "teamxiaolan.dawnlib/0.2.3",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/netstandard2.1/com.github.teamxiaolan.dawnlib.dll",
+        "teamxiaolan.dawnlib.0.2.3.nupkg.sha512",
+        "teamxiaolan.dawnlib.nuspec"
+      ]
+    },
     "UnityEngine.Modules/2022.3.9": {
       "sha512": "sSxqZjd05U0NWlX+eappdlsEuXFvDRHkUaClDVTocGRzCmIwNvgGJIPh22lGklIpNZ3cJZneYJkIUnEIazR8VA==",
       "type": "package",
@@ -3131,6 +3155,7 @@
       "Evaisa.LethalLib >= 1.1.*",
       "IAmBatby.LethalLevelLoader >= 1.4.*",
       "LethalCompany.GameLibs.Steam >= *-*",
+      "TeamXiaolan.DawnLib >= 0.2.3",
       "UnityEngine.Modules >= 2022.3.9",
       "XuXiaolan.CodeRebirthLib >= 0.7.*",
       "mrov.WeatherRegistry >= 0.7.*"
@@ -3217,6 +3242,11 @@
             "suppressParent": "All",
             "target": "Package",
             "version": "[*-*, )"
+          },
+          "TeamXiaolan.DawnLib": {
+            "suppressParent": "All",
+            "target": "Package",
+            "version": "[0.2.3, )"
           },
           "UnityEngine.Modules": {
             "include": "Compile",

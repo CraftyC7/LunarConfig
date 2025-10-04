@@ -82,6 +82,11 @@
               "target": "Package",
               "version": "[*-*, )"
             },
+            "TeamXiaolan.DawnLib": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[0.2.3, )"
+            },
             "UnityEngine.Modules": {
               "include": "Compile",
               "suppressParent": "All",
