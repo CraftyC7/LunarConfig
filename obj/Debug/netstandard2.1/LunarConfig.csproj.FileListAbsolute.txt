@@ -17,3 +17,4 @@ C:\Users\pataa\Desktop\LCDev\LunarConfig\obj\Debug\netstandard2.1\LunarConfig.As
 C:\Users\pataa\Desktop\LCDev\LunarConfig\obj\Debug\netstandard2.1\LunarConfig.csproj.CoreCompileInputs.cache
 C:\Users\pataa\Desktop\LCDev\LunarConfig\obj\Debug\netstandard2.1\LunarConfig.sourcelink.json
 C:\Users\pataa\Desktop\LCDev\LunarConfig\obj\Debug\netstandard2.1\Crafty.LunarConfig.dll
+C:\Users\pataa\Desktop\LCDev\LunarConfig\obj\Debug\netstandard2.1\LunarConfig.IgnoresAccessChecksTo.cs

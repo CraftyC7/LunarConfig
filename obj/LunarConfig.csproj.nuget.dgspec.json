@@ -57,6 +57,11 @@
               "target": "Package",
               "version": "[1.*, )"
             },
+            "BepInEx.AssemblyPublicizer.MSBuild": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[0.4.2, )"
+            },
             "BepInEx.Core": {
               "suppressParent": "All",
               "target": "Package",
@@ -85,7 +90,7 @@
             "TeamXiaolan.DawnLib": {
               "suppressParent": "All",
               "target": "Package",
-              "version": "[0.2.3, )"
+              "version": "[0.3.4, )"
             },
             "UnityEngine.Modules": {
               "include": "Compile",

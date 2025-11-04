@@ -57,6 +57,7 @@ namespace LunarConfig
 
             Harmony.PatchAll(typeof(RoundManagerPatch));
             Harmony.PatchAll(typeof(StartOfRoundPatch));
+            Harmony.PatchAll(typeof(DawnPatch));
 
             Logger.LogDebug("Finished patching!");
         }

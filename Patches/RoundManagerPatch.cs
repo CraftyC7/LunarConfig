@@ -29,9 +29,10 @@ namespace LunarConfig.Patches
         {
             LunarCentral lunarCentral = LunarConfig.central;
 
+            LethalContent.Items.OnFreeze += lunarCentral.InitItems;
+
             lunarCentral.InitConfig();
 
-            registeredOverrides["Item"] = new List<string>();
             registeredOverrides["Enemy"] = new List<string>();
             registeredOverrides["Moon"] = new List<string>();
 
@@ -53,14 +54,12 @@ namespace LunarConfig.Patches
                     }
                 }
 
-                List<string> overridenSettings = new List<string>();
-
-                foreach (var dawnItem in Dawn.LethalContent.Items)
+                foreach (var dawnItem in LethalContent.Items)
                 {
                     try
                     {
                         DawnItemInfo item = dawnItem.Value;
-                        LunarConfigEntry configuredItem = itemFile.entries[lunarCentral.UUIDify(dawnItem.Key.ToString())];
+                        LunarConfigEntry configuredItem = itemFile.entries[LunarCentral.UUIDify(dawnItem.Key.ToString())];
 
                         if (configuredItem.GetValue<bool>("Configure Content"))
                         {
@@ -73,18 +72,21 @@ namespace LunarConfig.Patches
                                 itemScanNode = itemObj.spawnPrefab.GetComponentInChildren<ScanNodeProperties>();
                             }
 
-                            if (enabledSettings.Contains("Display Name")) { configuredItem.SetValue("Display Name", ref itemObj.itemName, overridenSettings.Contains("Display Name")); }
+                            if (enabledSettings.Contains("Display Name")) { configuredItem.SetValue("Display Name", ref itemObj.itemName); }
                             if (itemScanNode != null && enabledSettings.Contains("Scan Name")) { configuredItem.SetValue("Scan Name", ref itemScanNode.headerText); }
                             if (itemScanNode != null && enabledSettings.Contains("Scan Subtext")) { configuredItem.SetValue("Scan Subtext", ref itemScanNode.subText); }
                             if (itemScanNode != null && enabledSettings.Contains("Scan Min Range")) { configuredItem.SetValue("Scan Min Range", ref itemScanNode.minRange); }
                             if (itemScanNode != null && enabledSettings.Contains("Scan Max Range")) { configuredItem.SetValue("Scan Max Range", ref itemScanNode.maxRange); }
-                            if (enabledSettings.Contains("Minimum Value")) { configuredItem.SetValue("Minimum Value", ref itemObj.minValue, overridenSettings.Contains("Minimum Value")); }
-                            if (enabledSettings.Contains("Maximum Value")) { configuredItem.SetValue("Maximum Value", ref itemObj.maxValue, overridenSettings.Contains("Maximum Value")); }
-                            if (enabledSettings.Contains("Cost")) { shopInfo.Cost = configuredItem.GetValue<int>("Cost"); }
-                            if (enabledSettings.Contains("Weight")) { configuredItem.SetValue("Weight", ref itemObj.weight, overridenSettings.Contains("Weight")); }
-                            if (enabledSettings.Contains("Conductivity")) { configuredItem.SetValue("Conductivity", ref itemObj.isConductiveMetal, overridenSettings.Contains("Conductivity")); }
-                            if (enabledSettings.Contains("Two-Handed")) { configuredItem.SetValue("Two-Handed", ref itemObj.twoHanded, overridenSettings.Contains("Two-Handed")); }
-                            if (enabledSettings.Contains("Is Scrap?")) { configuredItem.SetValue("Is Scrap?", ref itemObj.isScrap, overridenSettings.Contains("Is Scrap?")); }
+                            if (enabledSettings.Contains("Minimum Value")) { configuredItem.SetValue("Minimum Value", ref itemObj.minValue); }
+                            if (enabledSettings.Contains("Maximum Value")) { configuredItem.SetValue("Maximum Value", ref itemObj.maxValue); }
+
+                            if (shopInfo != null) { LunarCentral.TrySetField(enabledSettings, configuredItem, "Cost", ref shopInfo.Cost); }
+                            if (shopInfo != null && enabledSettings.Contains("Cost")) { shopInfo.Cost = configuredItem.GetValue<int>("Cost"); }
+
+                            if (enabledSettings.Contains("Weight")) { configuredItem.SetValue("Weight", ref itemObj.weight); }
+                            if (enabledSettings.Contains("Conductivity")) { configuredItem.SetValue("Conductivity", ref itemObj.isConductiveMetal); }
+                            if (enabledSettings.Contains("Two-Handed")) { configuredItem.SetValue("Two-Handed", ref itemObj.twoHanded); }
+                            if (enabledSettings.Contains("Is Scrap?")) { configuredItem.SetValue("Is Scrap?", ref itemObj.isScrap); }
                         }
                     }
                     catch (Exception e)
@@ -397,8 +399,6 @@ namespace LunarConfig.Patches
             try
             {
                 LunarCentral lunarCentral = LunarConfig.central;
-
-                Dawn.LethalContent.Items.OnFreeze += lunarCentral.InitItems;
 
                 lunarCentral.InitCentral();
 

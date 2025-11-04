@@ -5,6 +5,7 @@ using DunGen.Graph;
 using HarmonyLib;
 using LethalLevelLoader;
 using LethalLib.Modules;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -31,9 +32,23 @@ namespace LunarConfig.Objects.Config
 
         public LunarCentral() { }
 
-        public string UUIDify(string uuid)
+        // UTILS
+        public static string UUIDify(string uuid)
         {
             return uuid.Replace("=", "").Replace("\n", "").Replace("\t", "").Replace("\\", "").Replace("\"", "").Replace("\'", "").Replace("[", "").Replace("]", "");
+        }
+
+        public static string CleanString(string str)
+        {
+            return RemoveWhitespace(str.ToLower());
+        }
+
+        // Taken from LLL
+        public static string RemoveWhitespace(string input)
+        {
+            return new string((from c in input.ToCharArray()
+                               where !char.IsWhiteSpace(c)
+                               select c).ToArray());
         }
 
         public string CurveToString(AnimationCurve curve)
@@ -111,7 +126,65 @@ namespace LunarConfig.Objects.Config
                 MiniLogger.LogInfo($"TAG : {st}");
             }
         }
-        
+
+        // Passable as a lambda for when the value edited may not exist
+        public static void TryAddField(HashSet<string> enabledSettings, LunarConfigEntry entry, string name, string desc, Func<object> defProvider)
+        {
+            if (enabledSettings.Contains(name))
+            {
+                try
+                {
+                    entry.AddField(name, desc, defProvider());
+                }
+                catch (NullReferenceException)
+                {
+                    // Something doesn't exist, oh well
+                }
+                catch (Exception e)
+                {
+                    MiniLogger.LogWarning($"An issue occured while adding {name} to {entry.name}, please report this!\n{e}");
+                }
+            }
+        }
+
+        public static void TryAddField(HashSet<string> enabledSettings, LunarConfigEntry entry, string name, string desc, object def)
+        {
+            if (enabledSettings.Contains(name))
+            {
+                try
+                {
+                    entry.AddField(name, desc, def);
+                }
+                catch (Exception e)
+                {
+                    MiniLogger.LogWarning($"An issue occured while adding {name} to {entry.name}, please report this!\n{e}");
+                }
+            }
+        }
+
+
+        // Passable as a lambda for when the value edited may not exist
+        public static void TrySetField(HashSet<string> enabledSettings, LunarConfigEntry entry, string name, ref object defProvider)
+        {
+            if (enabledSettings.Contains(name))
+            {
+                try
+                {
+                    entry.SetValue(name, ref defProvider);
+                }
+                catch (NullReferenceException)
+                {
+                    // Something doesn't exist, oh well
+                }
+                catch (Exception e)
+                {
+                    MiniLogger.LogWarning($"An issue occured while adding {name} to {entry.name}, please report this!\n{e}");
+                }
+            }
+        }
+
+
+        // LUNAR
         public void InitConfig()
         {
             InitCollections();
@@ -371,8 +444,7 @@ namespace LunarConfig.Objects.Config
             }
 
             HashSet<string> registeredItems = new HashSet<string>();
-
-            // LLL/Vanilla Content
+            
             foreach (var dawnItem in LethalContent.Items)
             {
                 string itemUUID = UUIDify(dawnItem.Key.ToString());
@@ -380,7 +452,7 @@ namespace LunarConfig.Objects.Config
                 if (!registeredItems.Contains(itemUUID))
                 {
                     Item itemObj = item.Item;
-                    ScanNodeProperties itemScanNode = null;
+                    ScanNodeProperties? itemScanNode = null;
                     DawnShopItemInfo? shopInfo = item.ShopInfo;
 
                     if (itemObj.spawnPrefab != null)
@@ -391,20 +463,19 @@ namespace LunarConfig.Objects.Config
                     LunarConfigEntry itemEntry = itemFile.AddEntry(itemUUID);
                     MiniLogger.LogInfo($"Recording {itemUUID}...");
                     itemEntry.AddField("Configure Content", "Enable to change any of the settings below.", false);
-                    itemEntry.AddField("Appropriate Aliases", "Changing this setting will do nothing, these are the names which LunarConfig will recognize as this object in other config options.\nThey are case-insensitve and do not regard whitespace.", $"{ConfigHelper.SanitizeString(item.Item.itemName)}, {ConfigHelper.SanitizeString(item.Item.name)}");
-                    if (enabledSettings.Contains("Display Name")) { itemEntry.AddField("Display Name", "Specifies the name that appears when scanning the item.", itemObj.itemName); }
-                    if (itemScanNode != null && enabledSettings.Contains("Scan Name")) { itemEntry.AddField("Scan Name", "Specifies the name of the item that appears on its scan node.", itemScanNode.headerText); }
-                    if (itemScanNode != null && enabledSettings.Contains("Scan Subtext")) { itemEntry.AddField("Scan Subtext", "Specifies the subtext that appears on the item's scan node. NOTE: This setting may be overridden if the item has a scrap value.", itemScanNode.subText); }
-                    if (itemScanNode != null && enabledSettings.Contains("Scan Min Range")) { itemEntry.AddField("Scan Min Range", "Specifies the minimum distance the scan node can be scanned.", itemScanNode.minRange); }
-                    if (itemScanNode != null && enabledSettings.Contains("Scan Max Range")) { itemEntry.AddField("Scan Max Range", "Specifies the maximum distance the scan node can be scanned.", itemScanNode.maxRange); }
-                    if (enabledSettings.Contains("Minimum Value")) { itemEntry.AddField("Minimum Value", "The minimum scrap value and item can have.\nTypically multiplied by 0.4, setting not applicable to non-scrap.\nDoes not work on items like Apparatus and items from enemies (Hives, Double-barrel).", itemObj.minValue); }
-                    if (enabledSettings.Contains("Maximum Value")) { itemEntry.AddField("Maximum Value", "The maximum scrap value and item can have.\nTypically multiplied by 0.4, setting not applicable to non-scrap.\nDoes not work on items like Apparatus and items from enemies (Hives, Double-barrel).", itemObj.maxValue); }
-                    if (shopInfo != null && enabledSettings.Contains("Cost")) { itemEntry.AddField("Cost", "The price of an item in the shop.", shopInfo.Cost); }
-                    //if (enabledSettings.Contains("Credits Worth")) { itemEntry.AddField("Credits Worth", "The value of an item if it is sold in the shop.", item.ShopInfo.Cost); }
-                    if (enabledSettings.Contains("Weight")) { itemEntry.AddField("Weight", "Specifies the weight of an item.\nCalculated with: (x - 1) * 105 = weight in pounds.", itemObj.weight); }
-                    if (enabledSettings.Contains("Conductivity")) { itemEntry.AddField("Conductivity", "Specifies whether an item is conductive.", itemObj.isConductiveMetal); }
-                    if (enabledSettings.Contains("Two-Handed")) { itemEntry.AddField("Two-Handed", "Specifies whether an item is two-handed.", itemObj.twoHanded); }
-                    if (enabledSettings.Contains("Is Scrap?")) { itemEntry.AddField("Is Scrap?", "Specifies if an item is scrap or gear.\nThis decides whether an item can be sold to the company for credits.", itemObj.isScrap); }
+                    itemEntry.AddField("Appropriate Aliases", "Changing this setting will do nothing, these are the names which LunarConfig will recognize as this object in other config options.\nThey are case-insensitve and do not regard whitespace.", $"{item.Item.itemName}, {item.Item.name}");
+                    TryAddField(enabledSettings, itemEntry, "Display Name", "Specifies the name that appears on the item's tooltip.", itemObj.itemName);
+                    TryAddField(enabledSettings, itemEntry, "Scan Name", "Specifies the name of the item that appears on its scan node.", () => itemScanNode?.headerText);
+                    TryAddField(enabledSettings, itemEntry, "Scan Subtext", "Specifies the subtext that appears on the item's scan node. NOTE: This setting may be overridden if the item has a scrap value.", () => itemScanNode?.subText);
+                    TryAddField(enabledSettings, itemEntry, "Scan Min Range", "Specifies the minimum distance the scan node can be scanned.", () => itemScanNode?.minRange);
+                    TryAddField(enabledSettings, itemEntry, "Scan Max Range", "Specifies the maximum distance the scan node can be scanned.", () => itemScanNode?.maxRange);
+                    TryAddField(enabledSettings, itemEntry, "Minimum Value", "The minimum scrap value and item can have.\nTypically multiplied by 0.4, setting not applicable to non-scrap.\nDoes not work on items like Apparatus and items from enemies (Hives, Double-barrel).", itemObj.minValue);
+                    TryAddField(enabledSettings, itemEntry, "Maximum Value", "The maximum scrap value and item can have.\nTypically multiplied by 0.4, setting not applicable to non-scrap.\nDoes not work on items like Apparatus and items from enemies (Hives, Double-barrel).", itemObj.maxValue);
+                    TryAddField(enabledSettings, itemEntry, "Cost", "The price of an item in the shop.", () => shopInfo?.Cost);
+                    TryAddField(enabledSettings, itemEntry, "Weight", "Specifies the weight of an item.\nCalculated with: (x - 1) * 105 = weight in pounds.", itemObj.weight);
+                    TryAddField(enabledSettings, itemEntry, "Conductivity", "Specifies whether an item is conductive.", itemObj.isConductiveMetal);
+                    TryAddField(enabledSettings, itemEntry, "Two-Handed", "Specifies whether an item is two-handed.", itemObj.twoHanded);
+                    TryAddField(enabledSettings, itemEntry, "Is Scrap?", "Specifies if an item is scrap or gear.\nThis decides whether an item can be sold to the company for credits.", itemObj.isScrap);
                     MiniLogger.LogInfo($"Recorded {itemUUID}");
                     registeredItems.Add(itemUUID);
                 }

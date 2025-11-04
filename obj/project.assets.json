@@ -5,6 +5,35 @@
       "BepInEx.Analyzers/1.0.8": {
         "type": "package"
       },
+      "BepInEx.AssemblyPublicizer.MSBuild/0.4.2": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.1/AsmResolver.DotNet.dll": {},
+          "lib/netstandard2.1/AsmResolver.PE.File.dll": {},
+          "lib/netstandard2.1/AsmResolver.PE.dll": {},
+          "lib/netstandard2.1/AsmResolver.dll": {},
+          "lib/netstandard2.1/BepInEx.AssemblyPublicizer.MSBuild.dll": {},
+          "lib/netstandard2.1/BepInEx.AssemblyPublicizer.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.1/AsmResolver.DotNet.dll": {},
+          "lib/netstandard2.1/AsmResolver.PE.File.dll": {},
+          "lib/netstandard2.1/AsmResolver.PE.dll": {},
+          "lib/netstandard2.1/AsmResolver.dll": {},
+          "lib/netstandard2.1/BepInEx.AssemblyPublicizer.MSBuild.dll": {},
+          "lib/netstandard2.1/BepInEx.AssemblyPublicizer.dll": {}
+        },
+        "contentFiles": {
+          "contentFiles/cs/any/IgnoresAccessChecksToAttribute.cs": {
+            "buildAction": "Compile",
+            "codeLanguage": "cs",
+            "copyToOutput": false
+          }
+        },
+        "build": {
+          "build/BepInEx.AssemblyPublicizer.MSBuild.props": {}
+        }
+      },
       "BepInEx.BaseLib/5.4.20": {
         "type": "package",
         "compile": {
@@ -84,7 +113,7 @@
           "lib/netstandard2.1/LethalLevelLoader.dll": {}
         }
       },
-      "LethalCompany.GameLibs.Steam/70.0.0-ngd.0": {
+      "LethalCompany.GameLibs.Steam/73.0.0-ngd.0": {
         "type": "package",
         "dependencies": {
           "Newtonsoft.JSON": "13.0.3",
@@ -135,6 +164,7 @@
           "ref/netstandard2.1/Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary.dll": {},
           "ref/netstandard2.1/Unity.Services.Authentication.dll": {},
           "ref/netstandard2.1/Unity.Services.Core.Analytics.dll": {},
+          "ref/netstandard2.1/Unity.Services.Core.Components.dll": {},
           "ref/netstandard2.1/Unity.Services.Core.Configuration.dll": {},
           "ref/netstandard2.1/Unity.Services.Core.Device.dll": {},
           "ref/netstandard2.1/Unity.Services.Core.Environments.Internal.dll": {},
@@ -732,7 +762,7 @@
           "lib/netstandard2.1/BMX.LobbyCompatibility.dll": {}
         }
       },
-      "TeamXiaolan.DawnLib/0.2.3": {
+      "TeamXiaolan.DawnLib/0.3.4": {
         "type": "package",
         "dependencies": {
           "Evaisa.LethalLib": "1.1.1"
@@ -848,6 +878,31 @@
         "tools/uninstall.ps1"
       ]
     },
+    "BepInEx.AssemblyPublicizer.MSBuild/0.4.2": {
+      "sha512": "AwGR6zOQxhWPWmcMdmhCaawC2qYdYHttkGmlXxyvhB1EIUAtuILEle8kKSkzElnbFGZjvw6iabpFi+AYUG4IuA==",
+      "type": "package",
+      "path": "bepinex.assemblypublicizer.msbuild/0.4.2",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "bepinex.assemblypublicizer.msbuild.0.4.2.nupkg.sha512",
+        "bepinex.assemblypublicizer.msbuild.nuspec",
+        "build/BepInEx.AssemblyPublicizer.MSBuild.props",
+        "contentFiles/cs/any/IgnoresAccessChecksToAttribute.cs",
+        "lib/net472/AsmResolver.DotNet.dll",
+        "lib/net472/AsmResolver.PE.File.dll",
+        "lib/net472/AsmResolver.PE.dll",
+        "lib/net472/AsmResolver.dll",
+        "lib/net472/BepInEx.AssemblyPublicizer.MSBuild.dll",
+        "lib/net472/BepInEx.AssemblyPublicizer.dll",
+        "lib/netstandard2.1/AsmResolver.DotNet.dll",
+        "lib/netstandard2.1/AsmResolver.PE.File.dll",
+        "lib/netstandard2.1/AsmResolver.PE.dll",
+        "lib/netstandard2.1/AsmResolver.dll",
+        "lib/netstandard2.1/BepInEx.AssemblyPublicizer.MSBuild.dll",
+        "lib/netstandard2.1/BepInEx.AssemblyPublicizer.dll"
+      ]
+    },
     "BepInEx.BaseLib/5.4.20": {
       "sha512": "0bXgYxbCEN2Ixp3kiFEhyw+RASeFQeg/ww+lbMt7if6XMeVS60eg6epNsMA8Jbx57dmNOzNevkKKw8mP8SUMqw==",
       "type": "package",
@@ -935,14 +990,14 @@
         "lib/netstandard2.1/LethalLevelLoader.dll"
       ]
     },
-    "LethalCompany.GameLibs.Steam/70.0.0-ngd.0": {
-      "sha512": "i2Iqz1Q8fbF5J5tM39r7hHsTtuiPS0SvFFz7qFL7NVSPj/kJJ1R5eI6xaApLFTWvIOzq1ZbVny6CUcU5wgLfxA==",
+    "LethalCompany.GameLibs.Steam/73.0.0-ngd.0": {
+      "sha512": "iaHCHoJTFiTnAyAYIrEbjCJOOuhcJ42+KJnEbmCmf4UdkhjSwwio2bcdPCbchodB9kEp+3v3ATgkBwYn56/Gdw==",
       "type": "package",
-      "path": "lethalcompany.gamelibs.steam/70.0.0-ngd.0",
+      "path": "lethalcompany.gamelibs.steam/73.0.0-ngd.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "lethalcompany.gamelibs.steam.70.0.0-ngd.0.nupkg.sha512",
+        "lethalcompany.gamelibs.steam.73.0.0-ngd.0.nupkg.sha512",
         "lethalcompany.gamelibs.steam.nuspec",
         "ref/netstandard2.1/AmazingAssets.TerrainToMesh.dll",
         "ref/netstandard2.1/Assembly-CSharp-firstpass.dll",
@@ -988,6 +1043,7 @@
         "ref/netstandard2.1/Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary.dll",
         "ref/netstandard2.1/Unity.Services.Authentication.dll",
         "ref/netstandard2.1/Unity.Services.Core.Analytics.dll",
+        "ref/netstandard2.1/Unity.Services.Core.Components.dll",
         "ref/netstandard2.1/Unity.Services.Core.Configuration.dll",
         "ref/netstandard2.1/Unity.Services.Core.Device.dll",
         "ref/netstandard2.1/Unity.Services.Core.Environments.Internal.dll",
@@ -2914,15 +2970,15 @@
         "teambmx.lobbycompatibility.nuspec"
       ]
     },
-    "TeamXiaolan.DawnLib/0.2.3": {
-      "sha512": "sCeuesSz7vgKjb5iWb35E4w6Cvu6Rp99SZktC5+RtpAeUarK8peoUvHtQCx7L5LvS8Fh9DS/hanvB3XsFlqxRA==",
+    "TeamXiaolan.DawnLib/0.3.4": {
+      "sha512": "/9vxQndtEIA/ZtYd2noPAqG2xwzR6KmECZTlk3fJcnB+u5/I8SdIkDnat1uol1B6QwNip/3QBvvJY6cEfXgUxA==",
       "type": "package",
-      "path": "teamxiaolan.dawnlib/0.2.3",
+      "path": "teamxiaolan.dawnlib/0.3.4",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "lib/netstandard2.1/com.github.teamxiaolan.dawnlib.dll",
-        "teamxiaolan.dawnlib.0.2.3.nupkg.sha512",
+        "teamxiaolan.dawnlib.0.3.4.nupkg.sha512",
         "teamxiaolan.dawnlib.nuspec"
       ]
     },
@@ -3150,12 +3206,13 @@
   "projectFileDependencyGroups": {
     ".NETStandard,Version=v2.1": [
       "BepInEx.Analyzers >= 1.*",
+      "BepInEx.AssemblyPublicizer.MSBuild >= 0.4.2",
       "BepInEx.Core >= 5.*",
       "BepInEx.PluginInfoProps >= 2.*",
       "Evaisa.LethalLib >= 1.1.*",
       "IAmBatby.LethalLevelLoader >= 1.4.*",
       "LethalCompany.GameLibs.Steam >= *-*",
-      "TeamXiaolan.DawnLib >= 0.2.3",
+      "TeamXiaolan.DawnLib >= 0.3.4",
       "UnityEngine.Modules >= 2022.3.9",
       "XuXiaolan.CodeRebirthLib >= 0.7.*",
       "mrov.WeatherRegistry >= 0.7.*"
@@ -3218,6 +3275,11 @@
             "target": "Package",
             "version": "[1.*, )"
           },
+          "BepInEx.AssemblyPublicizer.MSBuild": {
+            "suppressParent": "All",
+            "target": "Package",
+            "version": "[0.4.2, )"
+          },
           "BepInEx.Core": {
             "suppressParent": "All",
             "target": "Package",
@@ -3246,7 +3308,7 @@
           "TeamXiaolan.DawnLib": {
             "suppressParent": "All",
             "target": "Package",
-            "version": "[0.2.3, )"
+            "version": "[0.3.4, )"
           },
           "UnityEngine.Modules": {
             "include": "Compile",
