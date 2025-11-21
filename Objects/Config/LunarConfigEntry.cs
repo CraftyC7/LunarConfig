@@ -1,13 +1,11 @@
 ﻿using BepInEx.Configuration;
 using DunGen.Graph;
-using LethalLevelLoader;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.Rendering.HighDefinition;
-using ConfigHelper = LethalLevelLoader.ConfigHelper;
 
 namespace LunarConfig.Objects.Config
 {
@@ -30,11 +28,11 @@ namespace LunarConfig.Objects.Config
             var matchedValues = new List<string>();
 
             var pattern = @"(?<key>[^:,]+?)\s*:\s*(?<value>(?:(?![^:,]+?\s*:).)*)(?:,|$)";
-            var matches = Regex.Matches(GetValue<string>("Override " + key).RemoveWhitespace(), pattern);
+            var matches = Regex.Matches(LunarCentral.CleanString(GetValue<string>("Override " + key)), pattern);
 
             foreach (Match match in matches)
             {
-                var k = ConfigHelper.SanitizeString(match.Groups["key"].Value);
+                var k = LunarCentral.CleanString(match.Groups["key"].Value);
                 var v = match.Groups["value"].Value.Trim();
                 overFields[k] = v;
             }
@@ -68,6 +66,14 @@ namespace LunarConfig.Objects.Config
             fields[key] = file.Bind(name, key, defaultValue, description);
         }
 
+        public void TryAddField<T>(HashSet<string> enabled, string key, string description, T defaultValue)
+        {
+            if (enabled.Contains(key) && !fields.Keys.Contains(key))
+            {
+                fields[key] = file.Bind(name, key, defaultValue, description);
+            }
+        }
+
         public void AddFields(List<(string, string, object)> fieldList)
         {
             foreach (var field in fieldList)
@@ -93,6 +99,19 @@ namespace LunarConfig.Objects.Config
             }
         }
 
+        public void TrySetValue<T>(HashSet<string> enabled, string key, ref T obj)
+        {
+            if (enabled.Contains(key))
+            {
+                T value = GetValue<T>(key);
+
+                if (!EqualityComparer<T>.Default.Equals(obj, value))
+                {
+                    obj = value;
+                }
+            }
+        }
+
         public void SetCurve(string key, ref AnimationCurve obj, bool over = false)
         {
             AnimationCurve value = LunarCentral.StringToCurve(GetValue<string>(key));
@@ -103,6 +122,7 @@ namespace LunarConfig.Objects.Config
             }
         }
 
+        /*
         public void SetItems(string key, LunarCentral central, ref List<SpawnableItemWithRarity> obj, bool over = false)
         {
             string itemString = GetValue<string>(key);
@@ -115,7 +135,7 @@ namespace LunarConfig.Objects.Config
             foreach (var entry in stringList)
             {
                 string sanitizedID = ConfigHelper.SanitizeString(entry.Item1);
-                if (central.items.TryGetValue(sanitizedID, out Item item))
+                if (LunarCentral.items.TryGetValue(sanitizedID, out Item item))
                 {
                     if (entry.Item2.Contains("*"))
                     {
@@ -180,7 +200,7 @@ namespace LunarConfig.Objects.Config
             foreach (var entry in stringList)
             {
                 string sanitizedID = ConfigHelper.SanitizeString(entry.Item1);
-                if (central.enemies.TryGetValue(sanitizedID, out EnemyType enemy))
+                if (LunarCentral.enemies.TryGetValue(sanitizedID, out EnemyType enemy))
                 {
                     if (entry.Item2.Contains("*"))
                     {
@@ -245,7 +265,7 @@ namespace LunarConfig.Objects.Config
             foreach (var entry in stringList)
             {
                 string sanitizedID = ConfigHelper.SanitizeString(entry.Item1);
-                if (central.dungeons.TryGetValue(sanitizedID, out ExtendedDungeonFlow extendedDungeon))
+                if (LunarCentral.dungeons.TryGetValue(sanitizedID, out ExtendedDungeonFlow extendedDungeon))
                 {
                     DungeonFlow flow = extendedDungeon.DungeonFlow;
                     if (entry.Item2.Contains("*"))
@@ -295,5 +315,6 @@ namespace LunarConfig.Objects.Config
                 }
             }
         }
+        */
     }
 }

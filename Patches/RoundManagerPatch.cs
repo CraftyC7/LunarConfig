@@ -3,11 +3,8 @@ using HarmonyLib;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using LethalLevelLoader;
 using LunarConfig.Objects.Config;
 using LethalLib.Modules;
-using CodeRebirthLib;
-using CodeRebirthLib.ContentManagement.MapObjects;
 using Dawn;
 
 namespace LunarConfig.Patches
@@ -20,11 +17,11 @@ namespace LunarConfig.Patches
         public static Dictionary<string, List<string>> registeredOverrides = new Dictionary<string, List<string>>();
 
         public static Dictionary<string, SpawnableMapObject> configuredMapObjects = new Dictionary<string, SpawnableMapObject>();
-        public static Dictionary<string, CRMapObjectDefinition> configuredCROutsideObjects = new Dictionary<string, CRMapObjectDefinition>();
+        //public static Dictionary<string, CRMapObjectDefinition> configuredCROutsideObjects = new Dictionary<string, CRMapObjectDefinition>();
         public static Dictionary<string, SpawnableOutsideObjectWithRarity> configuredOutsideObjects = new Dictionary<string, SpawnableOutsideObjectWithRarity>();
 
         public static bool runLate = false;
-
+        /*
         public static void startMod()
         {
             LunarCentral lunarCentral = LunarConfig.central;
@@ -71,6 +68,8 @@ namespace LunarConfig.Patches
                             {
                                 itemScanNode = itemObj.spawnPrefab.GetComponentInChildren<ScanNodeProperties>();
                             }
+
+                            item.Internal_AddTag(DawnLibTags.LunarConfig);
 
                             if (enabledSettings.Contains("Display Name")) { configuredItem.SetValue("Display Name", ref itemObj.itemName); }
                             if (itemScanNode != null && enabledSettings.Contains("Scan Name")) { configuredItem.SetValue("Scan Name", ref itemScanNode.headerText); }
@@ -390,7 +389,8 @@ namespace LunarConfig.Patches
                 }
             }
         }
-
+        */
+        /*
         [HarmonyPatch(typeof(RoundManager), "Awake")]
         [HarmonyPriority(400)]
         [HarmonyPostfix]
@@ -788,5 +788,6 @@ namespace LunarConfig.Patches
                 }
             }
         }
+        */
     }
 }

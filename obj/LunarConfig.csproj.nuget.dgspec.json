@@ -28,7 +28,9 @@
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {},
           "https://api.nuget.org/v3/index.json": {},
-          "https://nuget.bepinex.dev/v3/index.json": {}
+          "https://nuget.bepinex.dev/v3/index.json": {},
+          "https://nuget.bepinex.dev/v3/index.json": {},
+          "https://nuget.windows10ce.com/nuget/v3/index.json": {}
         },
         "frameworks": {
           "netstandard2.1": {
@@ -72,16 +74,6 @@
               "target": "Package",
               "version": "[2.*, )"
             },
-            "Evaisa.LethalLib": {
-              "suppressParent": "All",
-              "target": "Package",
-              "version": "[1.1.*, )"
-            },
-            "IAmBatby.LethalLevelLoader": {
-              "suppressParent": "All",
-              "target": "Package",
-              "version": "[1.4.*, )"
-            },
             "LethalCompany.GameLibs.Steam": {
               "suppressParent": "All",
               "target": "Package",
@@ -90,23 +82,13 @@
             "TeamXiaolan.DawnLib": {
               "suppressParent": "All",
               "target": "Package",
-              "version": "[0.3.4, )"
+              "version": "[0.4.9, )"
             },
             "UnityEngine.Modules": {
               "include": "Compile",
               "suppressParent": "All",
               "target": "Package",
               "version": "[2022.3.9, )"
-            },
-            "XuXiaolan.CodeRebirthLib": {
-              "suppressParent": "All",
-              "target": "Package",
-              "version": "[0.7.*, )"
-            },
-            "mrov.WeatherRegistry": {
-              "suppressParent": "All",
-              "target": "Package",
-              "version": "[0.7.*, )"
             }
           },
           "imports": [

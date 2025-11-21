@@ -1,5 +1,4 @@
 ﻿using HarmonyLib;
-using LethalLevelLoader;
 using LunarConfig.Objects.Config;
 using System;
 using System.Collections.Generic;
@@ -10,6 +9,7 @@ namespace LunarConfig.Patches
 {
     internal class StartOfRoundPatch
     {
+        /*
         // For initial game startup
         [HarmonyPatch(typeof(Terminal), "Start")]
         [HarmonyPriority(800)]
@@ -143,6 +143,7 @@ namespace LunarConfig.Patches
                 MiniLogger.LogError($"An error occured while setting moon values, please report this!\n{e}");
             }
         }
+        */
 
         [HarmonyPatch(typeof(StartOfRound), "SetTimeAndPlanetToSavedSettings")]
         [HarmonyPriority(-2000)]
@@ -151,42 +152,9 @@ namespace LunarConfig.Patches
         {
             try
             {
-                StartOfRound instance = StartOfRound.Instance;
-
-                LunarCentral lunarCentral = LunarConfig.central;
-
-                if (lunarCentral.files.Keys.Contains(LunarConfig.CENTRAL_FILE_NAME) && lunarCentral.files.Keys.Contains(LunarConfig.MOON_FILE_NAME))
+                foreach (var (moon, setting) in LunarCentral.definedChallengeMoons)
                 {
-                    LunarConfigFile centralFile = lunarCentral.files[LunarConfig.CENTRAL_FILE_NAME];
-                    LunarConfigEntry centralConfig = centralFile.entries["Configuration"];
-
-                    if (centralConfig.GetValue<bool>("Configure Moons"))
-                    {
-                        LunarConfigFile moonFile = lunarCentral.files[LunarConfig.MOON_FILE_NAME];
-
-                        LunarConfigEntry enabledEntry = centralFile.entries["Enabled Moon Settings"];
-                        HashSet<string> enabledSettings = new HashSet<string>();
-
-                        foreach (var setting in enabledEntry.fields.Keys)
-                        {
-                            if (enabledEntry.GetValue<bool>(setting))
-                            {
-                                enabledSettings.Add(setting);
-                            }
-                        }
-
-                        // LLL/Vanilla Moons
-                        foreach (var extendedMoon in PatchedContent.ExtendedLevels)
-                        {
-                            SelectableLevel moon = extendedMoon.SelectableLevel;
-                            LunarConfigEntry configuredMoon = moonFile.entries[lunarCentral.UUIDify($"LLL - {extendedMoon.NumberlessPlanetName} ({extendedMoon.UniqueIdentificationName})")];
-
-                            if (configuredMoon.GetValue<bool>("Configure Content"))
-                            {
-                                if (enabledSettings.Contains("Can Be Challenge Moon?")) { configuredMoon.SetValue("Can Be Challenge Moon?", ref moon.planetHasTime); }
-                            }
-                        }
-                    }
+                    moon.planetHasTime = setting;
                 }
             }
             catch (Exception e)
@@ -202,42 +170,9 @@ namespace LunarConfig.Patches
         {
             try
             {
-                StartOfRound instance = StartOfRound.Instance;
-
-                LunarCentral lunarCentral = LunarConfig.central;
-
-                if (lunarCentral.files.Keys.Contains(LunarConfig.CENTRAL_FILE_NAME) && lunarCentral.files.Keys.Contains(LunarConfig.MOON_FILE_NAME))
+                foreach (var (moon, setting) in LunarCentral.definedChallengeMoonTimes)
                 {
-                    LunarConfigFile centralFile = lunarCentral.files[LunarConfig.CENTRAL_FILE_NAME];
-                    LunarConfigEntry centralConfig = centralFile.entries["Configuration"];
-
-                    if (centralConfig.GetValue<bool>("Configure Moons"))
-                    {
-                        LunarConfigFile moonFile = lunarCentral.files[LunarConfig.MOON_FILE_NAME];
-
-                        LunarConfigEntry enabledEntry = centralFile.entries["Enabled Moon Settings"];
-                        HashSet<string> enabledSettings = new HashSet<string>();
-
-                        foreach (var setting in enabledEntry.fields.Keys)
-                        {
-                            if (enabledEntry.GetValue<bool>(setting))
-                            {
-                                enabledSettings.Add(setting);
-                            }
-                        }
-
-                        // LLL/Vanilla Moons
-                        foreach (var extendedMoon in PatchedContent.ExtendedLevels)
-                        {
-                            SelectableLevel moon = extendedMoon.SelectableLevel;
-                            LunarConfigEntry configuredMoon = moonFile.entries[lunarCentral.UUIDify($"LLL - {extendedMoon.NumberlessPlanetName} ({extendedMoon.UniqueIdentificationName})")];
-
-                            if (configuredMoon.GetValue<bool>("Configure Content"))
-                            {
-                                if (enabledSettings.Contains("Has Time?")) { configuredMoon.SetValue("Has Time?", ref moon.planetHasTime); }
-                            }
-                        }
-                    }
+                    moon.planetHasTime = setting;
                 }
             }
             catch (Exception e)

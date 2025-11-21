@@ -1,5 +1,6 @@
 using BepInEx;
 using BepInEx.Logging;
+using Dawn;
 using HarmonyLib;
 using LunarConfig.Objects.Config;
 using LunarConfig.Patches;
@@ -57,7 +58,9 @@ namespace LunarConfig
 
             Harmony.PatchAll(typeof(RoundManagerPatch));
             Harmony.PatchAll(typeof(StartOfRoundPatch));
-            Harmony.PatchAll(typeof(DawnPatch));
+
+            LethalContent.Items.OnFreeze += central.InitItems;
+            LethalContent.Moons.OnFreeze += central.InitMoons;
 
             Logger.LogDebug("Finished patching!");
         }

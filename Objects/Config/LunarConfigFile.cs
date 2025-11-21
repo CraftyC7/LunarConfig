@@ -19,9 +19,16 @@ namespace LunarConfig.Objects.Config
 
         public LunarConfigEntry AddEntry(string name)
         {
-            LunarConfigEntry entry = new LunarConfigEntry(file, name);
-            entries[name] = entry;
-            return entry;
+            if (entries.ContainsKey(name))
+            {
+                return entries[name];
+            }
+            else
+            {
+                LunarConfigEntry entry = new LunarConfigEntry(file, name);
+                entries[name] = entry;
+                return entry;
+            }
         }
     }
 }

@@ -1,17 +1,15 @@
-﻿using BepInEx.Configuration;
-using CodeRebirthLib;
+﻿using AsmResolver.PE.File;
+using BepInEx.Configuration;
 using Dawn;
 using DunGen.Graph;
 using HarmonyLib;
-using LethalLevelLoader;
 using LethalLib.Modules;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
-using WeatherRegistry;
-using ConfigHelper = LethalLevelLoader.ConfigHelper;
+using UnityEngine.Rendering.HighDefinition;
 
 namespace LunarConfig.Objects.Config
 {
@@ -19,16 +17,27 @@ namespace LunarConfig.Objects.Config
     {
         public Dictionary<string, LunarConfigFile> files = new Dictionary<string, LunarConfigFile>();
 
-        public Dictionary<string, Item> items = new Dictionary<string, Item>();
-        public Dictionary<string, EnemyType> enemies = new Dictionary<string, EnemyType>();
-        public Dictionary<string, ExtendedDungeonFlow> dungeons = new Dictionary<string, ExtendedDungeonFlow>();
+        public static Dictionary<string, Item> items = new Dictionary<string, Item>();
+        public static Dictionary<string, SelectableLevel> moons = new Dictionary<string, SelectableLevel>();
+        public static Dictionary<string, EnemyType> enemies = new Dictionary<string, EnemyType>();
+        //public static Dictionary<string, ExtendedDungeonFlow> dungeons = new Dictionary<string, ExtendedDungeonFlow>();
 
         public HashSet<string> foundTags = new HashSet<string>();
         public bool useLLLTags = false;
         public static bool clearOrphans = false;
+        public static bool backCompat = true;
+        public static Dictionary<SelectableLevel, bool> definedChallengeMoons = new Dictionary<SelectableLevel, bool>();
+        public static Dictionary<SelectableLevel, bool> definedChallengeMoonTimes = new Dictionary<SelectableLevel, bool>();
 
         public static HashSet<string> currentStrings = new HashSet<string>();
         public static HashSet<string> currentTags = new HashSet<string>();
+
+        public static bool centralInitialized = false;
+        public static bool itemsInitialized = false;
+        public static HashSet<string> enabledItemSettings = new HashSet<string>();
+        public static HashSet<string> enabledMoonSettings = new HashSet<string>();
+
+        public static Dictionary<string, List<(string, int)>> defaultItemWeights = new Dictionary<string, List<(string, int)>>();
 
         public LunarCentral() { }
 
@@ -53,7 +62,7 @@ namespace LunarConfig.Objects.Config
 
         public string CurveToString(AnimationCurve curve)
         {
-            return string.Join(" ; ", curve.keys.Select(kf => $"{kf.time},{kf.value}"));
+            return string.Join(" ; ", curve.keys.Select(kf => $"{kf.time.ToString(System.Globalization.CultureInfo.InvariantCulture)},{kf.value.ToString(System.Globalization.CultureInfo.InvariantCulture)}"));
         }
 
         // Taken from lethal.wiki
@@ -65,6 +74,21 @@ namespace LunarConfig.Objects.Config
                 var orphanedEntries = (Dictionary<ConfigDefinition, string>)orphanedEntriesProp.GetValue(cfg);
                 orphanedEntries.Clear();
             }
+        }
+
+        bool TryGetEntryWithPrefix(Dictionary<string, LunarConfigEntry> dict, string prefix, out LunarConfigEntry entry)
+        {
+            foreach (var kvp in dict)
+            {
+                if (kvp.Key.StartsWith(prefix, StringComparison.Ordinal))
+                {
+                    entry = kvp.Value;
+                    return true;
+                }
+            }
+
+            entry = null;
+            return false;
         }
 
         public static AnimationCurve StringToCurve(string data)
@@ -91,6 +115,7 @@ namespace LunarConfig.Objects.Config
             return curve;
         }
 
+        /*
         public static void RefreshMatchers()
         {
             currentStrings.Clear();
@@ -126,122 +151,15 @@ namespace LunarConfig.Objects.Config
                 MiniLogger.LogInfo($"TAG : {st}");
             }
         }
-
-        // Passable as a lambda for when the value edited may not exist
-        public static void TryAddField(HashSet<string> enabledSettings, LunarConfigEntry entry, string name, string desc, Func<object> defProvider)
-        {
-            if (enabledSettings.Contains(name))
-            {
-                try
-                {
-                    entry.AddField(name, desc, defProvider());
-                }
-                catch (NullReferenceException)
-                {
-                    // Something doesn't exist, oh well
-                }
-                catch (Exception e)
-                {
-                    MiniLogger.LogWarning($"An issue occured while adding {name} to {entry.name}, please report this!\n{e}");
-                }
-            }
-        }
-
-        public static void TryAddField(HashSet<string> enabledSettings, LunarConfigEntry entry, string name, string desc, object def)
-        {
-            if (enabledSettings.Contains(name))
-            {
-                try
-                {
-                    entry.AddField(name, desc, def);
-                }
-                catch (Exception e)
-                {
-                    MiniLogger.LogWarning($"An issue occured while adding {name} to {entry.name}, please report this!\n{e}");
-                }
-            }
-        }
-
-
-        // Passable as a lambda for when the value edited may not exist
-        public static void TrySetField(HashSet<string> enabledSettings, LunarConfigEntry entry, string name, ref object defProvider)
-        {
-            if (enabledSettings.Contains(name))
-            {
-                try
-                {
-                    entry.SetValue(name, ref defProvider);
-                }
-                catch (NullReferenceException)
-                {
-                    // Something doesn't exist, oh well
-                }
-                catch (Exception e)
-                {
-                    MiniLogger.LogWarning($"An issue occured while adding {name} to {entry.name}, please report this!\n{e}");
-                }
-            }
-        }
-
+        */
 
         // LUNAR
         public void InitConfig()
         {
-            InitCollections();
-
-            FixDungeons();
-
             LunarConfigEntry centralConfig = files[LunarConfig.CENTRAL_FILE_NAME].entries["Configuration"];
-            
-            if (centralConfig.GetValue<bool>("Configure Enemies")) { InitEnemies(); }
-            if (centralConfig.GetValue<bool>("Configure Moons")) { InitMoons(); }
-            if (centralConfig.GetValue<bool>("Configure Dungeons")) { InitDungeons(); }
-            if (centralConfig.GetValue<bool>("Configure Map Objects")) { InitMapObjects(); }
-            if (centralConfig.GetValue<bool>("Configure Outside Map Objects")) { InitOutsideMapObjects(); }
         }
 
-        public void InitCollections()
-        {
-            CollectItems();
-            CollectEnemies();
-            CollectDungeons();
-            foreach (var str in dungeons.Keys)
-            {
-                MiniLogger.LogInfo($"DUNGEON: {str}");
-            }
-        }
-
-        public void CollectItems()
-        {
-            foreach (ExtendedItem extendedItem in PatchedContent.ExtendedItems)
-            {
-                Item item = extendedItem.Item;
-                items[ConfigHelper.SanitizeString(item.itemName)] = item;
-                items[ConfigHelper.SanitizeString(item.name)] = item;
-            }
-
-            foreach (Items.ScrapItem scrapItem in Items.scrapItems)
-            {
-                Item item = scrapItem.item;
-                items[ConfigHelper.SanitizeString(item.itemName)] = item;
-                items[ConfigHelper.SanitizeString(item.name)] = item;
-            }
-
-            foreach (Items.ShopItem scrapItem in Items.shopItems)
-            {
-                Item item = scrapItem.item;
-                items[ConfigHelper.SanitizeString(item.itemName)] = item;
-                items[ConfigHelper.SanitizeString(item.name)] = item;
-            }
-
-            foreach (Items.PlainItem scrapItem in Items.plainItems)
-            {
-                Item item = scrapItem.item;
-                items[ConfigHelper.SanitizeString(item.itemName)] = item;
-                items[ConfigHelper.SanitizeString(item.name)] = item;
-            }
-        }
-
+        /*
         public void CollectEnemies()
         {
             foreach (ExtendedEnemyType extendedEnemy in PatchedContent.ExtendedEnemyTypes)
@@ -286,7 +204,7 @@ namespace LunarConfig.Objects.Config
                 dungeons[ConfigHelper.SanitizeString(extendedDungeon.DungeonFlow.name)] = extendedDungeon;
             }
         }
-
+        */
         public void InitCentral()
         {
             LunarConfigFile centralFile = AddFile(LunarConfig.CENTRAL_FILE, LunarConfig.CENTRAL_FILE_NAME);
@@ -299,8 +217,9 @@ namespace LunarConfig.Objects.Config
             configEntry.AddField("Configure Dungeons", "Check this to generate and use configuration files for dungeons.", true);
             configEntry.AddField("Configure Map Objects", "Check this to generate and use configuration files for map objects.", true);
             configEntry.AddField("Configure Outside Map Objects", "Check this to generate and use configuration files for outside map objects.", true);
-            configEntry.AddField("Run Late (CentralConfig Port)", "IMPORTANT: This setting will make LunarConfig initialize later than usual, breaking some of it's functionality.\nThis should only be used if you are trying to port settings from a mod like CentralConfig, and should be turned off after the first use.\nLunar Config isn't perfect at porting, but it can get most things right, also remember to delete all Lunar Config files before trying this for the best result!", false);
+            configEntry.AddField("Enable Backwards Compat", "Allows Lunar to look for config entries that are named using the previous v0.1.x system, I would advise turning this off after you have all your previous values.", false);
             configEntry.AddField("Clear Orphaned Entries", "WARNING: Enabling this will delete any config entries that get disabled when the configuration is refreshed!", false);
+            backCompat = configEntry.GetValue<bool>("Enable Backwards Compat");
             clearOrphans = configEntry.GetValue<bool>("Clear Orphaned Entries");
 
             if (configEntry.GetValue<bool>("Configure Items"))
@@ -313,13 +232,67 @@ namespace LunarConfig.Objects.Config
                 configItems.AddField("Scan Max Range", "Disable this to disable configuring this property in item config entries.", true);
                 configItems.AddField("Minimum Value", "Disable this to disable configuring this property in item config entries.", true);
                 configItems.AddField("Maximum Value", "Disable this to disable configuring this property in item config entries.", true);
-                configItems.AddField("Cost", "Disable this to disable configuring this property in item config entries.", true);
                 configItems.AddField("Weight", "Disable this to disable configuring this property in item config entries.", true);
                 configItems.AddField("Conductivity", "Disable this to disable configuring this property in item config entries.", true);
                 configItems.AddField("Two-Handed", "Disable this to disable configuring this property in item config entries.", true);
                 configItems.AddField("Is Scrap?", "Disable this to disable configuring this property in item config entries.", true);
+                configItems.AddField("Cost", "Disable this to disable configuring this property in item config entries.", true);
+
+                configItems.AddField("Info Node Text", "Enable this to enable configuring this property in item config entries.", false);
+                configItems.AddField("Request Node Text", "Enable this to enable configuring this property in item config entries.", false);
+                configItems.AddField("Receipt Node Text", "Enable this to enable configuring this property in item config entries.", false);
+
+                foreach (var setting in configItems.fields.Keys)
+                {
+                    if (configItems.GetValue<bool>(setting))
+                    {
+                        enabledItemSettings.Add(setting);
+                    }
+                }
             }
 
+            if (configEntry.GetValue<bool>("Configure Moons"))
+            {
+                LunarConfigEntry configMoons = centralFile.AddEntry("Enabled Moon Settings");
+                configMoons.AddField("Display Name", "Disable this to disable configuring this property in moon config entries.", true);
+                configMoons.AddField("Risk Level", "Disable this to disable configuring this property in moon config entries.", true);
+                configMoons.AddField("Description", "Disable this to disable configuring this property in moon config entries.", true);
+                configMoons.AddField("Route Price", "Disable this to disable configuring this property in moon config entries.", true);
+                configMoons.AddField("Is Hidden?", "Disable this to disable configuring this property in moon config entries.", true);
+                configMoons.AddField("Is Locked?", "Disable this to disable configuring this property in moon config entries.", true);
+                configMoons.AddField("Can Be Challenge Moon?", "Disable this to disable configuring this property in moon config entries.", true);
+                configMoons.AddField("Has Time?", "Disable this to disable configuring this property in moon config entries.", true);
+                configMoons.AddField("Time Multiplier", "Disable this to disable configuring this property in moon config entries.", true);
+                configMoons.AddField("Daytime Probability Range", "Disable this to disable configuring this property in moon config entries.", true);
+                configMoons.AddField("Daytime Curve", "Disable this to disable configuring this property in moon config entries.", true);
+                configMoons.AddField("Max Daytime Power", "Disable this to disable configuring this property in moon config entries.", true);
+                configMoons.AddField("Spawnable Daytime Enemies", "Disable this to disable configuring this property in moon config entries.", true);
+                configMoons.AddField("Interior Probability Range", "Disable this to disable configuring this property in moon config entries.", true);
+                configMoons.AddField("Interior Curve", "Disable this to disable configuring this property in moon config entries.", true);
+                configMoons.AddField("Max Interior Power", "Disable this to disable configuring this property in moon config entries.", true);
+                configMoons.AddField("Spawnable Interior Enemies", "Disable this to disable configuring this property in moon config entries.", true);
+                configMoons.AddField("Outside Curve", "Disable this to disable configuring this property in moon config entries.", true);
+                configMoons.AddField("Max Outside Power", "Disable this to disable configuring this property in moon config entries.", true);
+                configMoons.AddField("Spawnable Outside Enemies", "Disable this to disable configuring this property in moon config entries.", true);
+                configMoons.AddField("Min Scrap", "Disable this to disable configuring this property in moon config entries.", true);
+                configMoons.AddField("Max Scrap", "Disable this to disable configuring this property in moon config entries.", true);
+                configMoons.AddField("Value Multiplier", "Disable this to disable configuring this property in moon config entries.", true);
+                configMoons.AddField("Amount Multiplier", "Disable this to disable configuring this property in moon config entries.", true);
+                configMoons.AddField("Spawnable Scrap", "Disable this to disable configuring this property in moon config entries.", true);
+                configMoons.AddField("Interior Multiplier", "Disable this to disable configuring this property in moon config entries.", true);
+                configMoons.AddField("Possible Interiors", "Disable this to disable configuring this property in moon config entries.", true);
+                configMoons.AddField("Tags", "Disable this to disable configuring this property in moon config entries.", true);
+
+                foreach (var setting in configMoons.fields.Keys)
+                {
+                    if (configMoons.GetValue<bool>(setting))
+                    {
+                        enabledMoonSettings.Add(setting);
+                    }
+                }
+            }
+
+            /*
             if (configEntry.GetValue<bool>("Configure Enemies"))
             {
                 LunarConfigEntry configEnemies = centralFile.AddEntry("Enabled Enemy Settings");
@@ -419,75 +392,328 @@ namespace LunarConfig.Objects.Config
                     configOutsideMapObjects.AddField($"Level Curve - {UUIDify(level.NumberlessPlanetName)}", "Disable this to disable configuring this property in outside map object config entries.", true);
                 }
             }
+            */
 
             ClearOrphanedEntries(centralFile.file);
             centralFile.file.Save();
             centralFile.file.SaveOnConfigSet = true;
+
+            centralInitialized = true;
         }
 
         public void InitItems()
         {
-            MiniLogger.LogInfo("Initializing Item Configuration...");
+            if (!centralInitialized)
+            {
+                InitCentral();
+            }
 
             LunarConfigFile itemFile = AddFile(LunarConfig.ITEM_FILE, LunarConfig.ITEM_FILE_NAME);
             itemFile.file.SaveOnConfigSet = false;
 
-            LunarConfigEntry enabledEntry = files[LunarConfig.CENTRAL_FILE_NAME].entries["Enabled Item Settings"];
-            HashSet<string> enabledSettings = new HashSet<string>();
-
-            foreach (var setting in enabledEntry.fields.Keys)
+            foreach (var item in LethalContent.Items)
             {
-                if (enabledEntry.GetValue<bool>(setting))
-                {
-                    enabledSettings.Add(setting);
-                }
-            }
+                string uuid = UUIDify(item.Key.ToString());
 
-            HashSet<string> registeredItems = new HashSet<string>();
-            
-            foreach (var dawnItem in LethalContent.Items)
-            {
-                string itemUUID = UUIDify(dawnItem.Key.ToString());
-                DawnItemInfo item = dawnItem.Value;
-                if (!registeredItems.Contains(itemUUID))
+                try
                 {
-                    Item itemObj = item.Item;
-                    ScanNodeProperties? itemScanNode = null;
-                    DawnShopItemInfo? shopInfo = item.ShopInfo;
+                    DawnItemInfo dawnItem = item.Value;
+                    LunarConfigEntry itemEntry = itemFile.AddEntry(uuid);
+                    Item itemObj = dawnItem.Item;
+                    ScanNodeProperties itemScanNode = null;
+                    DawnShopItemInfo shopInfo = null;
+                    DawnPurchaseInfo purchaseInfo = null;
+                    DawnScrapItemInfo scrapInfo = null;
+                    TerminalNode infoNode = null;
+                    TerminalNode requestNode = null;
+                    TerminalNode receiptNode = null;
 
                     if (itemObj.spawnPrefab != null)
                     {
                         itemScanNode = itemObj.spawnPrefab.GetComponentInChildren<ScanNodeProperties>();
                     }
 
-                    LunarConfigEntry itemEntry = itemFile.AddEntry(itemUUID);
-                    MiniLogger.LogInfo($"Recording {itemUUID}...");
+                    if (dawnItem.ShopInfo != null)
+                    {
+                        shopInfo = dawnItem.ShopInfo;
+
+                        if (shopInfo.InfoNode != null)
+                        {
+                            infoNode = shopInfo.InfoNode;
+                        }
+
+                        if (shopInfo.RequestNode != null)
+                        {
+                            requestNode = shopInfo.RequestNode;
+                        }
+
+                        if (shopInfo.ReceiptNode != null)
+                        {
+                            receiptNode = shopInfo.ReceiptNode;
+                        }
+
+                        if (shopInfo.DawnPurchaseInfo != null)
+                        {
+                            purchaseInfo = shopInfo.DawnPurchaseInfo;
+                        }
+                    }
+
+                    if (dawnItem.ScrapInfo != null)
+                    {
+                        scrapInfo = dawnItem.ScrapInfo;
+                    }
+
+                    // GETTING VALUES (for config)
                     itemEntry.AddField("Configure Content", "Enable to change any of the settings below.", false);
-                    itemEntry.AddField("Appropriate Aliases", "Changing this setting will do nothing, these are the names which LunarConfig will recognize as this object in other config options.\nThey are case-insensitve and do not regard whitespace.", $"{item.Item.itemName}, {item.Item.name}");
-                    TryAddField(enabledSettings, itemEntry, "Display Name", "Specifies the name that appears on the item's tooltip.", itemObj.itemName);
-                    TryAddField(enabledSettings, itemEntry, "Scan Name", "Specifies the name of the item that appears on its scan node.", () => itemScanNode?.headerText);
-                    TryAddField(enabledSettings, itemEntry, "Scan Subtext", "Specifies the subtext that appears on the item's scan node. NOTE: This setting may be overridden if the item has a scrap value.", () => itemScanNode?.subText);
-                    TryAddField(enabledSettings, itemEntry, "Scan Min Range", "Specifies the minimum distance the scan node can be scanned.", () => itemScanNode?.minRange);
-                    TryAddField(enabledSettings, itemEntry, "Scan Max Range", "Specifies the maximum distance the scan node can be scanned.", () => itemScanNode?.maxRange);
-                    TryAddField(enabledSettings, itemEntry, "Minimum Value", "The minimum scrap value and item can have.\nTypically multiplied by 0.4, setting not applicable to non-scrap.\nDoes not work on items like Apparatus and items from enemies (Hives, Double-barrel).", itemObj.minValue);
-                    TryAddField(enabledSettings, itemEntry, "Maximum Value", "The maximum scrap value and item can have.\nTypically multiplied by 0.4, setting not applicable to non-scrap.\nDoes not work on items like Apparatus and items from enemies (Hives, Double-barrel).", itemObj.maxValue);
-                    TryAddField(enabledSettings, itemEntry, "Cost", "The price of an item in the shop.", () => shopInfo?.Cost);
-                    TryAddField(enabledSettings, itemEntry, "Weight", "Specifies the weight of an item.\nCalculated with: (x - 1) * 105 = weight in pounds.", itemObj.weight);
-                    TryAddField(enabledSettings, itemEntry, "Conductivity", "Specifies whether an item is conductive.", itemObj.isConductiveMetal);
-                    TryAddField(enabledSettings, itemEntry, "Two-Handed", "Specifies whether an item is two-handed.", itemObj.twoHanded);
-                    TryAddField(enabledSettings, itemEntry, "Is Scrap?", "Specifies if an item is scrap or gear.\nThis decides whether an item can be sold to the company for credits.", itemObj.isScrap);
-                    MiniLogger.LogInfo($"Recorded {itemUUID}");
-                    registeredItems.Add(itemUUID);
+                    itemEntry.AddField("Appropriate Aliases", "These are the names which LunarConfig will recognize as this object in other config options.\nThey are case-insensitve and do not regard whitespace.", $"{itemObj.itemName}, {itemObj.name}");
+                    itemEntry.TryAddField(enabledItemSettings, "Display Name", "Specifies the name that appears on the item's tooltip.", itemObj.itemName);
+                    
+                    if (itemScanNode != null)
+                    {
+                        itemEntry.TryAddField(enabledItemSettings, "Scan Name", "Specifies the name of the item that appears on its scan node.", itemScanNode.headerText);
+                        itemEntry.TryAddField(enabledItemSettings, "Scan Subtext", "Specifies the subtext that appears on the item's scan node. NOTE: This setting may be overridden if the item has a scrap value.", itemScanNode.subText);
+                        itemEntry.TryAddField(enabledItemSettings, "Scan Min Range", "Specifies the minimum distance the scan node can be scanned.", itemScanNode.minRange);
+                        itemEntry.TryAddField(enabledItemSettings, "Scan Max Range", "Specifies the maximum distance the scan node can be scanned.", itemScanNode.maxRange);
+                    }
+
+                    itemEntry.TryAddField(enabledItemSettings, "Minimum Value", "The minimum scrap value and item can have.\nTypically multiplied by 0.4, setting not applicable to non-scrap.\nDoes not work on items like Apparatus and items from enemies (Hives, Double-barrel).", itemObj.minValue);
+                    itemEntry.TryAddField(enabledItemSettings, "Maximum Value", "The maximum scrap value and item can have.\nTypically multiplied by 0.4, setting not applicable to non-scrap.\nDoes not work on items like Apparatus and items from enemies (Hives, Double-barrel).", itemObj.maxValue);
+                    itemEntry.TryAddField(enabledItemSettings, "Weight", "Specifies the weight of an item.\nCalculated with: (x - 1) * 105 = weight in pounds.", itemObj.weight);
+                    itemEntry.TryAddField(enabledItemSettings, "Conductivity", "Specifies whether an item is conductive.", itemObj.isConductiveMetal);
+                    itemEntry.TryAddField(enabledItemSettings, "Two-Handed", "Specifies whether an item is two-handed.", itemObj.twoHanded);
+                    itemEntry.TryAddField(enabledItemSettings, "Is Scrap?", "Specifies if an item is scrap or gear.\nThis decides whether an item can be sold to the company for credits.", itemObj.isScrap);
+
+                    if (infoNode != null) { itemEntry.TryAddField(enabledItemSettings, "Info Node Text", "The text of the terminal when viewing the info of an item. New lines are represented by semi-colons.", infoNode.displayText.Replace("\n", ";")); }
+                    if (requestNode != null) { itemEntry.TryAddField(enabledItemSettings, "Request Node Text", "The text of the terminal when requesting an item. New lines are represented by semi-colons.", requestNode.displayText.Replace("\n", ";")); }
+                    if (receiptNode != null) { itemEntry.TryAddField(enabledItemSettings, "Receipt Node Text", "The text of the terminal after purchasing an item. New lines are represented by semi-colons.", receiptNode.displayText.Replace("\n", ";")); }
+
+                    if (purchaseInfo != null) { itemEntry.TryAddField(enabledItemSettings, "Cost", "The cost of the item if it is sold in the shop.", purchaseInfo.Cost.Provide()); }
+
+                    // LLL Backcompat
+                    if (TryGetEntryWithPrefix(itemFile.entries, $"LLL - {itemObj.itemName}", out LunarConfigEntry oldLLLEntry))
+                    {
+                        foreach (var field in oldLLLEntry.fields)
+                        {
+                            if (itemEntry.fields.TryGetValue(field.Key, out ConfigEntryBase value))
+                            {
+                                value.BoxedValue = field.Value.BoxedValue;
+                            }
+                        }
+                    }
+
+                    // LL Backcompat
+                    if (TryGetEntryWithPrefix(itemFile.entries, $"LL - {itemObj.itemName}", out LunarConfigEntry oldLLEntry))
+                    {
+                        foreach (var field in oldLLEntry.fields)
+                        {
+                            if (itemEntry.fields.TryGetValue(field.Key, out ConfigEntryBase value))
+                            {
+                                value.BoxedValue = field.Value.BoxedValue;
+                            }
+                        }
+                    }
+
+                    // SETTING VALUES
+                    if (itemEntry.GetValue<bool>("Configure Content"))
+                    {
+                        dawnItem.Internal_AddTag(DawnLibTags.LunarConfig);
+
+                        foreach (var key in itemEntry.GetValue<string>("Appropriate Aliases").Split(","))
+                        {
+                            items[CleanString(key)] = itemObj;
+                        }
+
+                        itemEntry.TrySetValue(enabledItemSettings, "Display Name", ref itemObj.itemName);
+
+                        if (itemScanNode != null)
+                        {
+                            itemEntry.TrySetValue(enabledItemSettings, "Scan Name", ref itemScanNode.headerText);
+                            itemEntry.TrySetValue(enabledItemSettings, "Scan Subtext", ref itemScanNode.subText);
+                            itemEntry.TrySetValue(enabledItemSettings, "Scan Min Range", ref itemScanNode.minRange);
+                            itemEntry.TrySetValue(enabledItemSettings, "Scan Max Range", ref itemScanNode.maxRange);
+                        }
+
+                        itemEntry.TrySetValue(enabledItemSettings, "Minimum Value", ref itemObj.minValue);
+                        itemEntry.TrySetValue(enabledItemSettings, "Maximum Value", ref itemObj.maxValue);
+                        itemEntry.TrySetValue(enabledItemSettings, "Weight", ref itemObj.weight);
+                        itemEntry.TrySetValue(enabledItemSettings, "Conductivity", ref itemObj.isConductiveMetal);
+                        itemEntry.TrySetValue(enabledItemSettings, "Two-Handed", ref itemObj.twoHanded);
+                        itemEntry.TrySetValue(enabledItemSettings, "Is Scrap?", ref itemObj.isScrap);
+
+                        if (infoNode != null) { infoNode.displayText = itemEntry.GetValue<string>("Info Node Text").Replace(";", "\n"); }
+                        if (requestNode != null) { requestNode.displayText = itemEntry.GetValue<string>("Request Node Text").Replace(";", "\n"); }
+                        if (receiptNode != null) { receiptNode.displayText = itemEntry.GetValue<string>("Receipt Node Text").Replace(";", "\n"); }
+                        
+                        if (purchaseInfo != null && enabledItemSettings.Contains("Cost")) { purchaseInfo.Cost = new SimpleProvider<int>(itemEntry.GetValue<int>("Cost")); } 
+                    }
+                }
+                catch (Exception e)
+                {
+                    MiniLogger.LogError($"LunarConfig encountered an issue while configuring {uuid}, please report this!\n{e}");
                 }
             }
 
             ClearOrphanedEntries(itemFile.file);
             itemFile.file.Save();
             itemFile.file.SaveOnConfigSet = true;
-
-            MiniLogger.LogInfo("Item Configuration Initialized!");
         }
-        
+
+        public void InitMoons()
+        {
+            if (!centralInitialized)
+            {
+                InitCentral();
+            }
+
+            LunarConfigFile moonFile = AddFile(LunarConfig.MOON_FILE, LunarConfig.MOON_FILE_NAME);
+            moonFile.file.SaveOnConfigSet = false;
+
+            foreach (var moon in LethalContent.Moons)
+            {
+                string uuid = UUIDify(moon.Key.ToString());
+
+                try
+                {
+                    DawnMoonInfo dawnMoon = moon.Value;
+                    LunarConfigEntry moonEntry = moonFile.AddEntry(uuid);
+                    SelectableLevel moonObj = dawnMoon.Level;
+                    DawnPurchaseInfo purchaseInfo = null;
+                    TerminalNode infoNode = null;
+                    TerminalNode requestNode = null;
+                    TerminalNode receiptNode = null;
+                    string numberlessName = dawnMoon.GetNumberlessPlanetName();
+
+                    if (dawnMoon.DawnPurchaseInfo != null)
+                    {
+                        purchaseInfo = dawnMoon.DawnPurchaseInfo;
+                    }
+
+                    // GETTING VALUES (for config)
+                    moonEntry.AddField("Configure Content", "Enable to change any of the settings below.", false);
+                    moonEntry.AddField("Appropriate Aliases", "These are the names which LunarConfig will recognize as this object in other config options.\nThey are case-insensitve and do not regard whitespace.", $"{numberlessName}");
+                    
+                    moonEntry.TryAddField(enabledMoonSettings, "Display Name", "Changes the name of the moon.\nDoes not modify terminal commands/nodes.", moonObj.PlanetName);
+                    moonEntry.TryAddField(enabledMoonSettings, "Risk Level", "Changes the risk level of the moon.\nThis setting is only cosmetic.", moonObj.riskLevel);
+                    moonEntry.TryAddField(enabledMoonSettings, "Description", "The description given to the moon.\nNew lines are represented by semi-colons.\nDoes not modify terminal commands/nodes.", moonObj.LevelDescription.Replace("\n", ";"));
+                    moonEntry.TryAddField(enabledMoonSettings, "Has Time?", "Defines whether a moon has time.", moonObj.planetHasTime);
+                    moonEntry.TryAddField(enabledMoonSettings, "Can Be Challenge Moon?", "Defines whether or not a moon can be selected for the weekly challenge moon.", moonObj.planetHasTime);
+                    moonEntry.TryAddField(enabledMoonSettings, "Time Multiplier", "Multiplies the speed at which time progresses on a moon.\nIn order to not cause issues, it is best to only modify this setting while using Moon Day Speed Multiplier Patcher by WhiteSpike.", moonObj.DaySpeedMultiplier);
+                    moonEntry.TryAddField(enabledMoonSettings, "Daytime Probability Range", "The amount of daytime enemies spawned that can differ from the curve.\nFor instance, if this value is 3, and at the current time and spawn cycle 2 daytime enemies should spawn, anywhere between 0 and 5 can spawn.", moonObj.daytimeEnemiesProbabilityRange);
+                    moonEntry.TryAddField(enabledMoonSettings, "Daytime Curve", "Decides the amount of daytime enemies that spawn as the day progresses.\nKeyframes represented by x,y and separated by semicolons.", CurveToString(moonObj.daytimeEnemySpawnChanceThroughDay));
+                    moonEntry.TryAddField(enabledMoonSettings, "Max Daytime Power", "The amount of daytime power capacity that a moon has.", moonObj.maxDaytimeEnemyPowerCount);
+                    moonEntry.TryAddField(enabledMoonSettings, "Interior Probability Range", "The amount of interior enemies spawned that can differ from the curve.\nFor instance, if this value is 3, and at the current time and spawn cycle 2 interior enemies should spawn, anywhere between 0 and 5 can spawn.", moonObj.spawnProbabilityRange);
+                    moonEntry.TryAddField(enabledMoonSettings, "Interior Curve", "Decides the amount of interior enemies that spawn as the day progresses.\nKeyframes represented by x,y and separated by semicolons.", CurveToString(moonObj.enemySpawnChanceThroughoutDay));
+                    moonEntry.TryAddField(enabledMoonSettings, "Max Interior Power", "The amount of interior power capacity that a moon has.", moonObj.maxEnemyPowerCount);
+                    moonEntry.TryAddField(enabledMoonSettings, "Outside Curve", "Decides the amount of outside enemies that spawn as the day progresses.\nKeyframes represented by x,y and separated by semicolons.", CurveToString(moonObj.outsideEnemySpawnChanceThroughDay));
+                    moonEntry.TryAddField(enabledMoonSettings, "Max Outside Power", "The amount of outside power capacity that a moon has.", moonObj.maxOutsideEnemyPowerCount);
+                    moonEntry.TryAddField(enabledMoonSettings, "Min Scrap", "The minimum amount of scrap items that can spawn on a moon.", moonObj.minScrap);
+                    moonEntry.TryAddField(enabledMoonSettings, "Max Scrap", "The maximum amount of scrap items that can spawn on a moon.", moonObj.maxScrap);
+                    moonEntry.TryAddField(enabledMoonSettings, "Interior Multiplier", "Changes the size of the interior generated.", moonObj.factorySizeMultiplier);
+
+                    foreach (var scrap in moonObj.spawnableScrap)
+                    {
+                        defaultItemWeights[scrap.spawnableItem.GetDawnInfo().Key.ToString()].Add((numberlessName, scrap.rarity));
+                    }
+
+                    //if (enabledSettings.Contains("Value Multiplier")) { moonEntry.AddField("Value Multiplier", "The multiplier applied to the value of a moon's scrap.", 1f); }
+                    //if (enabledSettings.Contains("Amount Multiplier")) { moonEntry.AddField("Amount Multiplier", "The multiplier applied to the amount of scrap a moon has.", 1f); }
+                    //if (enabledSettings.Contains("Tags")) { moonEntry.AddField("Tags", "Tags allocated to the moon.\nSeparate tags with commas.", defaultTags); }
+
+                    if (purchaseInfo != null) 
+                    { 
+                        moonEntry.TryAddField(enabledMoonSettings, "Route Price", "Changes the price to route to the moon.", purchaseInfo.Cost.Provide());
+                        moonEntry.TryAddField(enabledMoonSettings, "Is Hidden?", "Changes if the moon is hidden in the terminal.", purchaseInfo.PurchasePredicate.CanPurchase() is TerminalPurchaseResult.HiddenPurchaseResult);
+                        moonEntry.TryAddField(enabledMoonSettings, "Is Locked?", "Changes if the moon is locked in the terminal.", purchaseInfo.PurchasePredicate.CanPurchase() is TerminalPurchaseResult.FailedPurchaseResult);
+                    }
+
+                    moonEntry.TryAddField(enabledMoonSettings, "Spawnable Scrap", );
+
+                    // LLL Backcompat
+                    if (TryGetEntryWithPrefix(moonFile.entries, $"LLL - {numberlessName}", out LunarConfigEntry oldLLLEntry))
+                    {
+                        foreach (var field in oldLLLEntry.fields)
+                        {
+                            if (moonEntry.fields.TryGetValue(field.Key, out ConfigEntryBase value))
+                            {
+                                value.BoxedValue = field.Value.BoxedValue;
+                            }
+                        }
+                    }
+
+                    // SETTING VALUES
+                    if (moonEntry.GetValue<bool>("Configure Content"))
+                    {
+                        dawnMoon.Internal_AddTag(DawnLibTags.LunarConfig);
+
+                        foreach (var key in moonEntry.GetValue<string>("Appropriate Aliases").Split(","))
+                        {
+                            moons[CleanString(key)] = moonObj;
+                        }
+
+                        moonEntry.TrySetValue(enabledMoonSettings, "Display Name", ref moonObj.PlanetName);
+                        moonEntry.TrySetValue(enabledMoonSettings, "Risk Level", ref moonObj.riskLevel);
+                        moonEntry.TrySetValue(enabledMoonSettings, "Description", ref moonObj.LevelDescription);
+                        moonEntry.TrySetValue(enabledMoonSettings, "Has Time?", ref moonObj.planetHasTime);
+                        moonEntry.TrySetValue(enabledMoonSettings, "Time Multiplier", ref moonObj.DaySpeedMultiplier);
+                        if (enabledMoonSettings.Contains("Can Be Challenge Moon?")) { definedChallengeMoons[moonObj] = moonEntry.GetValue<bool>("Can Be Challenge Moon?"); }
+                        if (enabledMoonSettings.Contains("Can Be Challenge Moon?")) { definedChallengeMoonTimes[moonObj] = moonEntry.GetValue<bool>("Has Time?"); }
+                        moonEntry.TrySetValue(enabledMoonSettings, "Daytime Probability Range", ref moonObj.daytimeEnemiesProbabilityRange);
+                        if (enabledMoonSettings.Contains("Daytime Curve")) { moonObj.daytimeEnemySpawnChanceThroughDay = StringToCurve(moonEntry.GetValue<string>("Daytime Curve")); }
+                        moonEntry.TrySetValue(enabledMoonSettings, "Max Daytime Power", ref moonObj.maxDaytimeEnemyPowerCount);
+                        moonEntry.TrySetValue(enabledMoonSettings, "Interior Probability Range", ref moonObj.spawnProbabilityRange);
+                        if (enabledMoonSettings.Contains("Interior Curve")) { moonObj.enemySpawnChanceThroughoutDay = StringToCurve(moonEntry.GetValue<string>("Interior Curve")); }
+                        moonEntry.TrySetValue(enabledMoonSettings, "Max Interior Power", ref moonObj.maxEnemyPowerCount);
+                        if (enabledMoonSettings.Contains("Outside Curve")) { moonObj.outsideEnemySpawnChanceThroughDay = StringToCurve(moonEntry.GetValue<string>("Outside Curve")); }
+                        moonEntry.TrySetValue(enabledMoonSettings, "Max Outside Power", ref moonObj.maxOutsideEnemyPowerCount);
+                        moonEntry.TrySetValue(enabledMoonSettings, "Min Scrap", ref moonObj.minScrap);
+                        moonEntry.TrySetValue(enabledMoonSettings, "Max Scrap", ref moonObj.maxScrap);
+                        moonEntry.TrySetValue(enabledMoonSettings, "Interior Multiplier", ref moonObj.factorySizeMultiplier);
+
+                        if (purchaseInfo != null) 
+                        {
+                            if (enabledMoonSettings.Contains("Route Price")) { purchaseInfo.Cost = new SimpleProvider<int>(moonEntry.GetValue<int>("Route Price")); }
+                            if (enabledMoonSettings.Contains("Is Hidden?") || enabledMoonSettings.Contains("Is Locked?")) 
+                            {
+                                ITerminalPurchasePredicate predicate = ITerminalPurchasePredicate.AlwaysSuccess();
+
+                                if (moonEntry.GetValue<bool>("Is Locked?"))
+                                {
+                                    if (moonEntry.GetValue<bool>("Is Hidden?"))
+                                    {
+                                        predicate = new ConstantTerminalPredicate(TerminalPurchaseResult.Hidden().SetFailure(true));
+                                    }
+                                    else
+                                    {
+                                        TerminalNode _node = ScriptableObject.CreateInstance<TerminalNode>();
+                                        _node.displayText = "Route Locked!";
+                                        predicate = ITerminalPurchasePredicate.AlwaysFail(_node);
+                                    }
+                                }
+                                else
+                                {
+                                    if (moonEntry.GetValue<bool>("Is Locked?"))
+                                    {
+                                        predicate = new ConstantTerminalPredicate(TerminalPurchaseResult.Hidden());
+                                    }
+                                }
+
+                                purchaseInfo.PurchasePredicate = predicate;
+                            }
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    MiniLogger.LogError($"LunarConfig encountered an issue while configuring {uuid}, please report this!\n{e}");
+                }
+            }
+
+            ClearOrphanedEntries(moonFile.file);
+            moonFile.file.Save();
+            moonFile.file.SaveOnConfigSet = true;
+        }
+
+        /*
         public void InitEnemies()
         {
             MiniLogger.LogInfo("Initializing Enemy Configuration...");
@@ -1054,6 +1280,7 @@ namespace LunarConfig.Objects.Config
                 flow.LevelMatchingProperties = props;
             }
         }
+        */
 
         public LunarConfigFile AddFile(string path, string name)
         {
