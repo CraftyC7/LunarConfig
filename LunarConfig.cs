@@ -60,6 +60,7 @@ namespace LunarConfig
             Harmony.PatchAll(typeof(StartOfRoundPatch));
 
             LethalContent.Items.OnFreeze += central.InitItems;
+            LethalContent.Enemies.OnFreeze += central.InitEnemies;
             LethalContent.Moons.OnFreeze += central.InitMoons;
 
             Logger.LogDebug("Finished patching!");
@@ -82,7 +83,7 @@ namespace LunarConfig
 
         public static void LogInfo(string message)
         {
-            logger.LogDebug(message);
+            logger.LogInfo(message);
         }
 
         public static void LogWarning(string message)

@@ -680,7 +680,7 @@
           }
         }
       },
-      "TeamXiaolan.DawnLib/0.4.9": {
+      "TeamXiaolan.DawnLib/0.4.10": {
         "type": "package",
         "dependencies": {
           "Evaisa.LethalLib": "1.1.1"
@@ -2755,15 +2755,15 @@
         "system.threading.tasks.nuspec"
       ]
     },
-    "TeamXiaolan.DawnLib/0.4.9": {
-      "sha512": "10V9YwfEhZwdFcFkXQyBuqd3jdOg/1XBzSM899sM7IaEdIqsmVA9tYe7vEjKnTY2iFVQV21XadiBA9R4zR4KUA==",
+    "TeamXiaolan.DawnLib/0.4.10": {
+      "sha512": "zTy6TPSuIkeE1O9yR0Svo31HV+TkFiuiwGYav80PsQRbQxRn2xvy3Gqavpnm8KzS5fVSZ7YjPwig8WQe4ykqbw==",
       "type": "package",
-      "path": "teamxiaolan.dawnlib/0.4.9",
+      "path": "teamxiaolan.dawnlib/0.4.10",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "lib/netstandard2.1/com.github.teamxiaolan.dawnlib.dll",
-        "teamxiaolan.dawnlib.0.4.9.nupkg.sha512",
+        "teamxiaolan.dawnlib.0.4.10.nupkg.sha512",
         "teamxiaolan.dawnlib.nuspec"
       ]
     },
@@ -2983,7 +2983,7 @@
       "BepInEx.Core >= 5.*",
       "BepInEx.PluginInfoProps >= 2.*",
       "LethalCompany.GameLibs.Steam >= *-*",
-      "TeamXiaolan.DawnLib >= 0.4.9",
+      "TeamXiaolan.DawnLib >= 0.4.10",
       "UnityEngine.Modules >= 2022.3.9"
     ]
   },
@@ -3069,7 +3069,7 @@
           "TeamXiaolan.DawnLib": {
             "suppressParent": "All",
             "target": "Package",
-            "version": "[0.4.9, )"
+            "version": "[0.4.10, )"
           },
           "UnityEngine.Modules": {
             "include": "Compile",

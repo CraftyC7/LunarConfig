@@ -82,7 +82,7 @@
             "TeamXiaolan.DawnLib": {
               "suppressParent": "All",
               "target": "Package",
-              "version": "[0.4.9, )"
+              "version": "[0.4.10, )"
             },
             "UnityEngine.Modules": {
               "include": "Compile",

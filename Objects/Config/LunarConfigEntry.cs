@@ -21,46 +21,6 @@ namespace LunarConfig.Objects.Config
             this.file = file;
         }
 
-        public List<string> GetOverrideMatches(string key)
-        {
-            var c = LunarConfig.central;
-            var overFields = new Dictionary<string, string>();
-            var matchedValues = new List<string>();
-
-            var pattern = @"(?<key>[^:,]+?)\s*:\s*(?<value>(?:(?![^:,]+?\s*:).)*)(?:,|$)";
-            var matches = Regex.Matches(LunarCentral.CleanString(GetValue<string>("Override " + key)), pattern);
-
-            foreach (Match match in matches)
-            {
-                var k = LunarCentral.CleanString(match.Groups["key"].Value);
-                var v = match.Groups["value"].Value.Trim();
-                overFields[k] = v;
-            }
-
-            foreach (var field in overFields)
-            {
-                string k = field.Key;
-                string v = field.Value;
-
-                if (LunarCentral.currentStrings.Contains(k))
-                {
-                    matchedValues.Add(v);
-                    continue;
-                }
-
-                foreach (var tag in LunarCentral.currentTags)
-                {
-                    if (tag.StartsWith(k))
-                    {
-                        matchedValues.Add(v);
-                        break;
-                    }
-                }
-            }
-
-            return matchedValues;
-        }
-
         public void AddField<T>(string key, string description, T defaultValue)
         {
             fields[key] = file.Bind(name, key, defaultValue, description);
