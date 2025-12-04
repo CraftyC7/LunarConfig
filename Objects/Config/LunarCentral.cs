@@ -1603,7 +1603,6 @@ namespace LunarConfig.Objects.Config
 
         public void InitMapObjectCurves()
         {
-            MiniLogger.LogInfo($"Tryna initialize some curvesd type shi {configureMoons} {moonsInitialized} {mapObjectsInitialized} {mapObjectCurvesInitialized} plus soem other shi {enabledMapObjectSettings.Contains("(Inside) Level Curves")} {enabledMapObjectSettings.Contains("(Outside) Level Curves")}");
             if (configureMoons && moonsInitialized && mapObjectsInitialized && !mapObjectCurvesInitialized)
             {
                 if (enabledMapObjectSettings.Contains("(Inside) Level Curves"))
@@ -1691,6 +1690,8 @@ namespace LunarConfig.Objects.Config
 
                         foreach (var kvp in pair.Value)
                         {
+                            MiniLogger.LogInfo($"{kvp.Key} - {dawnMoon.Key} curve forced to {kvp.Value}");
+
                             string id = kvp.Key;
                             if (!kvp.Value.IsNullOrWhiteSpace())
                             {
@@ -1732,6 +1733,7 @@ namespace LunarConfig.Objects.Config
                                 foreach (var moon in moonVars)
                                 {
                                     curveBuilder.AddCurve(moon.Key, moon.Value);
+                                    MiniLogger.LogInfo($"{uuid} - {moon.Key.Key} curve set to {CurveToString(moon.Value)}");
                                 }
                             }
 
@@ -2043,6 +2045,8 @@ namespace LunarConfig.Objects.Config
                                         }
 
                                         moonDict.Add(field.Key.Replace("Inside Curve - ", ""), (string)field.Value.BoxedValue);
+
+                                        cachedInsideMapObjects[dawnMoon.TypedKey] = moonDict;
                                     }
                                 }
                             }
@@ -2058,6 +2062,8 @@ namespace LunarConfig.Objects.Config
                                         }
 
                                         moonDict.Add(field.Key.Replace("Outside Curve - ", ""), (string)field.Value.BoxedValue);
+
+                                        cachedOutsideMapObjects[dawnMoon.TypedKey] = moonDict;
                                     }
                                 }
                             }
