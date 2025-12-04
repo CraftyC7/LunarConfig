@@ -82,7 +82,12 @@
             "TeamXiaolan.DawnLib": {
               "suppressParent": "All",
               "target": "Package",
-              "version": "[0.4.10, )"
+              "version": "[0.5.3, )"
+            },
+            "TeamXiaolan.DawnLib.DuskMod": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[0.5.3, )"
             },
             "UnityEngine.Modules": {
               "include": "Compile",

@@ -61,7 +61,9 @@ namespace LunarConfig
 
             LethalContent.Items.OnFreeze += central.InitItems;
             LethalContent.Enemies.OnFreeze += central.InitEnemies;
+            LethalContent.Dungeons.OnFreeze += central.InitDungeons;
             LethalContent.Moons.OnFreeze += central.InitMoons;
+            LethalContent.MapObjects.OnFreeze += central.InitMapObjects;
 
             Logger.LogDebug("Finished patching!");
         }
