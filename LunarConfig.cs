@@ -25,11 +25,11 @@ namespace LunarConfig
         internal static readonly string MAP_OBJECT_FILE_NAME = "LunarConfigMapObjects.cfg";
         internal static readonly string MAP_OBJECT_FILE = Path.Combine(EXPORT_DIRECTORY, MAP_OBJECT_FILE_NAME);
 
-        internal static readonly string OUTSIDE_MAP_OBJECT_FILE_NAME = "LunarConfigOutsideMapObjects.cfg";
-        internal static readonly string OUTSIDE_MAP_OBJECT_FILE = Path.Combine(EXPORT_DIRECTORY, OUTSIDE_MAP_OBJECT_FILE_NAME);
-
         internal static readonly string DUNGEON_FILE_NAME = "LunarConfigDungeons.cfg";
         internal static readonly string DUNGEON_FILE = Path.Combine(EXPORT_DIRECTORY, DUNGEON_FILE_NAME);
+
+        internal static readonly string BUYABLE_FILE_NAME = "LunarConfigUnlockables.cfg";
+        internal static readonly string BUYABLE_FILE = Path.Combine(EXPORT_DIRECTORY, BUYABLE_FILE_NAME);
 
         internal static readonly string CENTRAL_FILE_NAME = "LunarConfigCentral.cfg";
         internal static readonly string CENTRAL_FILE = Path.Combine(Paths.ConfigPath, CENTRAL_FILE_NAME);
@@ -64,6 +64,7 @@ namespace LunarConfig
             LethalContent.Dungeons.OnFreeze += central.InitDungeons;
             LethalContent.Moons.OnFreeze += central.InitMoons;
             LethalContent.MapObjects.OnFreeze += central.InitMapObjects;
+            //LethalContent.Unlockables.OnFreeze += central.InitUnlockables;
 
             Logger.LogDebug("Finished patching!");
         }
