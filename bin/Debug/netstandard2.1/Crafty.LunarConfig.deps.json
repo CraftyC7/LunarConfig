@@ -10,21 +10,47 @@
       "Crafty.LunarConfig/1.0.0": {
         "dependencies": {
           "BepInEx.Analyzers": "1.0.8",
+          "BepInEx.AssemblyPublicizer.MSBuild": "0.4.2",
           "BepInEx.Core": "5.4.21",
           "BepInEx.PluginInfoProps": "2.1.0",
-          "Evaisa.LethalLib": "1.1.1",
-          "IAmBatby.LethalLevelLoader": "1.4.0",
-          "LethalCompany.GameLibs.Steam": "70.0.0-ngd.0",
-          "TeamBMX.LobbyCompatibility": "1.5.1",
-          "UnityEngine.Modules": "2022.3.9",
-          "XuXiaolan.CodeRebirthLib": "0.7.2",
-          "mrov.WeatherRegistry": "0.7.0"
+          "LethalCompany.GameLibs.Steam": "73.0.0-ngd.0",
+          "TeamXiaolan.DawnLib": "0.5.10",
+          "TeamXiaolan.DawnLib.DuskMod": "0.5.10",
+          "UnityEngine.Modules": "2022.3.9"
         },
         "runtime": {
           "Crafty.LunarConfig.dll": {}
         }
       },
       "BepInEx.Analyzers/1.0.8": {},
+      "BepInEx.AssemblyPublicizer.MSBuild/0.4.2": {
+        "runtime": {
+          "lib/netstandard2.1/AsmResolver.DotNet.dll": {
+            "assemblyVersion": "5.5.1.0",
+            "fileVersion": "5.5.1.0"
+          },
+          "lib/netstandard2.1/AsmResolver.PE.File.dll": {
+            "assemblyVersion": "5.5.1.0",
+            "fileVersion": "5.5.1.0"
+          },
+          "lib/netstandard2.1/AsmResolver.PE.dll": {
+            "assemblyVersion": "5.5.1.0",
+            "fileVersion": "5.5.1.0"
+          },
+          "lib/netstandard2.1/AsmResolver.dll": {
+            "assemblyVersion": "5.5.1.0",
+            "fileVersion": "5.5.1.0"
+          },
+          "lib/netstandard2.1/BepInEx.AssemblyPublicizer.MSBuild.dll": {
+            "assemblyVersion": "0.4.2.0",
+            "fileVersion": "0.4.2.0"
+          },
+          "lib/netstandard2.1/BepInEx.AssemblyPublicizer.dll": {
+            "assemblyVersion": "0.4.2.0",
+            "fileVersion": "0.4.2.0"
+          }
+        }
+      },
       "BepInEx.BaseLib/5.4.20": {
         "runtime": {
           "lib/netstandard2.0/BepInEx.dll": {
@@ -63,47 +89,10 @@
           }
         }
       },
-      "IAmBatby.LethalLevelLoader/1.4.0": {
-        "dependencies": {
-          "BepInEx.Core": "5.4.21",
-          "Evaisa.LethalLib": "1.1.1",
-          "LethalCompany.GameLibs.Steam": "70.0.0-ngd.0",
-          "MaxWasUnavailable.LethalModDataLib": "1.2.2"
-        },
-        "runtime": {
-          "lib/netstandard2.1/LethalLevelLoader.dll": {
-            "assemblyVersion": "1.0.0.0",
-            "fileVersion": "1.4.0.0"
-          }
-        }
-      },
-      "LethalCompany.GameLibs.Steam/70.0.0-ngd.0": {
+      "LethalCompany.GameLibs.Steam/73.0.0-ngd.0": {
         "dependencies": {
           "Newtonsoft.Json": "13.0.3",
           "UnityEngine.Modules": "2022.3.9"
-        }
-      },
-      "Lib.Harmony/2.3.3": {
-        "dependencies": {
-          "Lib.Harmony.Ref": "2.3.3"
-        }
-      },
-      "Lib.Harmony.Ref/2.3.3": {
-        "dependencies": {
-          "System.Reflection.Emit": "4.7.0"
-        }
-      },
-      "MaxWasUnavailable.LethalModDataLib/1.2.2": {
-        "dependencies": {
-          "BepInEx.Core": "5.4.21",
-          "BepInEx.PluginInfoProps": "2.1.0",
-          "UnityEngine.Modules": "2022.3.9"
-        },
-        "runtime": {
-          "lib/netstandard2.1/MaxWasUnavailable.LethalModDataLib.dll": {
-            "assemblyVersion": "1.0.0.0",
-            "fileVersion": "1.2.2.0"
-          }
         }
       },
       "Microsoft.NETCore.Platforms/1.1.0": {},
@@ -160,22 +149,6 @@
           "lib/netstandard2.0/MonoMod.Utils.dll": {
             "assemblyVersion": "21.12.13.1",
             "fileVersion": "21.12.13.1"
-          }
-        }
-      },
-      "mrov.WeatherRegistry/0.7.0": {
-        "dependencies": {
-          "BepInEx.Core": "5.4.21",
-          "BepInEx.PluginInfoProps": "2.1.0",
-          "Evaisa.LethalLib": "1.1.1",
-          "Lib.Harmony": "2.3.3",
-          "Newtonsoft.Json": "13.0.3",
-          "TeamBMX.LobbyCompatibility": "1.5.1"
-        },
-        "runtime": {
-          "lib/netstandard2.1/WeatherRegistry.dll": {
-            "assemblyVersion": "0.0.0.0",
-            "fileVersion": "0.7.0.0"
           }
         }
       },
@@ -435,26 +408,29 @@
           "System.Runtime": "4.3.0"
         }
       },
-      "TeamBMX.LobbyCompatibility/1.5.1": {
-        "runtime": {
-          "lib/netstandard2.1/BMX.LobbyCompatibility.dll": {
-            "assemblyVersion": "1.0.0.0",
-            "fileVersion": "1.5.1.0"
-          }
-        }
-      },
-      "UnityEngine.Modules/2022.3.9": {},
-      "XuXiaolan.CodeRebirthLib/0.7.2": {
+      "TeamXiaolan.DawnLib/0.5.10": {
         "dependencies": {
           "Evaisa.LethalLib": "1.1.1"
         },
         "runtime": {
-          "lib/netstandard2.1/com.github.xuuxiaolan.coderebirthlib.dll": {
-            "assemblyVersion": "0.7.2.0",
-            "fileVersion": "0.7.2.0"
+          "lib/netstandard2.1/com.github.teamxiaolan.dawnlib.dll": {
+            "assemblyVersion": "0.5.10.0",
+            "fileVersion": "0.5.10.0"
           }
         }
-      }
+      },
+      "TeamXiaolan.DawnLib.DuskMod/0.5.10": {
+        "dependencies": {
+          "TeamXiaolan.DawnLib": "0.5.10"
+        },
+        "runtime": {
+          "lib/netstandard2.1/com.github.teamxiaolan.dawnlib.dusk.dll": {
+            "assemblyVersion": "0.5.10.0",
+            "fileVersion": "0.5.10.0"
+          }
+        }
+      },
+      "UnityEngine.Modules/2022.3.9": {}
     }
   },
   "libraries": {
@@ -469,6 +445,13 @@
       "sha512": "sha512-xrfNmunsPhBx+vStTxLonq/aHkRrDH77c9tG/x3m5eejrKe5B0nf7cJPRRt6x330sGI0bLaPTtygdeHUgvI3wQ==",
       "path": "bepinex.analyzers/1.0.8",
       "hashPath": "bepinex.analyzers.1.0.8.nupkg.sha512"
+    },
+    "BepInEx.AssemblyPublicizer.MSBuild/0.4.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-AwGR6zOQxhWPWmcMdmhCaawC2qYdYHttkGmlXxyvhB1EIUAtuILEle8kKSkzElnbFGZjvw6iabpFi+AYUG4IuA==",
+      "path": "bepinex.assemblypublicizer.msbuild/0.4.2",
+      "hashPath": "bepinex.assemblypublicizer.msbuild.0.4.2.nupkg.sha512"
     },
     "BepInEx.BaseLib/5.4.20": {
       "type": "package",
@@ -505,40 +488,12 @@
       "path": "harmonyx/2.7.0",
       "hashPath": "harmonyx.2.7.0.nupkg.sha512"
     },
-    "IAmBatby.LethalLevelLoader/1.4.0": {
+    "LethalCompany.GameLibs.Steam/73.0.0-ngd.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-Ok9ANF0gu3NcK74PnxQimmscjB5Yy+E18ryuMm9irBPPNCAMnd4dSOw2HH3b7uEXzbhKhW+uhHRWdM2UfTuf0Q==",
-      "path": "iambatby.lethallevelloader/1.4.0",
-      "hashPath": "iambatby.lethallevelloader.1.4.0.nupkg.sha512"
-    },
-    "LethalCompany.GameLibs.Steam/70.0.0-ngd.0": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-i2Iqz1Q8fbF5J5tM39r7hHsTtuiPS0SvFFz7qFL7NVSPj/kJJ1R5eI6xaApLFTWvIOzq1ZbVny6CUcU5wgLfxA==",
-      "path": "lethalcompany.gamelibs.steam/70.0.0-ngd.0",
-      "hashPath": "lethalcompany.gamelibs.steam.70.0.0-ngd.0.nupkg.sha512"
-    },
-    "Lib.Harmony/2.3.3": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-qxO8d2q7luoY8mTfCStQFOgRSd3dWZSS0Ffi5nrjX4qFkZxEBAEvNh5b/ZejTl2kY0fJs62LmfRJkBBTeiuuyQ==",
-      "path": "lib.harmony/2.3.3",
-      "hashPath": "lib.harmony.2.3.3.nupkg.sha512"
-    },
-    "Lib.Harmony.Ref/2.3.3": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-OJ3cLy2eAKLKYbPqsI1leZt+p+ZSqCEGVZzSlyFVTxwR9eG5HwSxJBb3G+qT4cW0VdL58E+qv35wkeBj0ErqZQ==",
-      "path": "lib.harmony.ref/2.3.3",
-      "hashPath": "lib.harmony.ref.2.3.3.nupkg.sha512"
-    },
-    "MaxWasUnavailable.LethalModDataLib/1.2.2": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-sIvyoqkr6YH9UMxhPjw7i7W9JyRFNFwt9Dx+eDGT+JbuHx1PzAQvWiIb7GNpzE6eeHy1UDjjPE0N859YMXcN3A==",
-      "path": "maxwasunavailable.lethalmoddatalib/1.2.2",
-      "hashPath": "maxwasunavailable.lethalmoddatalib.1.2.2.nupkg.sha512"
+      "sha512": "sha512-iaHCHoJTFiTnAyAYIrEbjCJOOuhcJ42+KJnEbmCmf4UdkhjSwwio2bcdPCbchodB9kEp+3v3ATgkBwYn56/Gdw==",
+      "path": "lethalcompany.gamelibs.steam/73.0.0-ngd.0",
+      "hashPath": "lethalcompany.gamelibs.steam.73.0.0-ngd.0.nupkg.sha512"
     },
     "Microsoft.NETCore.Platforms/1.1.0": {
       "type": "package",
@@ -574,13 +529,6 @@
       "sha512": "sha512-/H+0RMWqx/D1/fSuY5jhY6GFvqhdYdlnI7J3IfL8P6y4nJkoZDxqts6+RxWWOz4pbnJdWnxSjS8XG+Lq6rUi7w==",
       "path": "monomod.utils/21.12.13.1",
       "hashPath": "monomod.utils.21.12.13.1.nupkg.sha512"
-    },
-    "mrov.WeatherRegistry/0.7.0": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-zQ4xGpXjppKKUCGqXMlGGbo13SD3vjYprdpl3piQO0g4cExnadUbAR9ZAsToUbDR4NG2ov7kGzkssIt8IUKobQ==",
-      "path": "mrov.weatherregistry/0.7.0",
-      "hashPath": "mrov.weatherregistry.0.7.0.nupkg.sha512"
     },
     "Newtonsoft.Json/13.0.3": {
       "type": "package",
@@ -778,12 +726,19 @@
       "path": "system.threading.tasks/4.3.0",
       "hashPath": "system.threading.tasks.4.3.0.nupkg.sha512"
     },
-    "TeamBMX.LobbyCompatibility/1.5.1": {
+    "TeamXiaolan.DawnLib/0.5.10": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-U1taVjagI6Ma1v7EXLX9dJpJJGHBt8R2UIdOgPu/k87ZFc9qER19a4C1FPigM7qBdE6/pzXo8ovwuPrRRFb51g==",
-      "path": "teambmx.lobbycompatibility/1.5.1",
-      "hashPath": "teambmx.lobbycompatibility.1.5.1.nupkg.sha512"
+      "sha512": "sha512-uMjRVJknM7KsSg+ylEfqeDiYe5YKqRDAnSZxgWzVZCfFByqEjAs6Tuv44jvNC0FOqgomkOkSoC7q2N2GpuNnEg==",
+      "path": "teamxiaolan.dawnlib/0.5.10",
+      "hashPath": "teamxiaolan.dawnlib.0.5.10.nupkg.sha512"
+    },
+    "TeamXiaolan.DawnLib.DuskMod/0.5.10": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-090BgP0Zp2vFu3i+Gd09m7+y0a4IqFxNrXrSu/E8q7jxIfCwjgEBI9FoHYKJmC6KNPng9gEleto+5gIYuJeJtg==",
+      "path": "teamxiaolan.dawnlib.duskmod/0.5.10",
+      "hashPath": "teamxiaolan.dawnlib.duskmod.0.5.10.nupkg.sha512"
     },
     "UnityEngine.Modules/2022.3.9": {
       "type": "package",
@@ -791,13 +746,6 @@
       "sha512": "sha512-sSxqZjd05U0NWlX+eappdlsEuXFvDRHkUaClDVTocGRzCmIwNvgGJIPh22lGklIpNZ3cJZneYJkIUnEIazR8VA==",
       "path": "unityengine.modules/2022.3.9",
       "hashPath": "unityengine.modules.2022.3.9.nupkg.sha512"
-    },
-    "XuXiaolan.CodeRebirthLib/0.7.2": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-13Iuiu1/QbXauYMFrDuWRHD4JgL9TznBjSdRzQYkomMGlibEGewJ7Z5HoQV4tTBLfyFtYRCWBpt2UOfqfYSchg==",
-      "path": "xuxiaolan.coderebirthlib/0.7.2",
-      "hashPath": "xuxiaolan.coderebirthlib.0.7.2.nupkg.sha512"
     }
   }
 }
