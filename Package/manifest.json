@@ -6,6 +6,6 @@
     "description": "An all-in-one configuration solution for changing almost anything about almost everything!",
     "dependencies": [
         "BepInEx-BepInExPack-5.4.2100",
-        "TeamXiaolan-DawnLib-0.5.10",
+        "TeamXiaolan-DawnLib-0.5.10"
     ]
 }
