@@ -1,3 +1,42 @@
+# Version 0.2.0 - DAWNLIB PORT
+
+Features
+- LunarConfig no longer requires any of it's former dependencies, only DawnLib (and BepinEx I guess).
+- Cleaner code (keyword '-er').
+- DawnLib content, and non-library affiliated content can now be configured with LunarConfig.
+- Aliases used to refer to anything in LunarConfig can now be changed.
+- Enemies can now have their bestiary text and keywords configured.
+- Items can now be configured to be sold in the shop, and have the text of shop-related nodes configured.
+- Some more map object settings.
+- Map object curves are now in LunarConfigMoons.
+- Map objects can now spawn where they shouldn't, however map objects that do not have a NetworkObject (usually the vanilla outside objects) are not able to spawn inside.
+- Tags are now based on DawnLib, not LLL (might cause some things not to work while libraries port).
+- As config files changed, a way was added to port old configurations, SEE README BEFORE ATTEMPTING (this also removed porting from CentralConfig).
+- Added some notices to config fields that require other mods to work.
+
+Fixes
+- Mostly just issues caused by Lunar not being DawnLib-related.
+
+## Version 0.1.13
+
+Fixes
+- Fixed an issue that breaks curve configurations on cultures that use commas as decimal points.
+
+## Version 0.1.12
+
+Fixes
+- Fixed ANOTHER issue where dungeon configuration just wouldn't work.
+
+## Version 0.1.11
+
+Fixes
+- Fixed an issue where dungeon configuration just wouldn't work.
+
+## Version 0.1.10
+
+Fixes
+- Fixed an issue where disabling configuring moons would softlock the game.
+
 ## Version 0.1.9
 
 Fixes

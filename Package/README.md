@@ -1,4 +1,4 @@
-Lunar Config is an all-in-one configuration mod for Lethal Company. Lunar Config currently allows you to change various properties around items, enemies, moons, and map objects (traps) with more planned in the future. This mod supports content in the vanilla game and added via LethalLevelLoader, LethalLib, and CRLib (it also requires all of these, along with WeatherRegistry, in order to function properly!).
+Lunar Config is an all-in-one configuration mod for Lethal Company. Lunar Config currently allows you to change various properties around items, enemies, moons, and map objects (traps) with more planned in the future. It should register almost anything from any mod and vanilla, it does require DawnLib and BepInEx in order to function!).
 
 # Notice!
 
@@ -14,11 +14,19 @@ After installing the mod, if you launch the game and load into a lobby, several 
 
 Any setting you want to change requires you to enable the "Configure Content" value in the given entry, otherwise the changes will not be acknowledged. I'm not going to go through each setting here as they are for the most part self-explanatory, but you can always ask questions in [the mod's discord thread](https://discord.com/channels/1168655651455639582/1390479837025538048/1390479837025538048).
 
-## Porting
+## Porting Pre-v0.2.0
 
-Lunar Config includes an option to port most configuration settings from CentralConfig. To do so, enable the "Run Late" option in 'LunarConfigCentral', you may also want to delete all Lunar Config files in the LunarConfig folder before doing this for the best result. Then run the game and load into a lobby to refresh your configuration files and most settings should port from CentralConfig (this isn't perfect, but it can get many settings).
+**Before updating LunarConfig to v0.2.0, take a copy of your configuration files for safekeeping!**
 
-**Make sure you disable the 'Run Late' setting after you run the game once, as leaving it on will disable some of the mod's functionality!**
+As the formatting for configuration files changed with v0.2.0, Lunar includes a system to port files from older versions. 
+
+Before loading your game on v0.2.0+ of Lunar, **turn off "Clear Orphaned Entries" in LunarConfigCentral.cfg!** Then, install a v0.2.0+ version of LunarConfig and load into a lobby. In LunarConfigCentral, there should now be an option to "Enable Backwards Compat", turn it on. Once this is done, you should be able to load into a lobby again and most your settings will transfer over (exceptions detailed below). **Be sure to turn it off after running the game once, or your old files will continue to overwrite any changes!**
+
+Some settings that will NOT transfer over include:
+
+* Anything in LunarConfigDungeons.cfg
+* Anything in LunarConfigMapObjects.cfg
+* Tags on moons
 
 ## Disabling Settings
 
@@ -41,10 +49,8 @@ If you need any help you are free to ask in this mod's thread in the [Lethal Com
 
 Hopefully as I have time I intend to add some of the following:
 
-* Relying on primarily DawnLib as opposed to 4 different libraries.
-* CSync integration, so host configuration is used by all clients automatically.
 * Cleaner and more optimized code (please don't look at my mess now).
-* Injection and modification of any setting based on the current moon, LLL tags, current interior, or current weather.
+* Injection and modification of any setting based on the current moon, tags, current interior, or current weather.
 
 ## Credits
 

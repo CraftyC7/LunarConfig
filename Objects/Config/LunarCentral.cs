@@ -146,6 +146,30 @@ namespace LunarConfig.Objects.Config
             return dawnID;
         }
 
+        public static void MigrateSection(ConfigFile config, string oldSection, string newSection)
+        {
+            PropertyInfo orphanedEntriesProp = AccessTools.Property(typeof(ConfigFile), "OrphanedEntries");
+            
+            if (orphanedEntriesProp == null) { return; }
+
+            var orphaned = (Dictionary<ConfigDefinition, string>)orphanedEntriesProp.GetValue(config);
+            if (orphaned == null || orphaned.Count == 0) { return; }
+
+            foreach (var kv in orphaned.ToList())
+            {
+                var oldDef = kv.Key;
+                var rawValue = kv.Value;
+                
+                if (!oldDef.Section.StartsWith(oldSection)) { continue; }
+                
+                var newEntry = config.GetConfigEntries().FirstOrDefault(e => e.Definition.Section == newSection && e.Definition.Key == oldDef.Key);
+
+                if (newEntry == null) { continue; }
+                
+                newEntry.SetSerializedValue(rawValue);
+            }
+        }
+
         // Taken from lethal.wiki
         public static void ClearOrphanedEntries(ConfigFile cfg)
         {
@@ -385,8 +409,8 @@ namespace LunarConfig.Objects.Config
                 configMoons.AddField("Risk Level", "Disable this to disable configuring this property in moon config entries.", true);
                 configMoons.AddField("Description", "Disable this to disable configuring this property in moon config entries.", true);
                 configMoons.AddField("Route Price", "Disable this to disable configuring this property in moon config entries.", true);
-                configMoons.AddField("Is Hidden?", "Disable this to disable configuring this property in moon config entries.", true);
-                configMoons.AddField("Is Locked?", "Disable this to disable configuring this property in moon config entries.", true);
+                configMoons.AddField("Is Hidden?", "WARNING: If you enable this setting and don't enable 'Is Locked', it WILL cause issues.\nDisable this to disable configuring this property in moon config entries.", true);
+                configMoons.AddField("Is Locked?", "WARNING: If you enable this setting and don't enable 'Is Hidden', it WILL cause issues.\nDisable this to disable configuring this property in moon config entries.", true);
                 configMoons.AddField("Can Be Challenge Moon?", "Disable this to disable configuring this property in moon config entries.", true);
                 configMoons.AddField("Has Time?", "Disable this to disable configuring this property in moon config entries.", true);
                 configMoons.AddField("Time Multiplier", "Disable this to disable configuring this property in moon config entries.", true);
@@ -425,6 +449,8 @@ namespace LunarConfig.Objects.Config
                 configDungeons.AddField("Random Size Min", "Disable this to disable configuring this property in item config entries.", true);
                 configDungeons.AddField("Random Size Max", "Disable this to disable configuring this property in item config entries.", true);
                 configDungeons.AddField("Map Tile Size", "Disable this to disable configuring this property in item config entries.", true);
+                configDungeons.AddField("Clamp Range Min", "Disable this to disable configuring this property in item config entries.", true);
+                configDungeons.AddField("Clamp Range Max", "Disable this to disable configuring this property in item config entries.", true);
 
                 foreach (var setting in configDungeons.fields.Keys)
                 {
@@ -596,28 +622,10 @@ namespace LunarConfig.Objects.Config
                         itemEntry.TryAddField(enabledItemSettings, "Cost", "The cost of the item if it is sold in the shop.", defaultCost);
 
                         // LLL Backcompat
-                        if (TryGetEntryWithPrefix(itemFile.entries, $"LLL - {itemObj.itemName}", out LunarConfigEntry oldLLLEntry))
-                        {
-                            foreach (var field in oldLLLEntry.fields)
-                            {
-                                if (itemEntry.fields.TryGetValue(field.Key, out ConfigEntryBase value))
-                                {
-                                    value.BoxedValue = field.Value.BoxedValue;
-                                }
-                            }
-                        }
+                        if (backCompat) { MigrateSection(itemFile.file, $"LLL - {itemObj.itemName}", $"{niceUUID} - {uuid}"); }
 
                         // LL Backcompat
-                        if (TryGetEntryWithPrefix(itemFile.entries, $"LL - {itemObj.itemName}", out LunarConfigEntry oldLLEntry))
-                        {
-                            foreach (var field in oldLLEntry.fields)
-                            {
-                                if (itemEntry.fields.TryGetValue(field.Key, out ConfigEntryBase value))
-                                {
-                                    value.BoxedValue = field.Value.BoxedValue;
-                                }
-                            }
-                        }
+                        if (backCompat) { MigrateSection(itemFile.file, $"LL - {itemObj.itemName}", $"{niceUUID} - {uuid}"); }
 
                         // SETTING VALUES
                         if (itemEntry.GetValue<bool>("Configure Content"))
@@ -884,28 +892,10 @@ namespace LunarConfig.Objects.Config
                         if (word != null) { enemyEntry.TryAddField(enabledEnemySettings, "Bestiary Keyword", "The keyword to view the bestiary entry of an enemy.", word.word); }
 
                         // LLL Backcompat
-                        if (TryGetEntryWithPrefix(enemyFile.entries, $"LLL - {enemyObj.enemyName}", out LunarConfigEntry oldLLLEntry))
-                        {
-                            foreach (var field in oldLLLEntry.fields)
-                            {
-                                if (enemyEntry.fields.TryGetValue(field.Key, out ConfigEntryBase value))
-                                {
-                                    value.BoxedValue = field.Value.BoxedValue;
-                                }
-                            }
-                        }
+                        if (backCompat) { MigrateSection(enemyFile.file, $"LLL - {enemyObj.enemyName}", $"{niceUUID} - {uuid}"); }
 
                         // LL Backcompat
-                        if (TryGetEntryWithPrefix(enemyFile.entries, $"LL - {enemyObj.enemyName}", out LunarConfigEntry oldLLEntry))
-                        {
-                            foreach (var field in oldLLEntry.fields)
-                            {
-                                if (enemyEntry.fields.TryGetValue(field.Key, out ConfigEntryBase value))
-                                {
-                                    value.BoxedValue = field.Value.BoxedValue;
-                                }
-                            }
-                        }
+                        if (backCompat) { MigrateSection(enemyFile.file, $"LL - {enemyObj.enemyName}", $"{niceUUID} - {uuid}"); }
 
                         // SETTING VALUES
                         if (enemyEntry.GetValue<bool>("Configure Content"))
@@ -1733,7 +1723,7 @@ namespace LunarConfig.Objects.Config
                         if (purchaseInfo != null)
                         {
                             moonEntry.TryAddField(enabledMoonSettings, "Route Price", "Changes the price to route to the moon.", purchaseInfo.Cost.Provide());
-                            moonEntry.TryAddField(enabledMoonSettings, "Is Hidden?", "Changes if the moon is hidden in the terminal.", purchaseInfo.PurchasePredicate.CanPurchase() is TerminalPurchaseResult.HiddenPurchaseResult);
+                            moonEntry.TryAddField(enabledMoonSettings, "Is Hidden?", "SORRY: This setting currently doesn't work, will be fixed soon.\nChanges if the moon is hidden in the terminal.", purchaseInfo.PurchasePredicate.CanPurchase() is TerminalPurchaseResult.HiddenPurchaseResult);
                             moonEntry.TryAddField(enabledMoonSettings, "Is Locked?", "Changes if the moon is locked in the terminal.", purchaseInfo.PurchasePredicate.CanPurchase() is TerminalPurchaseResult.FailedPurchaseResult);
                         }
 
@@ -1868,17 +1858,7 @@ namespace LunarConfig.Objects.Config
                         }
 
                         // LLL Backcompat
-                        if (TryGetEntryWithPrefix(moonFile.entries, $"LLL - {numberlessName}", out LunarConfigEntry oldLLLEntry))
-                        {
-                            foreach (var field in oldLLLEntry.fields)
-                            {
-                                if (field.Key == "Tags") { continue; }
-                                if (moonEntry.fields.TryGetValue(field.Key, out ConfigEntryBase value))
-                                {
-                                    value.BoxedValue = field.Value.BoxedValue;
-                                }
-                            }
-                        }
+                        if (backCompat) { MigrateSection(moonFile.file, $"LLL - {numberlessName}", $"{niceUUID} - {uuid}"); }
 
                         // SETTING VALUES
                         if (moonEntry.GetValue<bool>("Configure Content"))
@@ -1925,30 +1905,22 @@ namespace LunarConfig.Objects.Config
                             if (purchaseInfo != null)
                             {
                                 if (enabledMoonSettings.Contains("Route Price")) { purchaseInfo.Cost = new SimpleProvider<int>(moonEntry.GetValue<int>("Route Price")); }
-                                if (enabledMoonSettings.Contains("Is Hidden?") || enabledMoonSettings.Contains("Is Locked?"))
+                                if (enabledMoonSettings.Contains("Is Locked?"))
                                 {
                                     ITerminalPurchasePredicate predicate = ITerminalPurchasePredicate.AlwaysSuccess();
-
+                                    
                                     if (moonEntry.GetValue<bool>("Is Locked?"))
                                     {
-                                        if (moonEntry.GetValue<bool>("Is Hidden?"))
-                                        {
-                                            predicate = new ConstantTerminalPredicate(TerminalPurchaseResult.Hidden().SetFailure(true));
-                                        }
-                                        else
-                                        {
-                                            TerminalNode _node = ScriptableObject.CreateInstance<TerminalNode>();
-                                            _node.displayText = "Route Locked!";
-                                            predicate = ITerminalPurchasePredicate.AlwaysFail(_node);
-                                        }
+                                        TerminalNode _node = ScriptableObject.CreateInstance<TerminalNode>();
+                                        _node.displayText = "Route Locked!";
+                                        predicate = ITerminalPurchasePredicate.AlwaysFail(_node);
                                     }
-                                    else
+                                    /*
+                                    if (moonEntry.GetValue<bool>("Is Hidden?"))
                                     {
-                                        if (moonEntry.GetValue<bool>("Is Hidden?"))
-                                        {
-                                            predicate = new ConstantTerminalPredicate(TerminalPurchaseResult.Hidden());
-                                        }
+                                        predicate = ITerminalPurchasePredicate.AlwaysHide();
                                     }
+                                    */
 
                                     purchaseInfo.PurchasePredicate = predicate;
                                 }
