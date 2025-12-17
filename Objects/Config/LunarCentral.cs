@@ -132,9 +132,9 @@ namespace LunarConfig.Objects.Config
             return string.Join(" ; ", curve.keys.Select(kf => $"{kf.time.ToString(System.Globalization.CultureInfo.InvariantCulture)},{kf.value.ToString(System.Globalization.CultureInfo.InvariantCulture)}"));
         }
 
-        public string GetDawnUUID(Dictionary<string, string> dic, string uuid)
+        public string? GetDawnUUID(Dictionary<string, string> dic, string uuid)
         {
-            string dawnID = "INVALID";
+            string? dawnID = null;
             try
             {
                 dawnID = dic[CleanString(uuid)];
@@ -694,9 +694,9 @@ namespace LunarConfig.Objects.Config
                                 }
                             }
 
-                            if (infoNode != null) { infoNode.displayText = itemEntry.GetValue<string>("Info Node Text").Replace(";", "\n"); }
-                            if (requestNode != null) { requestNode.displayText = itemEntry.GetValue<string>("Request Node Text").Replace(";", "\n"); }
-                            if (receiptNode != null) { receiptNode.displayText = itemEntry.GetValue<string>("Receipt Node Text").Replace(";", "\n"); }
+                            if (infoNode != null && enabledItemSettings.Contains("Info Node Text")) { infoNode.displayText = itemEntry.GetValue<string>("Info Node Text").Replace(";", "\n"); }
+                            if (requestNode != null && enabledItemSettings.Contains("Request Node Text")) { requestNode.displayText = itemEntry.GetValue<string>("Request Node Text").Replace(";", "\n"); }
+                            if (receiptNode != null && enabledItemSettings.Contains("Receipt Node Text")) { receiptNode.displayText = itemEntry.GetValue<string>("Receipt Node Text").Replace(";", "\n"); }
 
                             if (purchaseInfo != null && enabledItemSettings.Contains("Cost")) { purchaseInfo.Cost = new SimpleProvider<int>(itemEntry.GetValue<int>("Cost")); }
                         }
@@ -749,7 +749,9 @@ namespace LunarConfig.Objects.Config
 
                         string id = splits[0];
 
-                        string dawnID = GetDawnUUID(items, id);
+                        string? dawnID = GetDawnUUID(items, id);
+                        if (dawnID == null) { continue; }
+
                         itemWeightString[dawnID] = itemWeightString.GetValueOrDefault(dawnID, "") + cache.Key + ":" + CleanString(splits[1]) + ",";
                     }
                 }
@@ -1000,7 +1002,9 @@ namespace LunarConfig.Objects.Config
 
                             string id = splits[0];
 
-                            string dawnID = GetDawnUUID(enemies, id);
+                            string? dawnID = GetDawnUUID(enemies, id);
+                            if (dawnID == null) { continue; }
+
                             daytimeEnemyWeightString[dawnID] = daytimeEnemyWeightString.GetValueOrDefault(dawnID, "") + cache.Key + ":" + CleanString(splits[1]) + ",";
                         }
                     }
@@ -1070,7 +1074,9 @@ namespace LunarConfig.Objects.Config
 
                             string id = splits[0];
 
-                            string dawnID = GetDawnUUID(enemies, id);
+                            string? dawnID = GetDawnUUID(enemies, id);
+                            if (dawnID == null) { continue; }
+
                             interiorEnemyWeightString[dawnID] = interiorEnemyWeightString.GetValueOrDefault(dawnID, "") + cache.Key + ":" + CleanString(splits[1]) + ",";
                         }
                     }
@@ -1140,7 +1146,9 @@ namespace LunarConfig.Objects.Config
 
                             string id = splits[0];
 
-                            string dawnID = GetDawnUUID(enemies, id);
+                            string? dawnID = GetDawnUUID(enemies, id);
+                            if (dawnID == null) { continue; }
+
                             outsideEnemyWeightString[dawnID] = outsideEnemyWeightString.GetValueOrDefault(dawnID, "") + cache.Key + ":" + CleanString(splits[1]) + ",";
                         }
                     }
@@ -1300,7 +1308,9 @@ namespace LunarConfig.Objects.Config
 
                         string id = splits[0];
                         
-                        string dawnID = GetDawnUUID(dungeons, id);
+                        string? dawnID = GetDawnUUID(dungeons, id);
+                        if (dawnID == null) { continue; }
+
                         dungeonWeightString[dawnID] = dungeonWeightString.GetValueOrDefault(dawnID, "") + cache.Key + ":" + CleanString(splits[1]) + ",";
                     }
                 }
@@ -1429,7 +1439,7 @@ namespace LunarConfig.Objects.Config
                                 if (!key.IsNullOrWhiteSpace()) { mapObjects[CleanString(key)] = uuid; }
                             }
                             
-                            if (insideInfo != null)
+                            if (insideInfo == null)
                             {
                                 CurveTableBuilder<DawnMoonInfo> blankTable = new();
 
@@ -1445,7 +1455,7 @@ namespace LunarConfig.Objects.Config
                             if (enabledMapObjectSettings.Contains("(Inside) Flush Against Wall?")) { insideInfo.SpawnWithBackFlushAgainstWall = objEntry.GetValue<bool>("(Inside) Flush Against Wall?"); }
                             if (enabledMapObjectSettings.Contains("(Inside) Spawn Against Wall?")) { insideInfo.SpawnWithBackToWall = objEntry.GetValue<bool>("(Inside) Spawn Against Wall?"); }
 
-                            if (outsideInfo != null)
+                            if (outsideInfo == null)
                             {
                                 CurveTableBuilder<DawnMoonInfo> blankTable = new();
 

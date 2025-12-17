@@ -1,3 +1,9 @@
+## Version 0.2.1
+
+Fixes
+- Fixed almost anything breaking if you had invalid names in the scrap, enemy, or dungeon fields on moon settings.
+- Fixed some issues around item configs not working if you didn't enable node text editing.
+
 # Version 0.2.0 - DAWNLIB PORT
 
 Features
