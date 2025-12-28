@@ -62,6 +62,9 @@ namespace LunarConfig.Objects.Config
         public static bool configureMapObjects = false;
         public static bool configureUnlockables = false;
 
+        public static bool useZeekScrap = true;
+        public static bool useZeekWeight = false;
+
         public static HashSet<string> enabledItemSettings = new HashSet<string>();
         public static HashSet<string> enabledEnemySettings = new HashSet<string>();
         public static HashSet<string> enabledMoonSettings = new HashSet<string>();
@@ -320,9 +323,11 @@ namespace LunarConfig.Objects.Config
             configEntry.AddField("Configure Moons", "Check this to generate and use configuration files for moons.", true);
             configEntry.AddField("Configure Dungeons", "Check this to generate and use configuration files for dungeons.", true);
             configEntry.AddField("Configure Map Objects", "Check this to generate and use configuration files for map objects.", true);
-            configEntry.AddField("Configure Unlockables", "Check this to generate and use configuration files for unlockables.", true);
+            //configEntry.AddField("Configure Unlockables", "Check this to generate and use configuration files for unlockables.", true);
             configEntry.AddField("Enable Backwards Compat", "Allows Lunar to look for config entries that are named using the previous v0.1.x system, I would advise turning this off after you have all your previous values.", false);
             configEntry.AddField("Clear Orphaned Entries", "WARNING: Enabling this will delete any config entries that get disabled when the configuration is refreshed!", false);
+            configEntry.AddField("Use Simple Scrap Value", "Checking this will make items have a scrap value that already anticipates the *0.4.", false);
+            configEntry.AddField("Use Simple Weight", "Checking this will make items have their weight in pounds, already converting from Zeeker's formula.", false);
             backCompat = configEntry.GetValue<bool>("Enable Backwards Compat");
             clearOrphans = configEntry.GetValue<bool>("Clear Orphaned Entries");
             configureItems = configEntry.GetValue<bool>("Configure Items");
@@ -330,7 +335,9 @@ namespace LunarConfig.Objects.Config
             configureMoons = configEntry.GetValue<bool>("Configure Moons");
             configureDungeons = configEntry.GetValue<bool>("Configure Dungeons");
             configureMapObjects = configEntry.GetValue<bool>("Configure Map Objects");
-            configureUnlockables = configEntry.GetValue<bool>("Configure Unlockables");
+            //configureUnlockables = configEntry.GetValue<bool>("Configure Unlockables");
+            useZeekScrap = !configEntry.GetValue<bool>("Use Simple Scrap Value");
+            useZeekWeight = !configEntry.GetValue<bool>("Use Simple Weight");
 
             if (configureItems)
             {
@@ -409,8 +416,7 @@ namespace LunarConfig.Objects.Config
                 configMoons.AddField("Risk Level", "Disable this to disable configuring this property in moon config entries.", true);
                 configMoons.AddField("Description", "Disable this to disable configuring this property in moon config entries.", true);
                 configMoons.AddField("Route Price", "Disable this to disable configuring this property in moon config entries.", true);
-                configMoons.AddField("Is Hidden?", "WARNING: If you enable this setting and don't enable 'Is Locked', it WILL cause issues.\nDisable this to disable configuring this property in moon config entries.", true);
-                configMoons.AddField("Is Locked?", "WARNING: If you enable this setting and don't enable 'Is Hidden', it WILL cause issues.\nDisable this to disable configuring this property in moon config entries.", true);
+                configMoons.AddField("Is Hidden? & Is Locked?", "Disable this to disable configuring these properties in moon config entries.", true);
                 configMoons.AddField("Can Be Challenge Moon?", "Disable this to disable configuring this property in moon config entries.", true);
                 configMoons.AddField("Has Time?", "Disable this to disable configuring this property in moon config entries.", true);
                 configMoons.AddField("Time Multiplier", "Disable this to disable configuring this property in moon config entries.", true);
@@ -598,9 +604,9 @@ namespace LunarConfig.Objects.Config
                             itemEntry.TryAddField(enabledItemSettings, "Scan Max Range", "Specifies the maximum distance the scan node can be scanned.", itemScanNode.maxRange);
                         }
 
-                        itemEntry.TryAddField(enabledItemSettings, "Minimum Value", "The minimum scrap value and item can have.\nTypically multiplied by 0.4, setting not applicable to non-scrap.\nDoes not work on items like Apparatus and items from enemies (Hives, Double-barrel).", itemObj.minValue);
-                        itemEntry.TryAddField(enabledItemSettings, "Maximum Value", "The maximum scrap value and item can have.\nTypically multiplied by 0.4, setting not applicable to non-scrap.\nDoes not work on items like Apparatus and items from enemies (Hives, Double-barrel).", itemObj.maxValue);
-                        itemEntry.TryAddField(enabledItemSettings, "Weight", "Specifies the weight of an item.\nCalculated with: (x - 1) * 105 = weight in pounds.", itemObj.weight);
+                        itemEntry.TryAddField(enabledItemSettings, "Minimum Value", "The minimum scrap value and item can have.\nTypically multiplied by 0.4, setting not applicable to non-scrap.\nDoes not work on items like Apparatus and items from enemies (Hives, Double-barrel).", useZeekScrap ? itemObj.minValue : (int)Math.Round(itemObj.minValue*0.4));
+                        itemEntry.TryAddField(enabledItemSettings, "Maximum Value", "The maximum scrap value and item can have.\nTypically multiplied by 0.4, setting not applicable to non-scrap.\nDoes not work on items like Apparatus and items from enemies (Hives, Double-barrel).", useZeekScrap ? itemObj.maxValue : (int)Math.Round(itemObj.maxValue*0.4));
+                        itemEntry.TryAddField(enabledItemSettings, "Weight", "Specifies the weight of an item.\nCalculated with: (x - 1) * 105 = weight in pounds.", useZeekWeight ? itemObj.weight : (itemObj.weight - 1) * 105);
                         itemEntry.TryAddField(enabledItemSettings, "Conductivity", "Specifies whether an item is conductive.", itemObj.isConductiveMetal);
                         itemEntry.TryAddField(enabledItemSettings, "Two-Handed", "Specifies whether an item is two-handed.", itemObj.twoHanded);
                         itemEntry.TryAddField(enabledItemSettings, "Is Scrap?", "Specifies if an item is scrap or gear.\nThis decides whether an item can be sold to the company for credits.", itemObj.isScrap);
@@ -647,9 +653,26 @@ namespace LunarConfig.Objects.Config
                                 itemEntry.TrySetValue(enabledItemSettings, "Scan Max Range", ref itemScanNode.maxRange);
                             }
 
-                            itemEntry.TrySetValue(enabledItemSettings, "Minimum Value", ref itemObj.minValue);
-                            itemEntry.TrySetValue(enabledItemSettings, "Maximum Value", ref itemObj.maxValue);
-                            itemEntry.TrySetValue(enabledItemSettings, "Weight", ref itemObj.weight);
+                            if (useZeekScrap)
+                            {
+                                itemEntry.TrySetValue(enabledItemSettings, "Minimum Value", ref itemObj.minValue);
+                                itemEntry.TrySetValue(enabledItemSettings, "Maximum Value", ref itemObj.maxValue);
+                            }
+                            else
+                            {
+                                if (enabledItemSettings.Contains("Minimum Value")) { itemObj.minValue = (int)Math.Round(itemEntry.GetValue<int>("Minimum Value") * 2.5); }
+                                if (enabledItemSettings.Contains("Maximum Value")) { itemObj.maxValue = (int)Math.Round(itemEntry.GetValue<int>("Maximum Value") * 2.5); }
+                            }
+
+                            if (useZeekWeight) 
+                            { 
+                                itemEntry.TrySetValue(enabledItemSettings, "Weight", ref itemObj.weight); 
+                            }
+                            else
+                            {
+                                if (enabledItemSettings.Contains("Weight")) { itemObj.weight = itemEntry.GetValue<float>("Weight") / 105 + 1; }
+                            }
+
                             itemEntry.TrySetValue(enabledItemSettings, "Conductivity", ref itemObj.isConductiveMetal);
                             itemEntry.TrySetValue(enabledItemSettings, "Two-Handed", ref itemObj.twoHanded);
                             itemEntry.TrySetValue(enabledItemSettings, "Is Scrap?", ref itemObj.isScrap);
@@ -1537,7 +1560,6 @@ namespace LunarConfig.Objects.Config
                     foreach (var obj in LethalContent.MapObjects)
                     {
                         string uuid = UUIDify(obj.Key.ToString());
-                        //if (uuid.StartsWith("lethal_company")) { continue; }
 
                         try
                         {
@@ -1614,7 +1636,6 @@ namespace LunarConfig.Objects.Config
                     foreach (var obj in LethalContent.MapObjects)
                     {
                         string uuid = UUIDify(obj.Key.ToString());
-                        //if (uuid.StartsWith("lethal_company")) { continue; }
 
                         try
                         {
@@ -1655,6 +1676,7 @@ namespace LunarConfig.Objects.Config
                             }
                             else
                             {
+                                MiniLogger.LogInfo($"{uuid} does not have an OutsideInfo");
                                 dawnObj.OutsideInfo = new DawnOutsideMapObjectInfo(newTable, false, 12, Array.Empty<string>(), Vector3.zero, false, 0);
                                 dawnObj.OutsideInfo.ParentInfo = dawnObj;
                             }
@@ -1733,8 +1755,27 @@ namespace LunarConfig.Objects.Config
                         if (purchaseInfo != null)
                         {
                             moonEntry.TryAddField(enabledMoonSettings, "Route Price", "Changes the price to route to the moon.", purchaseInfo.Cost.Provide());
-                            moonEntry.TryAddField(enabledMoonSettings, "Is Hidden?", "SORRY: This setting currently doesn't work, will be fixed soon.\nChanges if the moon is hidden in the terminal.", purchaseInfo.PurchasePredicate.CanPurchase() is TerminalPurchaseResult.HiddenPurchaseResult);
-                            moonEntry.TryAddField(enabledMoonSettings, "Is Locked?", "Changes if the moon is locked in the terminal.", purchaseInfo.PurchasePredicate.CanPurchase() is TerminalPurchaseResult.FailedPurchaseResult);
+                            if (enabledMoonSettings.Contains("Is Hidden? & Is Locked?"))
+                            {
+                                TerminalPurchaseResult result = purchaseInfo.PurchasePredicate.CanPurchase();
+                                bool isHidden = false;
+                                bool isLocked = false;
+                                if (result is TerminalPurchaseResult.HiddenPurchaseResult hiddenResult)
+                                {
+                                    isHidden = true;
+                                    if (hiddenResult.IsFailure)
+                                    {
+                                        isLocked = true;
+                                    }
+                                }
+                                else if (result is TerminalPurchaseResult.FailedPurchaseResult)
+                                {
+                                    isLocked = true;
+                                }
+
+                                moonEntry.AddField("Is Hidden?", "Changes if the moon is hidden in the terminal.", isHidden);
+                                moonEntry.AddField("Is Locked?", "Changes if the moon is locked in the terminal.", isLocked);
+                            }
                         }
 
                         string defaultScrap = "";
@@ -1880,6 +1921,11 @@ namespace LunarConfig.Objects.Config
                                 foreach (string tag in RemoveWhitespace(moonEntry.GetValue<string>("Tags")).Split(","))
                                 {
                                     string[] splits = tag.Split(":");
+                                    if (splits.Length != 2) 
+                                    {
+                                        MiniLogger.LogWarning($"Incorrectly formatted tag '{tag}' found on {numberlessName}");
+                                        continue; 
+                                    }
                                     newTags.Add(new NamespacedKey(splits[0], splits[1]));
                                 }
 
@@ -1915,22 +1961,32 @@ namespace LunarConfig.Objects.Config
                             if (purchaseInfo != null)
                             {
                                 if (enabledMoonSettings.Contains("Route Price")) { purchaseInfo.Cost = new SimpleProvider<int>(moonEntry.GetValue<int>("Route Price")); }
-                                if (enabledMoonSettings.Contains("Is Locked?"))
+                                if (enabledMoonSettings.Contains("Is Hidden? & Is Locked?"))
                                 {
                                     ITerminalPurchasePredicate predicate = ITerminalPurchasePredicate.AlwaysSuccess();
-                                    
-                                    if (moonEntry.GetValue<bool>("Is Locked?"))
+                                    bool isHidden = moonEntry.GetValue<bool>("Is Hidden?");
+                                    bool isLocked = moonEntry.GetValue<bool>("Is Locked?");
+                                    TerminalNode failNode = ScriptableObject.CreateInstance<TerminalNode>();
+                                    failNode.displayText = "Route Locked!";
+
+                                    if (isHidden)
                                     {
-                                        TerminalNode _node = ScriptableObject.CreateInstance<TerminalNode>();
-                                        _node.displayText = "Route Locked!";
-                                        predicate = ITerminalPurchasePredicate.AlwaysFail(_node);
+                                        if (isLocked)
+                                        {
+                                            predicate = new ConstantTerminalPredicate(new TerminalPurchaseResult.HiddenPurchaseResult().SetFailure(true).SetFailNode(failNode));
+                                        }
+                                        else
+                                        {
+                                            predicate = new ConstantTerminalPredicate(new TerminalPurchaseResult.HiddenPurchaseResult().SetFailure(false));
+                                        }
                                     }
-                                    /*
-                                    if (moonEntry.GetValue<bool>("Is Hidden?"))
+                                    else
                                     {
-                                        predicate = ITerminalPurchasePredicate.AlwaysHide();
+                                        if (isLocked)
+                                        {
+                                            predicate = new ConstantTerminalPredicate(new TerminalPurchaseResult.FailedPurchaseResult(failNode));
+                                        }
                                     }
-                                    */
 
                                     purchaseInfo.PurchasePredicate = predicate;
                                 }

@@ -55,4 +55,4 @@ Hopefully as I have time I intend to add some of the following:
 ## Credits
 
 * The Lethal Company Modding Discord, essentially enabling me to make this mod, as I likely couldn't have figured it out without some of the people there.
-* LLL, LL, and CRLib, for the most part having easy to access systems regarding objects (and of course making this mod possible in the first place by having custom content to configure).
+* DawnLib, for being mostly easier to use than accessing 4 different libraries. (and Xu especially for tolerating me for months)

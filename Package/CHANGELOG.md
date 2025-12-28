@@ -1,3 +1,34 @@
+## Version 0.2.7
+
+Fixes
+- Is Hidden? and Is Locked? work now!
+
+## Version 0.2.6
+
+Fixes
+- Removed some logging I forgot about.
+- Changed Dawn dependency version to one that has working route price.
+
+## Version 0.2.5
+
+Features
+- Added settings that allow scrap values and weight to be based off of the real values/weight, not Zeekers math.
+
+## Version 0.2.4
+
+Fixes
+- Depended on the correct version of DawnLib.
+
+## Version 0.2.3
+
+Fixes
+- Fixed me breaking something relating to map objects (maybe), full fix will come alongside a DawnLib update.
+
+## Version 0.2.2
+
+Fixes
+- Added a warning when a tag is improperly formatted (as opposed to just failing to register the moon).
+
 ## Version 0.2.1
 
 Fixes
