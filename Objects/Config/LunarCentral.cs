@@ -359,6 +359,7 @@ namespace LunarConfig.Objects.Config
                 configItems.AddField("Request Node Text", "Enable this to enable configuring this property in item config entries.", false);
                 configItems.AddField("Receipt Node Text", "Enable this to enable configuring this property in item config entries.", false);
                 configItems.AddField("Cost", "Disable this to disable configuring this property in item config entries.", true);
+                configItems.AddField("Tags", "Disable this to disable configuring this property in moon config entries.", true);
 
                 foreach (var setting in configItems.fields.Keys)
                 {
@@ -399,6 +400,8 @@ namespace LunarConfig.Objects.Config
 
                 configEnemies.AddField("Bestiary Text", "Enable this to enable configuring this property in enemy config entries.", false);
                 configEnemies.AddField("Bestiary Keyword", "Enable this to enable configuring this property in enemy config entries.", false);
+
+                configEnemies.AddField("Tags", "Disable this to disable configuring this property in moon config entries.", true);
 
                 foreach (var setting in configEnemies.fields.Keys)
                 {
@@ -457,6 +460,7 @@ namespace LunarConfig.Objects.Config
                 configDungeons.AddField("Map Tile Size", "Disable this to disable configuring this property in item config entries.", true);
                 configDungeons.AddField("Clamp Range Min", "Disable this to disable configuring this property in item config entries.", true);
                 configDungeons.AddField("Clamp Range Max", "Disable this to disable configuring this property in item config entries.", true);
+                configDungeons.AddField("Tags", "Disable this to disable configuring this property in moon config entries.", true);
 
                 foreach (var setting in configDungeons.fields.Keys)
                 {
@@ -482,6 +486,7 @@ namespace LunarConfig.Objects.Config
                 configMapObjects.AddField("(Outside) Spawnable Floor Tags", "Disable this to disable configuring this property in map object config entries.", true);
                 configMapObjects.AddField("(Outside) Face Away From Wall?", "Disable this to disable configuring this property in map object config entries.", true);
                 configMapObjects.AddField("(Outside) Level Curves", "Disable this to disable configuring this property in map object config entries.", true);
+                configMapObjects.AddField("Tags", "Disable this to disable configuring this property in moon config entries.", true);
 
                 foreach (var setting in configMapObjects.fields.Keys)
                 {
@@ -627,6 +632,8 @@ namespace LunarConfig.Objects.Config
                         itemEntry.TryAddField(enabledItemSettings, "Receipt Node Text", "The text of the terminal after purchasing an item. New lines are represented by semi-colons.", defaultReceiptText);
                         itemEntry.TryAddField(enabledItemSettings, "Cost", "The cost of the item if it is sold in the shop.", defaultCost);
 
+                        itemEntry.TryAddField(enabledMoonSettings, "Tags", "Tags allocated to the item.\nSeparate tags with commas.", String.Join(", ", dawnItem.AllTags()));
+
                         // LLL Backcompat
                         if (backCompat) { MigrateSection(itemFile.file, $"LLL - {itemObj.itemName}", $"{niceUUID} - {uuid}"); }
 
@@ -636,6 +643,24 @@ namespace LunarConfig.Objects.Config
                         // SETTING VALUES
                         if (itemEntry.GetValue<bool>("Configure Content"))
                         {
+                            if (enabledMoonSettings.Contains("Tags"))
+                            {
+                                HashSet<NamespacedKey> newTags = new HashSet<NamespacedKey>();
+
+                                foreach (string tag in RemoveWhitespace(itemEntry.GetValue<string>("Tags")).Split(","))
+                                {
+                                    string[] splits = tag.Split(":");
+                                    if (splits.Length != 2)
+                                    {
+                                        MiniLogger.LogWarning($"Incorrectly formatted tag '{tag}' found on {uuid}");
+                                        continue;
+                                    }
+                                    newTags.Add(new NamespacedKey(splits[0], splits[1]));
+                                }
+
+                                dawnItem._tags = newTags;
+                            }
+
                             dawnItem.Internal_AddTag(DawnLibTags.LunarConfig);
 
                             foreach (var key in itemEntry.GetValue<string>("Appropriate Aliases").Split(","))
@@ -916,6 +941,8 @@ namespace LunarConfig.Objects.Config
                         
                         if (word != null) { enemyEntry.TryAddField(enabledEnemySettings, "Bestiary Keyword", "The keyword to view the bestiary entry of an enemy.", word.word); }
 
+                        enemyEntry.TryAddField(enabledMoonSettings, "Tags", "Tags allocated to the enemy.\nSeparate tags with commas.", String.Join(", ", dawnEnemy.AllTags()));
+
                         // LLL Backcompat
                         if (backCompat) { MigrateSection(enemyFile.file, $"LLL - {enemyObj.enemyName}", $"{niceUUID} - {uuid}"); }
 
@@ -925,6 +952,24 @@ namespace LunarConfig.Objects.Config
                         // SETTING VALUES
                         if (enemyEntry.GetValue<bool>("Configure Content"))
                         {
+                            if (enabledMoonSettings.Contains("Tags"))
+                            {
+                                HashSet<NamespacedKey> newTags = new HashSet<NamespacedKey>();
+
+                                foreach (string tag in RemoveWhitespace(enemyEntry.GetValue<string>("Tags")).Split(","))
+                                {
+                                    string[] splits = tag.Split(":");
+                                    if (splits.Length != 2)
+                                    {
+                                        MiniLogger.LogWarning($"Incorrectly formatted tag '{tag}' found on {uuid}");
+                                        continue;
+                                    }
+                                    newTags.Add(new NamespacedKey(splits[0], splits[1]));
+                                }
+
+                                dawnEnemy._tags = newTags;
+                            }
+
                             dawnEnemy.Internal_AddTag(DawnLibTags.LunarConfig);
 
                             foreach (var key in enemyEntry.GetValue<string>("Appropriate Aliases").Split(","))
@@ -1268,9 +1313,29 @@ namespace LunarConfig.Objects.Config
                         dungeonEntry.TryAddField(enabledDungeonSettings, "Clamp Range Min", "The minimum of the dungeon's clamp range.", dawnDungeon.DungeonClampRange.Min);
                         dungeonEntry.TryAddField(enabledDungeonSettings, "Clamp Range Max", "The maximum of the dungeon's clamp range.", dawnDungeon.DungeonClampRange.Max);
 
+                        dungeonEntry.TryAddField(enabledMoonSettings, "Tags", "Tags allocated to the dungeon.\nSeparate tags with commas.", String.Join(", ", dawnDungeon.AllTags()));
+
                         // SETTING VALUES
                         if (dungeonEntry.GetValue<bool>("Configure Content"))
                         {
+                            if (enabledMoonSettings.Contains("Tags"))
+                            {
+                                HashSet<NamespacedKey> newTags = new HashSet<NamespacedKey>();
+
+                                foreach (string tag in RemoveWhitespace(dungeonEntry.GetValue<string>("Tags")).Split(","))
+                                {
+                                    string[] splits = tag.Split(":");
+                                    if (splits.Length != 2)
+                                    {
+                                        MiniLogger.LogWarning($"Incorrectly formatted tag '{tag}' found on {uuid}");
+                                        continue;
+                                    }
+                                    newTags.Add(new NamespacedKey(splits[0], splits[1]));
+                                }
+
+                                dawnDungeon._tags = newTags;
+                            }
+
                             dawnDungeon.Internal_AddTag(DawnLibTags.LunarConfig);
 
                             foreach (var key in dungeonEntry.GetValue<string>("Appropriate Aliases").Split(","))
@@ -1452,9 +1517,29 @@ namespace LunarConfig.Objects.Config
                             objEntry.TryAddField(enabledMapObjectSettings, "(Outside) Face Away From Wall?", "Specifies whether the object should spawn facing away from a wall.", false);
                         }
 
+                        objEntry.TryAddField(enabledMoonSettings, "Tags", "Tags allocated to the map object.\nSeparate tags with commas.", String.Join(", ", dawnObj.AllTags()));
+
                         // SETTING VALUES
                         if (objEntry.GetValue<bool>("Configure Content"))
                         {
+                            if (enabledMoonSettings.Contains("Tags"))
+                            {
+                                HashSet<NamespacedKey> newTags = new HashSet<NamespacedKey>();
+
+                                foreach (string tag in RemoveWhitespace(objEntry.GetValue<string>("Tags")).Split(","))
+                                {
+                                    string[] splits = tag.Split(":");
+                                    if (splits.Length != 2)
+                                    {
+                                        MiniLogger.LogWarning($"Incorrectly formatted tag '{tag}' found on {uuid}");
+                                        continue;
+                                    }
+                                    newTags.Add(new NamespacedKey(splits[0], splits[1]));
+                                }
+
+                                dawnObj._tags = newTags;
+                            }
+
                             dawnObj.Internal_AddTag(DawnLibTags.LunarConfig);
 
                             foreach (var key in objEntry.GetValue<string>("Appropriate Aliases").Split(","))
@@ -1923,7 +2008,7 @@ namespace LunarConfig.Objects.Config
                                     string[] splits = tag.Split(":");
                                     if (splits.Length != 2) 
                                     {
-                                        MiniLogger.LogWarning($"Incorrectly formatted tag '{tag}' found on {numberlessName}");
+                                        MiniLogger.LogWarning($"Incorrectly formatted tag '{tag}' found on {uuid}");
                                         continue; 
                                     }
                                     newTags.Add(new NamespacedKey(splits[0], splits[1]));
