@@ -1,3 +1,12 @@
+## Version 0.2.8
+
+Features
+- Added tags on everything! (mostly useless for now)
+- Added configuration for unlockables (furniture, suits, ship upgrades)
+
+Fixes
+- Prevented meddling with DawnLib tags.
+
 ## Version 0.2.7
 
 Fixes

@@ -1,4 +1,4 @@
-Lunar Config is an all-in-one configuration mod for Lethal Company. Lunar Config currently allows you to change various properties around items, enemies, moons, and map objects (traps) with more planned in the future. It should register almost anything from any mod and vanilla, it does require DawnLib and BepInEx in order to function!).
+Lunar Config is an all-in-one configuration mod for Lethal Company. Lunar Config currently allows you to change various properties around items, enemies, moons, unlockables, and map objects (traps). It should register almost anything from any mod and vanilla, it does require DawnLib and BepInEx in order to function!).
 
 # Notice!
 

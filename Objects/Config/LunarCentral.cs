@@ -323,7 +323,7 @@ namespace LunarConfig.Objects.Config
             configEntry.AddField("Configure Moons", "Check this to generate and use configuration files for moons.", true);
             configEntry.AddField("Configure Dungeons", "Check this to generate and use configuration files for dungeons.", true);
             configEntry.AddField("Configure Map Objects", "Check this to generate and use configuration files for map objects.", true);
-            //configEntry.AddField("Configure Unlockables", "Check this to generate and use configuration files for unlockables.", true);
+            configEntry.AddField("Configure Unlockables", "Check this to generate and use configuration files for unlockables.", true);
             configEntry.AddField("Enable Backwards Compat", "Allows Lunar to look for config entries that are named using the previous v0.1.x system, I would advise turning this off after you have all your previous values.", false);
             configEntry.AddField("Clear Orphaned Entries", "WARNING: Enabling this will delete any config entries that get disabled when the configuration is refreshed!", false);
             configEntry.AddField("Use Simple Scrap Value", "Checking this will make items have a scrap value that already anticipates the *0.4.", false);
@@ -335,7 +335,7 @@ namespace LunarConfig.Objects.Config
             configureMoons = configEntry.GetValue<bool>("Configure Moons");
             configureDungeons = configEntry.GetValue<bool>("Configure Dungeons");
             configureMapObjects = configEntry.GetValue<bool>("Configure Map Objects");
-            //configureUnlockables = configEntry.GetValue<bool>("Configure Unlockables");
+            configureUnlockables = configEntry.GetValue<bool>("Configure Unlockables");
             useZeekScrap = !configEntry.GetValue<bool>("Use Simple Scrap Value");
             useZeekWeight = !configEntry.GetValue<bool>("Use Simple Weight");
 
@@ -496,27 +496,24 @@ namespace LunarConfig.Objects.Config
                     }
                 }
             }
-            /*
+            
             if (configureUnlockables)
             {
                 LunarConfigEntry configUnlockables = centralFile.AddEntry("Enabled Unlockable Settings");
-                configUnlockables.AddField("Display Name", "Disable this to disable configuring this property in item config entries.", true);
-                DawnUnlockableItemInfo a = null;
-
-                a.UnlockableItem.alreadyUnlocked;
-                a.UnlockableItem.alwaysInStock;
-                a.UnlockableItem.canBeStored;
-                a.UnlockableItem.IsPlaceable;
-                a.UnlockableItem.luckValue;
-                a.UnlockableItem.maxNumber;
-                a.UnlockableItem.unlockedInChallengeFile;
-                a.BuyKeyword;
-                a.ConfirmNode;
-                a.InfoNode;
-                a.RequestNode;
-                a.UnlockableItem.shopSelectionNode;
-                a.DawnPurchaseInfo.Cost;
-                a.DawnPurchaseInfo.PurchasePredicate;
+                configUnlockables.AddField("Already Unlocked", "Disable this to disable configuring this property in unlockable config entries.", true);
+                configUnlockables.AddField("Always In Stock", "Disable this to disable configuring this property in unlockable config entries.", true);
+                configUnlockables.AddField("Can Store?", "Disable this to disable configuring this property in unlockable config entries.", true);
+                configUnlockables.AddField("Is Placeable?", "Disable this to disable configuring this property in unlockable config entries.", true);
+                configUnlockables.AddField("Luck Value", "Disable this to disable configuring this property in unlockable config entries.", true);
+                configUnlockables.AddField("Max Number", "Disable this to disable configuring this property in unlockable config entries.", true);
+                configUnlockables.AddField("Unlocked In Challenge File", "Disable this to disable configuring this property in unlockable config entries.", true);
+                configUnlockables.AddField("Buy Keyword", "Enable this to enable configuring this property in unlockable config entries.", false);
+                configUnlockables.AddField("Confirm Node Text", "Enable this to enable configuring this property in unlockable config entries.", false);
+                configUnlockables.AddField("Info Node Text", "Enable this to enable configuring this property in unlockable config entries.", false);
+                configUnlockables.AddField("Request Node Text", "Enable this to enable configuring this property in unlockable config entries.", false);
+                configUnlockables.AddField("Shop Selection Node Text", "Enable this to enable configuring this property in unlockable config entries.", false);
+                configUnlockables.AddField("Cost", "Disable this to disable configuring this property in unlockable config entries.", true);
+                configUnlockables.AddField("Tags", "Disable this to disable configuring this property in unlockable config entries.", true);
 
                 foreach (var setting in configUnlockables.fields.Keys)
                 {
@@ -526,7 +523,7 @@ namespace LunarConfig.Objects.Config
                     }
                 }
             }
-            */
+            
 
             ClearOrphanedEntries(centralFile.file);
             centralFile.file.Save();
@@ -632,7 +629,7 @@ namespace LunarConfig.Objects.Config
                         itemEntry.TryAddField(enabledItemSettings, "Receipt Node Text", "The text of the terminal after purchasing an item. New lines are represented by semi-colons.", defaultReceiptText);
                         itemEntry.TryAddField(enabledItemSettings, "Cost", "The cost of the item if it is sold in the shop.", defaultCost);
 
-                        itemEntry.TryAddField(enabledMoonSettings, "Tags", "Tags allocated to the item.\nSeparate tags with commas.", String.Join(", ", dawnItem.AllTags()));
+                        itemEntry.TryAddField(enabledItemSettings, "Tags", "Tags allocated to the item.\nSeparate tags with commas.", String.Join(", ", dawnItem.AllTags().Where(tag => tag.Namespace != "dawn_lib")));
 
                         // LLL Backcompat
                         if (backCompat) { MigrateSection(itemFile.file, $"LLL - {itemObj.itemName}", $"{niceUUID} - {uuid}"); }
@@ -643,11 +640,11 @@ namespace LunarConfig.Objects.Config
                         // SETTING VALUES
                         if (itemEntry.GetValue<bool>("Configure Content"))
                         {
-                            if (enabledMoonSettings.Contains("Tags"))
+                            if (enabledItemSettings.Contains("Tags"))
                             {
                                 HashSet<NamespacedKey> newTags = new HashSet<NamespacedKey>();
 
-                                foreach (string tag in RemoveWhitespace(itemEntry.GetValue<string>("Tags")).Split(","))
+                                foreach (string tag in RemoveWhitespace(itemEntry.GetValue<string>("Tags")).ToLower().Split(","))
                                 {
                                     string[] splits = tag.Split(":");
                                     if (splits.Length != 2)
@@ -655,7 +652,19 @@ namespace LunarConfig.Objects.Config
                                         MiniLogger.LogWarning($"Incorrectly formatted tag '{tag}' found on {uuid}");
                                         continue;
                                     }
-                                    newTags.Add(new NamespacedKey(splits[0], splits[1]));
+
+                                    if (splits[0] != "dawn_lib")
+                                    {
+                                        newTags.Add(new NamespacedKey(splits[0], splits[1]));
+                                    }
+                                }
+
+                                foreach (NamespacedKey tag in dawnItem._tags)
+                                {
+                                    if (tag.Namespace == "dawn_lib")
+                                    {
+                                        newTags.Add(tag);
+                                    }
                                 }
 
                                 dawnItem._tags = newTags;
@@ -941,7 +950,7 @@ namespace LunarConfig.Objects.Config
                         
                         if (word != null) { enemyEntry.TryAddField(enabledEnemySettings, "Bestiary Keyword", "The keyword to view the bestiary entry of an enemy.", word.word); }
 
-                        enemyEntry.TryAddField(enabledMoonSettings, "Tags", "Tags allocated to the enemy.\nSeparate tags with commas.", String.Join(", ", dawnEnemy.AllTags()));
+                        enemyEntry.TryAddField(enabledItemSettings, "Tags", "Tags allocated to the enemy.\nSeparate tags with commas.", String.Join(", ", dawnEnemy.AllTags().Where(tag => tag.Namespace != "dawn_lib")));
 
                         // LLL Backcompat
                         if (backCompat) { MigrateSection(enemyFile.file, $"LLL - {enemyObj.enemyName}", $"{niceUUID} - {uuid}"); }
@@ -952,11 +961,11 @@ namespace LunarConfig.Objects.Config
                         // SETTING VALUES
                         if (enemyEntry.GetValue<bool>("Configure Content"))
                         {
-                            if (enabledMoonSettings.Contains("Tags"))
+                            if (enabledEnemySettings.Contains("Tags"))
                             {
                                 HashSet<NamespacedKey> newTags = new HashSet<NamespacedKey>();
 
-                                foreach (string tag in RemoveWhitespace(enemyEntry.GetValue<string>("Tags")).Split(","))
+                                foreach (string tag in RemoveWhitespace(enemyEntry.GetValue<string>("Tags")).ToLower().Split(","))
                                 {
                                     string[] splits = tag.Split(":");
                                     if (splits.Length != 2)
@@ -964,7 +973,19 @@ namespace LunarConfig.Objects.Config
                                         MiniLogger.LogWarning($"Incorrectly formatted tag '{tag}' found on {uuid}");
                                         continue;
                                     }
-                                    newTags.Add(new NamespacedKey(splits[0], splits[1]));
+
+                                    if (splits[0] != "dawn_lib")
+                                    {
+                                        newTags.Add(new NamespacedKey(splits[0], splits[1]));
+                                    }
+                                }
+
+                                foreach (NamespacedKey tag in dawnEnemy._tags)
+                                {
+                                    if (tag.Namespace == "dawn_lib")
+                                    {
+                                        newTags.Add(tag);
+                                    }
                                 }
 
                                 dawnEnemy._tags = newTags;
@@ -1313,16 +1334,16 @@ namespace LunarConfig.Objects.Config
                         dungeonEntry.TryAddField(enabledDungeonSettings, "Clamp Range Min", "The minimum of the dungeon's clamp range.", dawnDungeon.DungeonClampRange.Min);
                         dungeonEntry.TryAddField(enabledDungeonSettings, "Clamp Range Max", "The maximum of the dungeon's clamp range.", dawnDungeon.DungeonClampRange.Max);
 
-                        dungeonEntry.TryAddField(enabledMoonSettings, "Tags", "Tags allocated to the dungeon.\nSeparate tags with commas.", String.Join(", ", dawnDungeon.AllTags()));
+                        dungeonEntry.TryAddField(enabledDungeonSettings, "Tags", "Tags allocated to the dungeon.\nSeparate tags with commas.", String.Join(", ", dawnDungeon.AllTags().Where(tag => tag.Namespace != "dawn_lib")));
 
                         // SETTING VALUES
                         if (dungeonEntry.GetValue<bool>("Configure Content"))
                         {
-                            if (enabledMoonSettings.Contains("Tags"))
+                            if (enabledDungeonSettings.Contains("Tags"))
                             {
                                 HashSet<NamespacedKey> newTags = new HashSet<NamespacedKey>();
 
-                                foreach (string tag in RemoveWhitespace(dungeonEntry.GetValue<string>("Tags")).Split(","))
+                                foreach (string tag in RemoveWhitespace(dungeonEntry.GetValue<string>("Tags")).ToLower().Split(","))
                                 {
                                     string[] splits = tag.Split(":");
                                     if (splits.Length != 2)
@@ -1330,7 +1351,19 @@ namespace LunarConfig.Objects.Config
                                         MiniLogger.LogWarning($"Incorrectly formatted tag '{tag}' found on {uuid}");
                                         continue;
                                     }
-                                    newTags.Add(new NamespacedKey(splits[0], splits[1]));
+
+                                    if (splits[0] != "dawn_lib")
+                                    {
+                                        newTags.Add(new NamespacedKey(splits[0], splits[1]));
+                                    }
+                                }
+
+                                foreach (NamespacedKey tag in dawnDungeon._tags)
+                                {
+                                    if (tag.Namespace == "dawn_lib")
+                                    {
+                                        newTags.Add(tag);
+                                    }
                                 }
 
                                 dawnDungeon._tags = newTags;
@@ -1517,16 +1550,16 @@ namespace LunarConfig.Objects.Config
                             objEntry.TryAddField(enabledMapObjectSettings, "(Outside) Face Away From Wall?", "Specifies whether the object should spawn facing away from a wall.", false);
                         }
 
-                        objEntry.TryAddField(enabledMoonSettings, "Tags", "Tags allocated to the map object.\nSeparate tags with commas.", String.Join(", ", dawnObj.AllTags()));
+                        objEntry.TryAddField(enabledMapObjectSettings, "Tags", "Tags allocated to the map object.\nSeparate tags with commas.", String.Join(", ", dawnObj.AllTags().Where(tag => tag.Namespace != "dawn_lib")));
 
                         // SETTING VALUES
                         if (objEntry.GetValue<bool>("Configure Content"))
                         {
-                            if (enabledMoonSettings.Contains("Tags"))
+                            if (enabledMapObjectSettings.Contains("Tags"))
                             {
                                 HashSet<NamespacedKey> newTags = new HashSet<NamespacedKey>();
 
-                                foreach (string tag in RemoveWhitespace(objEntry.GetValue<string>("Tags")).Split(","))
+                                foreach (string tag in RemoveWhitespace(objEntry.GetValue<string>("Tags")).ToLower().Split(","))
                                 {
                                     string[] splits = tag.Split(":");
                                     if (splits.Length != 2)
@@ -1534,7 +1567,19 @@ namespace LunarConfig.Objects.Config
                                         MiniLogger.LogWarning($"Incorrectly formatted tag '{tag}' found on {uuid}");
                                         continue;
                                     }
-                                    newTags.Add(new NamespacedKey(splits[0], splits[1]));
+
+                                    if (splits[0] != "dawn_lib")
+                                    {
+                                        newTags.Add(new NamespacedKey(splits[0], splits[1]));
+                                    }
+                                }
+
+                                foreach (NamespacedKey tag in dawnObj._tags)
+                                {
+                                    if (tag.Namespace == "dawn_lib")
+                                    {
+                                        newTags.Add(tag);
+                                    }
                                 }
 
                                 dawnObj._tags = newTags;
@@ -1952,7 +1997,7 @@ namespace LunarConfig.Objects.Config
                         moonEntry.TryAddField(enabledMoonSettings, "Value Multiplier", "The multiplier applied to the value of a moon's scrap.", 1f);
                         moonEntry.TryAddField(enabledMoonSettings, "Amount Multiplier", "The multiplier applied to the amount of scrap a moon has.", 1f);
 
-                        moonEntry.TryAddField(enabledMoonSettings, "Tags", "Tags allocated to the moon.\nSeparate tags with commas.", String.Join(", ", dawnMoon.AllTags()));
+                        moonEntry.TryAddField(enabledMoonSettings, "Tags", "Tags allocated to the moon.\nSeparate tags with commas.", String.Join(", ", dawnMoon.AllTags().Where(tag => tag.Namespace != "dawn_lib")));
 
                         moonEntry.TryAddField(enabledMoonSettings, "Spawnable Scrap", "The base scrap that can spawn on the moon.\nDenoted with NAME:RARITY, separated with commas.", defaultScrap);
                         moonEntry.TryAddField(enabledMoonSettings, "Spawnable Daytime Enemies", "The base daytime enemies that can spawn on the moon.\nDenoted with NAME:RARITY, separated with commas.", defaultDayEnemies);
@@ -2003,15 +2048,27 @@ namespace LunarConfig.Objects.Config
                             {
                                 HashSet<NamespacedKey> newTags = new HashSet<NamespacedKey>();
 
-                                foreach (string tag in RemoveWhitespace(moonEntry.GetValue<string>("Tags")).Split(","))
+                                foreach (string tag in RemoveWhitespace(moonEntry.GetValue<string>("Tags")).ToLower().Split(","))
                                 {
                                     string[] splits = tag.Split(":");
-                                    if (splits.Length != 2) 
+                                    if (splits.Length != 2)
                                     {
                                         MiniLogger.LogWarning($"Incorrectly formatted tag '{tag}' found on {uuid}");
-                                        continue; 
+                                        continue;
                                     }
-                                    newTags.Add(new NamespacedKey(splits[0], splits[1]));
+
+                                    if (splits[0] != "dawn_lib")
+                                    {
+                                        newTags.Add(new NamespacedKey(splits[0], splits[1]));
+                                    }
+                                }
+
+                                foreach (NamespacedKey tag in dawnMoon._tags)
+                                {
+                                    if (tag.Namespace == "dawn_lib")
+                                    {
+                                        newTags.Add(tag);
+                                    }
                                 }
 
                                 dawnMoon._tags = newTags;
@@ -2189,58 +2246,141 @@ namespace LunarConfig.Objects.Config
             InitDungeonWeights();
         }
 
-        /*
-        public void InitDungeons()
+        public void InitUnlockables()
         {
-            MiniLogger.LogInfo("Initializing Dungeon Configuration...");
-
-            LunarConfigFile dungeonFile = AddFile(LunarConfig.DUNGEON_FILE, LunarConfig.DUNGEON_FILE_NAME);
-            dungeonFile.file.SaveOnConfigSet = false;
-
-            LunarConfigEntry enabledEntry = files[LunarConfig.CENTRAL_FILE_NAME].entries["Enabled Dungeon Settings"];
-            HashSet<string> enabledSettings = new HashSet<string>();
-
-            foreach (var setting in enabledEntry.fields.Keys)
+            if (!centralInitialized)
             {
-                if (enabledEntry.GetValue<bool>(setting))
-                {
-                    enabledSettings.Add(setting);
-                }
+                InitCentral();
             }
 
-            HashSet<string> registeredDungeons = new HashSet<string>();
-
-            // LLL/Vanilla Content
-            foreach (var dungeon in PatchedContent.ExtendedDungeonFlows)
+            MiniLogger.LogInfo("Initializing Unlockables");
+            if (configureUnlockables)
             {
-                string dungeonUUID = UUIDify($"LLL - {dungeon.DungeonName} ({dungeon.UniqueIdentificationName})");
-                if (!registeredDungeons.Contains(dungeonUUID))
+                LunarConfigFile unlockableFile = AddFile(LunarConfig.BUYABLE_FILE, LunarConfig.BUYABLE_FILE_NAME);
+                unlockableFile.file.SaveOnConfigSet = false;
+
+                foreach (var unlockable in LethalContent.Unlockables)
                 {
-                    DungeonFlow dungeonObj = dungeon.DungeonFlow;
-                    LunarConfigEntry dungeonEntry = dungeonFile.AddEntry(dungeonUUID);
-                    MiniLogger.LogInfo($"Recording {dungeon.name}...");
-                    dungeonEntry.AddField("Configure Content", "Enable to change any of the settings below.", false);
-                    dungeonEntry.AddField("Appropriate Aliases", "Changing this setting will do nothing, these are the names which LunarConfig will recognize as this object in other config options.\nThey are case-insensitve and do not regard whitespace.", $"{dungeon.DungeonName}, {dungeon.DungeonFlow.name}");
+                    string uuid = UUIDify(unlockable.Key.ToString());
 
-                    if (enabledSettings.Contains("Enable Dynamic Restriction")) { dungeonEntry.AddField("Enable Dynamic Restriction", "I don't know.", dungeon.IsDynamicDungeonSizeRestrictionEnabled); }
-                    if (enabledSettings.Contains("Dynamic Dungeon Size Lerp Rate")) { dungeonEntry.AddField("Dynamic Dungeon Size Lerp Rate", "I don't know.", dungeon.DynamicDungeonSizeLerpRate); }
-                    if (enabledSettings.Contains("Dynamic Dungeon Size Min")) { dungeonEntry.AddField("Dynamic Dungeon Size Min", "I don't know.", dungeon.DynamicDungeonSizeMinMax.x); }
-                    if (enabledSettings.Contains("Dynamic Dungeon Size Max")) { dungeonEntry.AddField("Dynamic Dungeon Size Max", "I don't know.", dungeon.DynamicDungeonSizeMinMax.y); }
-                    if (enabledSettings.Contains("Random Size Min")) { dungeonEntry.AddField("Random Size Min", "I don't know.", dungeon.DungeonFlow.Length.Min); }
-                    if (enabledSettings.Contains("Random Size Max")) { dungeonEntry.AddField("Random Size Max", "I don't know.", dungeon.DungeonFlow.Length.Max); }
-                    if (enabledSettings.Contains("Map Tile Size")) { dungeonEntry.AddField("Map Tile Size", "I don't know.", dungeon.MapTileSize); }
-                    MiniLogger.LogInfo($"Recorded {dungeon.name}");
-                    registeredDungeons.Add(dungeonUUID);
+                    try
+                    {
+                        string niceUUID = NiceifyDawnUUID(uuid);
+                        DawnUnlockableItemInfo dawnUnlockable = unlockable.Value;
+                        LunarConfigEntry unlockableEntry = unlockableFile.AddEntry($"{niceUUID} - {uuid}");
+
+                        UnlockableItem unlockableItem = dawnUnlockable.UnlockableItem;
+                        TerminalNode? infoNode = null;
+                        TerminalNode? requestNode = null;
+                        TerminalNode? confirmNode = null;
+                        TerminalKeyword buyWord = null;
+                        DawnPurchaseInfo purchaseInfo = dawnUnlockable.DawnPurchaseInfo;
+
+                        if (dawnUnlockable.InfoNode != null)
+                        {
+                            infoNode = dawnUnlockable.InfoNode;
+                        }
+
+                        if (dawnUnlockable.RequestNode != null)
+                        {
+                            requestNode = dawnUnlockable.RequestNode;
+                        }
+
+                        if (dawnUnlockable.ConfirmNode != null)
+                        {
+                            confirmNode = dawnUnlockable.ConfirmNode;
+                        }
+
+                        if (dawnUnlockable.BuyKeyword != null)
+                        {
+                            buyWord = dawnUnlockable.BuyKeyword;
+                        }
+
+                        // GETTING VALUES (for config)
+                        unlockableEntry.AddField("Configure Content", "Enable to change any of the settings below.", false);
+                        unlockableEntry.TryAddField(enabledUnlockableSettings, "Already Unlocked", "NOTE: With furniture and ship upgrades, it may only appear after refreshing the save. Whether or not the unlockable has already been unlocked.", unlockableItem.alreadyUnlocked);
+                        unlockableEntry.TryAddField(enabledUnlockableSettings, "Always In Stock", "Whether or not the unlockable is always in stock.", unlockableItem.alwaysInStock);
+                        unlockableEntry.TryAddField(enabledUnlockableSettings, "Can Store?", "Whether or not the unlockable can be stored.", unlockableItem.canBeStored);
+                        unlockableEntry.TryAddField(enabledUnlockableSettings, "Is Placeable", "Whether or not the unlockable is placeable.", unlockableItem.IsPlaceable);
+                        unlockableEntry.TryAddField(enabledUnlockableSettings, "Luck Value", "The luck value the unlockable.", unlockableItem.luckValue);
+                        unlockableEntry.TryAddField(enabledUnlockableSettings, "Max Number", "The max number of the unlockable.", unlockableItem.maxNumber);
+                        unlockableEntry.TryAddField(enabledUnlockableSettings, "Unlocked In Challenge File", "Whether or not the unlockable is unlocked in a challenge file.", unlockableItem.unlockedInChallengeFile);
+                        if (buyWord != null) { unlockableEntry.TryAddField(enabledUnlockableSettings, "Buy Keyword", "The keyword used to buy the unlockable.", buyWord.word); }
+
+                        if (infoNode != null && enabledUnlockableSettings.Contains("Info Node Text")) { unlockableEntry.AddField<string>("Info Node Text", "The text of the info node of the unlockable", infoNode.displayText.Replace("\n", ";")); }
+                        if (requestNode != null && enabledUnlockableSettings.Contains("Request Node Text")) { unlockableEntry.AddField<string>("Request Node Text", "The text of the request node of the unlockable", requestNode.displayText.Replace("\n", ";")); }
+                        if (confirmNode != null && enabledUnlockableSettings.Contains("Confirm Node Text")) { unlockableEntry.AddField<string>("Confirm Node Text", "The text of the confirm node of the unlockable", confirmNode.displayText.Replace("\n", ";")); }
+
+                        unlockableEntry.TryAddField(enabledUnlockableSettings, "Shop Selection Node Text", "The text of the shop selection node of the unlockable.", unlockableItem.shopSelectionNode);
+                        unlockableEntry.TryAddField(enabledUnlockableSettings, "Cost", "The cost of the unlockable.", purchaseInfo.Cost.Provide());
+
+                        unlockableEntry.TryAddField(enabledUnlockableSettings, "Tags", "Tags allocated to the unlockable.\nSeparate tags with commas.", String.Join(", ", dawnUnlockable.AllTags().Where(tag => tag.Namespace != "dawn_lib")));
+
+                        // SETTING VALUES
+                        if (unlockableEntry.GetValue<bool>("Configure Content"))
+                        {
+                            if (enabledUnlockableSettings.Contains("Tags"))
+                            {
+                                HashSet<NamespacedKey> newTags = new HashSet<NamespacedKey>();
+
+                                foreach (string tag in RemoveWhitespace(unlockableEntry.GetValue<string>("Tags")).ToLower().Split(","))
+                                {
+                                    string[] splits = tag.Split(":");
+                                    if (splits.Length != 2)
+                                    {
+                                        MiniLogger.LogWarning($"Incorrectly formatted tag '{tag}' found on {uuid}");
+                                        continue;
+                                    }
+
+                                    if (splits[0] != "dawn_lib")
+                                    {
+                                        newTags.Add(new NamespacedKey(splits[0], splits[1]));
+                                    }
+                                }
+
+                                foreach (NamespacedKey tag in dawnUnlockable._tags)
+                                {
+                                    if (tag.Namespace == "dawn_lib")
+                                    {
+                                        newTags.Add(tag);
+                                    }
+                                }
+
+                                dawnUnlockable._tags = newTags;
+                            }
+
+                            dawnUnlockable.Internal_AddTag(DawnLibTags.LunarConfig);
+
+                            unlockableEntry.TrySetValue(enabledUnlockableSettings, "Already Unlocked", ref unlockableItem.alreadyUnlocked);
+                            unlockableEntry.TrySetValue(enabledUnlockableSettings, "Always In Stock", ref unlockableItem.alwaysInStock);
+                            unlockableEntry.TrySetValue(enabledUnlockableSettings, "Can Store?", ref unlockableItem.canBeStored);
+                            unlockableEntry.TrySetValue(enabledUnlockableSettings, "Is Placeable", ref unlockableItem.IsPlaceable);
+                            unlockableEntry.TrySetValue(enabledUnlockableSettings, "Luck Value", ref unlockableItem.luckValue);
+                            unlockableEntry.TrySetValue(enabledUnlockableSettings, "Max Number", ref unlockableItem.maxNumber);
+                            unlockableEntry.TrySetValue(enabledUnlockableSettings, "Unlocked In Challenge File", ref unlockableItem.unlockedInChallengeFile);
+                            if (buyWord != null && enabledUnlockableSettings.Contains("Buy Keyword")) { buyWord.word = unlockableEntry.GetValue<string>("Buy Keyword"); }
+
+                            if (infoNode != null && enabledUnlockableSettings.Contains("Info Node Text")) { unlockableEntry.SetValue<string>("Info Node Text", ref infoNode.displayText); }
+                            if (requestNode != null && enabledUnlockableSettings.Contains("Request Node Text")) { unlockableEntry.SetValue<string>("Request Node Text", ref requestNode.displayText); }
+                            if (confirmNode != null && enabledUnlockableSettings.Contains("Confirm Node Text")) { unlockableEntry.SetValue<string>("Confirm Node Text", ref confirmNode.displayText); }
+
+                            unlockableEntry.TrySetValue(enabledUnlockableSettings, "Shop Selection Node Text", ref unlockableItem.shopSelectionNode);
+                            if (enabledUnlockableSettings.Contains("Cost")) { purchaseInfo.Cost = new SimpleProvider<int>(unlockableEntry.GetValue<int>("Cost")); }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        MiniLogger.LogError($"LunarConfig encountered an issue while configuring {uuid}, please report this!\n{e}");
+                    }
                 }
+
+                ClearOrphanedEntries(unlockableFile.file);
+                unlockableFile.file.Save();
+                unlockableFile.file.SaveOnConfigSet = true;
             }
-
-            ClearOrphanedEntries(dungeonFile.file);
-            dungeonFile.file.Save();
-            dungeonFile.file.SaveOnConfigSet = true;
-
-            MiniLogger.LogInfo("Dungeon Configuration Initialized!");
+            
+            MiniLogger.LogInfo("Completed Initializing Unlockables");
         }
-        */
 
         public LunarConfigFile AddFile(string path, string name)
         {

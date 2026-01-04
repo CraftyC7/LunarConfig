@@ -1,24 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\pataa\\Desktop\\LCDev\\LunarConfig\\LunarConfig.csproj": {}
+    "C:\\Users\\craft\\OneDrive\\Desktop\\LCDev\\LunarConfig\\LunarConfig.csproj": {}
   },
   "projects": {
-    "C:\\Users\\pataa\\Desktop\\LCDev\\LunarConfig\\LunarConfig.csproj": {
+    "C:\\Users\\craft\\OneDrive\\Desktop\\LCDev\\LunarConfig\\LunarConfig.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\pataa\\Desktop\\LCDev\\LunarConfig\\LunarConfig.csproj",
+        "projectUniqueName": "C:\\Users\\craft\\OneDrive\\Desktop\\LCDev\\LunarConfig\\LunarConfig.csproj",
         "projectName": "Crafty.LunarConfig",
-        "projectPath": "C:\\Users\\pataa\\Desktop\\LCDev\\LunarConfig\\LunarConfig.csproj",
-        "packagesPath": "C:\\Users\\pataa\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\pataa\\Desktop\\LCDev\\LunarConfig\\obj\\",
+        "projectPath": "C:\\Users\\craft\\OneDrive\\Desktop\\LCDev\\LunarConfig\\LunarConfig.csproj",
+        "packagesPath": "C:\\Users\\craft\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\craft\\OneDrive\\Desktop\\LCDev\\LunarConfig\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\pataa\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Users\\craft\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -29,8 +25,7 @@
           "https://api.nuget.org/v3/index.json": {},
           "https://api.nuget.org/v3/index.json": {},
           "https://nuget.bepinex.dev/v3/index.json": {},
-          "https://nuget.bepinex.dev/v3/index.json": {},
-          "https://nuget.windows10ce.com/nuget/v3/index.json": {}
+          "https://nuget.bepinex.dev/v3/index.json": {}
         },
         "frameworks": {
           "netstandard2.1": {
@@ -42,13 +37,7 @@
           "warnAsError": [
             "NU1605"
           ]
-        },
-        "restoreAuditProperties": {
-          "enableAudit": "true",
-          "auditLevel": "low",
-          "auditMode": "direct"
-        },
-        "SdkAnalysisLevel": "9.0.100"
+        }
       },
       "frameworks": {
         "netstandard2.1": {
@@ -112,7 +101,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.102\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.306\\RuntimeIdentifierGraph.json"
         }
       }
     }
