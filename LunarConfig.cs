@@ -34,6 +34,15 @@ namespace LunarConfig
         internal static readonly string CENTRAL_FILE_NAME = "LunarConfigCentral.cfg";
         internal static readonly string CENTRAL_FILE = Path.Combine(Paths.ConfigPath, CENTRAL_FILE_NAME);
 
+        internal static readonly string WEATHER_INJECTION_FILE_NAME = "LunarConfigWeatherInjection.cfg";
+        internal static readonly string WEATHER_INJECTION_FILE = Path.Combine(Paths.ConfigPath, WEATHER_INJECTION_FILE_NAME);
+
+        internal static readonly string DUNGEON_INJECTION_FILE_NAME = "LunarConfigDungeonInjection.cfg";
+        internal static readonly string DUNGEON_INJECTION_FILE = Path.Combine(Paths.ConfigPath, DUNGEON_INJECTION_FILE_NAME);
+
+        internal static readonly string TAG_INJECTION_FILE_NAME = "LunarConfigTagInjection.cfg";
+        internal static readonly string TAG_INJECTION_FILE = Path.Combine(Paths.ConfigPath, TAG_INJECTION_FILE_NAME);
+
         public static LunarConfig Instance { get; private set; } = null!;
         internal new static ManualLogSource Logger { get; private set; } = null!;
         internal static Harmony? Harmony { get; set; }
@@ -65,6 +74,9 @@ namespace LunarConfig
             LethalContent.Moons.OnFreeze += central.InitMoons;
             LethalContent.MapObjects.OnFreeze += central.InitMapObjects;
             LethalContent.Unlockables.OnFreeze += central.InitUnlockables;
+
+            LethalContent.Weathers.OnFreeze += central.InitWeatherInjection;
+            LethalContent.Dungeons.OnFreeze += central.InitDungeonInjection;
 
             Logger.LogDebug("Finished patching!");
         }

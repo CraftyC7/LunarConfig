@@ -30,6 +30,8 @@ namespace LunarConfig.Objects.Config
     {
         public Dictionary<string, LunarConfigFile> files = new Dictionary<string, LunarConfigFile>();
 
+        public static HashSet<String> everyMoonTag = new HashSet<String>();
+
         public static Dictionary<string, string> items = new Dictionary<string, string>();
         public static Dictionary<string, string> enemies = new Dictionary<string, string>();
         public static Dictionary<string, string> moons = new Dictionary<string, string>();
@@ -37,6 +39,8 @@ namespace LunarConfig.Objects.Config
         public static Dictionary<string, string> mapObjects = new Dictionary<string, string>();
 
         public static Dictionary<string, NamespacedKey<DawnMoonInfo>> moonKeys = new Dictionary<string, NamespacedKey<DawnMoonInfo>>();
+        public static Dictionary<string, NamespacedKey<DawnWeatherEffectInfo>> weatherKeys = new Dictionary<string, NamespacedKey<DawnWeatherEffectInfo>>();
+        public static Dictionary<string, NamespacedKey<DawnDungeonInfo>> dungeonKeys = new Dictionary<string, NamespacedKey<DawnDungeonInfo>>();
 
         public static bool clearOrphans = false;
         public static bool backCompat = true;
@@ -55,12 +59,19 @@ namespace LunarConfig.Objects.Config
         public static bool dungeonWeightsInitialized = false;
         public static bool mapObjectCurvesInitialized = false;
 
+        public static bool weatherInjectionInitialized = false;
+        public static bool dungeonInjectionInitialized = false;
+        public static bool tagInjectionInitialized = false;
+
         public static bool configureItems = false;
         public static bool configureEnemies = false;
         public static bool configureMoons = false;
         public static bool configureDungeons = false;
         public static bool configureMapObjects = false;
         public static bool configureUnlockables = false;
+        public static bool configureWeatherInjection = false;
+        public static bool configureDungeonInjection = false;
+        public static bool configureTagInjection = false;
 
         public static bool useZeekScrap = true;
         public static bool useZeekWeight = false;
@@ -71,6 +82,9 @@ namespace LunarConfig.Objects.Config
         public static HashSet<string> enabledDungeonSettings = new HashSet<string>();
         public static HashSet<string> enabledMapObjectSettings = new HashSet<string>();
         public static HashSet<string> enabledUnlockableSettings = new HashSet<string>();
+        public static HashSet<string> enabledWeatherInjectionSettings = new HashSet<string>();
+        public static HashSet<string> enabledDungeonInjectionSettings = new HashSet<string>();
+        public static HashSet<string> enabledTagInjectionSettings = new HashSet<string>();
 
         public static Dictionary<string, string> cachedSpawnableScrap = new Dictionary<string, string>();
         public static Dictionary<string, string> cachedDaytimeEnemies = new Dictionary<string, string>();
@@ -80,6 +94,23 @@ namespace LunarConfig.Objects.Config
         public static Dictionary<NamespacedKey<DawnMoonInfo>, Dictionary<string, string>> cachedInsideMapObjects = new Dictionary<NamespacedKey<DawnMoonInfo>, Dictionary<string, string>>();
         public static Dictionary<NamespacedKey<DawnMoonInfo>, Dictionary<string, string>> cachedOutsideMapObjects = new Dictionary<NamespacedKey<DawnMoonInfo>, Dictionary<string, string>>();
 
+        public static Dictionary<string, string> cachedWeatherSpawnableScrap = new Dictionary<string, string>();
+        public static Dictionary<string, string> cachedWeatherDaytimeEnemies = new Dictionary<string, string>();
+        public static Dictionary<string, string> cachedWeatherInteriorEnemies = new Dictionary<string, string>();
+        public static Dictionary<string, string> cachedWeatherOutsideEnemies = new Dictionary<string, string>();
+        public static Dictionary<string, string> cachedWeatherDungeons = new Dictionary<string, string>();
+
+        public static Dictionary<string, string> cachedDungeonSpawnableScrap = new Dictionary<string, string>();
+        public static Dictionary<string, string> cachedDungeonDaytimeEnemies = new Dictionary<string, string>();
+        public static Dictionary<string, string> cachedDungeonInteriorEnemies = new Dictionary<string, string>();
+        public static Dictionary<string, string> cachedDungeonOutsideEnemies = new Dictionary<string, string>();
+
+        public static Dictionary<string, string> cachedTagSpawnableScrap = new Dictionary<string, string>();
+        public static Dictionary<string, string> cachedTagDaytimeEnemies = new Dictionary<string, string>();
+        public static Dictionary<string, string> cachedTagInteriorEnemies = new Dictionary<string, string>();
+        public static Dictionary<string, string> cachedTagOutsideEnemies = new Dictionary<string, string>();
+        public static Dictionary<string, string> cachedTagDungeons = new Dictionary<string, string>();
+
         public static Dictionary<string, Dictionary<NamespacedKey<DawnMoonInfo>, AnimationCurve>> defaultInsideMapObjectCurves = new Dictionary<string, Dictionary<NamespacedKey<DawnMoonInfo>, AnimationCurve>>();
         public static Dictionary<string, Dictionary<NamespacedKey<DawnMoonInfo>, AnimationCurve>> defaultOutsideMapObjectCurves = new Dictionary<string, Dictionary<NamespacedKey<DawnMoonInfo>, AnimationCurve>>();
 
@@ -88,6 +119,17 @@ namespace LunarConfig.Objects.Config
         public static Dictionary<string, string> interiorEnemyWeightString = new Dictionary<string, string>();
         public static Dictionary<string, string> outsideEnemyWeightString = new Dictionary<string, string>();
         public static Dictionary<string, string> dungeonWeightString = new Dictionary<string, string>();
+
+        public static Dictionary<string, string> itemWeatherString = new Dictionary<string, string>();
+        public static Dictionary<string, string> daytimeEnemyWeatherString = new Dictionary<string, string>();
+        public static Dictionary<string, string> interiorEnemyWeatherString = new Dictionary<string, string>();
+        public static Dictionary<string, string> outsideEnemyWeatherString = new Dictionary<string, string>();
+        public static Dictionary<string, string> dungeonWeatherString = new Dictionary<string, string>();
+
+        public static Dictionary<string, string> itemDungeonString = new Dictionary<string, string>();
+        public static Dictionary<string, string> daytimeEnemyDungeonString = new Dictionary<string, string>();
+        public static Dictionary<string, string> interiorEnemyDungeonString = new Dictionary<string, string>();
+        public static Dictionary<string, string> outsideEnemyDungeonString = new Dictionary<string, string>();
 
         public static HashSet<DawnMoonInfo> notConfiguredScrapMoons = new HashSet<DawnMoonInfo>();
         public static HashSet<DawnMoonInfo> notConfiguredDaytimeMoons = new HashSet<DawnMoonInfo>();
@@ -118,7 +160,11 @@ namespace LunarConfig.Objects.Config
         public static string NiceifyDawnUUID(string uuid)
         {
             TextInfo textInfo = Thread.CurrentThread.CurrentCulture.TextInfo;
-            string name = uuid.Split(":")[1];
+            string name = uuid;
+            if (uuid.Contains(":"))
+            {
+                name = uuid.Split(":")[1];
+            }
             return textInfo.ToTitleCase(name.Replace("_", " "));
         }
 
@@ -132,7 +178,7 @@ namespace LunarConfig.Objects.Config
 
         public string CurveToString(AnimationCurve curve)
         {
-            return string.Join(" ; ", curve.keys.Select(kf => $"{kf.time.ToString(System.Globalization.CultureInfo.InvariantCulture)},{kf.value.ToString(System.Globalization.CultureInfo.InvariantCulture)}"));
+            return ConfigManager.ParseString(curve);
         }
 
         public string? GetDawnUUID(Dictionary<string, string> dic, string uuid)
@@ -184,43 +230,9 @@ namespace LunarConfig.Objects.Config
             }
         }
 
-        bool TryGetEntryWithPrefix(Dictionary<string, LunarConfigEntry> dict, string prefix, out LunarConfigEntry entry)
-        {
-            foreach (var kvp in dict)
-            {
-                if (kvp.Key.StartsWith(prefix, StringComparison.Ordinal))
-                {
-                    entry = kvp.Value;
-                    return true;
-                }
-            }
-
-            entry = null;
-            return false;
-        }
-
         public static AnimationCurve StringToCurve(string data)
         {
-            AnimationCurve curve = new AnimationCurve();
-
-            if (string.IsNullOrWhiteSpace(data))
-                return curve;
-
-            foreach (var pair in data.Split(';'))
-            {
-                var parts = pair.Split(',');
-                if (parts.Length != 2) continue;
-
-                string timeStr = parts[0].Trim();
-                string valueStr = parts[1].Trim();
-
-                if (float.TryParse(timeStr, out float time) && float.TryParse(valueStr, out float value))
-                {
-                    curve.AddKey(time, value);
-                }
-            }
-
-            return curve;
+            return ConfigManager.ParseCurve(data);
         }
 
         public static void TrySetInsideCurve(string item, AnimationCurve curve, NamespacedKey<DawnMoonInfo> moon)
@@ -324,6 +336,9 @@ namespace LunarConfig.Objects.Config
             configEntry.AddField("Configure Dungeons", "Check this to generate and use configuration files for dungeons.", true);
             configEntry.AddField("Configure Map Objects", "Check this to generate and use configuration files for map objects.", true);
             configEntry.AddField("Configure Unlockables", "Check this to generate and use configuration files for unlockables.", true);
+            configEntry.AddField("Configure Weather Injection", "Check this to generate and use configuration files for weather injection.", true);
+            configEntry.AddField("Configure Dungeon Injection", "Check this to generate and use configuration files for dungeon injection.", true);
+            configEntry.AddField("Configure Tag Injection", "Check this to generate and use configuration files for tag injection.", true);
             configEntry.AddField("Enable Backwards Compat", "Allows Lunar to look for config entries that are named using the previous v0.1.x system, I would advise turning this off after you have all your previous values.", false);
             configEntry.AddField("Clear Orphaned Entries", "WARNING: Enabling this will delete any config entries that get disabled when the configuration is refreshed!", false);
             configEntry.AddField("Use Simple Scrap Value", "Checking this will make items have a scrap value that already anticipates the *0.4.", false);
@@ -336,6 +351,9 @@ namespace LunarConfig.Objects.Config
             configureDungeons = configEntry.GetValue<bool>("Configure Dungeons");
             configureMapObjects = configEntry.GetValue<bool>("Configure Map Objects");
             configureUnlockables = configEntry.GetValue<bool>("Configure Unlockables");
+            configureWeatherInjection = configEntry.GetValue<bool>("Configure Weather Injection");
+            configureDungeonInjection = configEntry.GetValue<bool>("Configure Dungeon Injection");
+            configureTagInjection = configEntry.GetValue<bool>("Configure Tag Injection");
             useZeekScrap = !configEntry.GetValue<bool>("Use Simple Scrap Value");
             useZeekWeight = !configEntry.GetValue<bool>("Use Simple Weight");
 
@@ -436,6 +454,8 @@ namespace LunarConfig.Objects.Config
                 configMoons.AddField("Spawnable Outside Enemies", "Disable this to disable configuring this property in moon config entries.", true);
                 configMoons.AddField("Min Scrap", "Disable this to disable configuring this property in moon config entries.", true);
                 configMoons.AddField("Max Scrap", "Disable this to disable configuring this property in moon config entries.", true);
+                configMoons.AddField("Min Scrap Total", "Enable this to enable configuring this property in moon config entries.", false);
+                configMoons.AddField("Max Scrap Total", "Enable this to enable configuring this property in moon config entries.", false);
                 configMoons.AddField("Interior Multiplier", "Disable this to disable configuring this property in moon config entries.", true);
                 configMoons.AddField("Value Multiplier", "Disable this to disable configuring this property in moon config entries.", true);
                 configMoons.AddField("Amount Multiplier", "Disable this to disable configuring this property in moon config entries.", true);
@@ -523,7 +543,59 @@ namespace LunarConfig.Objects.Config
                     }
                 }
             }
-            
+
+            if (configureWeatherInjection)
+            {
+                LunarConfigEntry configWeatherInjection = centralFile.AddEntry("Enabled Weather Injection Settings");
+                configWeatherInjection.AddField("Spawnable Scrap", "Disable this to disable configuring this property in unlockable config entries.", true);
+                configWeatherInjection.AddField("Spawnable Daytime Enemies", "Disable this to disable configuring this property in unlockable config entries.", true);
+                configWeatherInjection.AddField("Spawnable Interior Enemies", "Disable this to disable configuring this property in unlockable config entries.", true);
+                configWeatherInjection.AddField("Spawnable Outside Enemies", "Disable this to disable configuring this property in unlockable config entries.", true);
+                configWeatherInjection.AddField("Possible Interiors", "Disable this to disable configuring this property in unlockable config entries.", true);
+
+                foreach (var setting in configWeatherInjection.fields.Keys)
+                {
+                    if (configWeatherInjection.GetValue<bool>(setting))
+                    {
+                        enabledWeatherInjectionSettings.Add(setting);
+                    }
+                }
+            }
+
+            if (configureDungeonInjection)
+            {
+                LunarConfigEntry configDungeonInjection = centralFile.AddEntry("Enabled Dungeon Injection Settings");
+                configDungeonInjection.AddField("Spawnable Scrap", "Disable this to disable configuring this property in unlockable config entries.", true);
+                configDungeonInjection.AddField("Spawnable Daytime Enemies", "Disable this to disable configuring this property in unlockable config entries.", true);
+                configDungeonInjection.AddField("Spawnable Interior Enemies", "Disable this to disable configuring this property in unlockable config entries.", true);
+                configDungeonInjection.AddField("Spawnable Outside Enemies", "Disable this to disable configuring this property in unlockable config entries.", true);
+
+                foreach (var setting in configDungeonInjection.fields.Keys)
+                {
+                    if (configDungeonInjection.GetValue<bool>(setting))
+                    {
+                        enabledDungeonInjectionSettings.Add(setting);
+                    }
+                }
+            }
+
+            if (configureTagInjection)
+            {
+                LunarConfigEntry configTagInjection = centralFile.AddEntry("Enabled Tag Injection Settings");
+                configTagInjection.AddField("Spawnable Scrap", "Disable this to disable configuring this property in unlockable config entries.", true);
+                configTagInjection.AddField("Spawnable Daytime Enemies", "Disable this to disable configuring this property in unlockable config entries.", true);
+                configTagInjection.AddField("Spawnable Interior Enemies", "Disable this to disable configuring this property in unlockable config entries.", true);
+                configTagInjection.AddField("Spawnable Outside Enemies", "Disable this to disable configuring this property in unlockable config entries.", true);
+                configTagInjection.AddField("Possible Interiors", "Disable this to disable configuring this property in unlockable config entries.", true);
+
+                foreach (var setting in configTagInjection.fields.Keys)
+                {
+                    if (configTagInjection.GetValue<bool>(setting))
+                    {
+                        enabledTagInjectionSettings.Add(setting);
+                    }
+                }
+            }
 
             ClearOrphanedEntries(centralFile.file);
             centralFile.file.Save();
@@ -794,11 +866,56 @@ namespace LunarConfig.Objects.Config
 
         public void InitItemWeights()
         {
-            if (enabledMoonSettings.Contains("Spawnable Scrap") && configureMoons && moonsInitialized && itemsInitialized && !itemWeightsInitialized)
+            if ((enabledMoonSettings.Contains("Spawnable Scrap") || enabledWeatherInjectionSettings.Contains("Spawnable Scrap") || enabledDungeonInjectionSettings.Contains("Spawnable Scrap") || enabledTagInjectionSettings.Contains("Spawnable Scrap")) && moonsInitialized && itemsInitialized && weatherInjectionInitialized && dungeonInjectionInitialized && tagInjectionInitialized && !itemWeightsInitialized)
             {
                 MiniLogger.LogInfo("Initializing Item Weights");
 
                 foreach (var cache in cachedSpawnableScrap)
+                {
+                    foreach (var item in cache.Value.Split(","))
+                    {
+                        string[] splits = item.Split(":");
+
+                        string id = splits[0];
+
+                        string? dawnID = GetDawnUUID(items, id);
+                        if (dawnID == null) { continue; }
+
+                        itemWeightString[dawnID] = itemWeightString.GetValueOrDefault(dawnID, "") + cache.Key + ":" + CleanString(splits[1]) + ",";
+                    }
+                }
+
+                foreach (var cache in cachedWeatherSpawnableScrap)
+                {
+                    foreach (var item in cache.Value.Split(","))
+                    {
+                        string[] splits = item.Split(":");
+
+                        string id = splits[0];
+
+                        string? dawnID = GetDawnUUID(items, id);
+                        if (dawnID == null) { continue; }
+
+                        itemWeatherString[dawnID] = itemWeatherString.GetValueOrDefault(dawnID, "") + cache.Key + ":" + CleanString(splits[1]) + ",";
+                    }
+                }
+
+                foreach (var cache in cachedDungeonSpawnableScrap)
+                {
+                    foreach (var item in cache.Value.Split(","))
+                    {
+                        string[] splits = item.Split(":");
+
+                        string id = splits[0];
+
+                        string? dawnID = GetDawnUUID(items, id);
+                        if (dawnID == null) { continue; }
+
+                        itemDungeonString[dawnID] = itemDungeonString.GetValueOrDefault(dawnID, "") + cache.Key + ":" + CleanString(splits[1]) + ",";
+                    }
+                }
+
+                foreach (var cache in cachedTagSpawnableScrap)
                 {
                     foreach (var item in cache.Value.Split(","))
                     {
@@ -841,8 +958,10 @@ namespace LunarConfig.Objects.Config
                         SpawnWeightsPreset weights = new();
 
                         List<NamespacedConfigWeight> Moons = NamespacedConfigWeight.ConvertManyFromString(ComprehendWeights(itemWeightString.GetValueOrDefault(item.Key.ToString(), "")));
+                        List<NamespacedConfigWeight> Weathers = NamespacedConfigWeight.ConvertManyFromString(ComprehendWeights(itemWeatherString.GetValueOrDefault(item.Key.ToString(), "")));
+                        List<NamespacedConfigWeight> Dungeons = NamespacedConfigWeight.ConvertManyFromString(ComprehendWeights(itemDungeonString.GetValueOrDefault(item.Key.ToString(), "")));
 
-                        weights.SetupSpawnWeightsPreset(Moons, new List<NamespacedConfigWeight>(), new List<NamespacedConfigWeight>());
+                        weights.SetupSpawnWeightsPreset(Moons, Dungeons, Weathers);
 
                         weightBuilder.SetGlobalWeight(weights);
 
@@ -1077,7 +1196,7 @@ namespace LunarConfig.Objects.Config
 
         public void InitEnemyWeights()
         {
-            if (configureMoons && moonsInitialized && enemiesInitialized && !enemyWeightsInitialized)
+            if (moonsInitialized && enemiesInitialized && weatherInjectionInitialized && dungeonInjectionInitialized && !enemyWeightsInitialized)
             {
                 if (enabledMoonSettings.Contains("Spawnable Daytime Enemies"))
                 {
@@ -1417,7 +1536,7 @@ namespace LunarConfig.Objects.Config
 
         public void InitDungeonWeights()
         {
-            if (enabledMoonSettings.Contains("Possible Interiors") && configureMoons && moonsInitialized && dungeonsInitialized && !dungeonWeightsInitialized)
+            if (enabledMoonSettings.Contains("Possible Interiors") && moonsInitialized && dungeonsInitialized && weatherInjectionInitialized && !dungeonWeightsInitialized)
             {
                 MiniLogger.LogInfo("Initializing Dungeon Weights");
 
@@ -1665,7 +1784,7 @@ namespace LunarConfig.Objects.Config
 
         public void InitMapObjectCurves()
         {
-            if (configureMoons && moonsInitialized && mapObjectsInitialized && !mapObjectCurvesInitialized)
+            if (moonsInitialized && mapObjectsInitialized && !mapObjectCurvesInitialized)
             {
                 if (enabledMapObjectSettings.Contains("(Inside) Level Curves"))
                 {
@@ -1880,6 +1999,8 @@ namespace LunarConfig.Objects.Config
                         moonEntry.TryAddField(enabledMoonSettings, "Max Outside Power", "The amount of outside power capacity that a moon has.", moonObj.maxOutsideEnemyPowerCount);
                         moonEntry.TryAddField(enabledMoonSettings, "Min Scrap", "The minimum amount of scrap items that can spawn on a moon.", moonObj.minScrap);
                         moonEntry.TryAddField(enabledMoonSettings, "Max Scrap", "The maximum amount of scrap items that can spawn on a moon.", moonObj.maxScrap);
+                        moonEntry.TryAddField(enabledMoonSettings, "Min Scrap Total", "NOTE: This setting is essentially unused in the vanilla game except for Single Item Days, Lunar does not implement any new functionality.\nThe minimum amount of scrap value that can spawn on a moon.", moonObj.minTotalScrapValue);
+                        moonEntry.TryAddField(enabledMoonSettings, "Max Scrap Total", "NOTE: This setting is essentially unused in the vanilla game except for Single Item Days, Lunar does not implement any new functionality.\nThe maximum amount of scrap value that can spawn on a moon.", moonObj.maxTotalScrapValue);
                         moonEntry.TryAddField(enabledMoonSettings, "Interior Multiplier", "Changes the size of the interior generated.", moonObj.factorySizeMultiplier);
 
                         if (purchaseInfo != null)
@@ -2059,7 +2180,9 @@ namespace LunarConfig.Objects.Config
 
                                     if (splits[0] != "dawn_lib")
                                     {
-                                        newTags.Add(new NamespacedKey(splits[0], splits[1]));
+                                        NamespacedKey newTag = new NamespacedKey(splits[0], splits[1]);
+                                        newTags.Add(newTag);
+                                        everyMoonTag.Add(newTag.Key);
                                     }
                                 }
 
@@ -2098,6 +2221,8 @@ namespace LunarConfig.Objects.Config
                             moonEntry.TrySetValue(enabledMoonSettings, "Max Outside Power", ref moonObj.maxOutsideEnemyPowerCount);
                             moonEntry.TrySetValue(enabledMoonSettings, "Min Scrap", ref moonObj.minScrap);
                             moonEntry.TrySetValue(enabledMoonSettings, "Max Scrap", ref moonObj.maxScrap);
+                            moonEntry.TrySetValue(enabledMoonSettings, "Min Scrap Total", ref moonObj.minTotalScrapValue);
+                            moonEntry.TrySetValue(enabledMoonSettings, "Max Scrap Total", ref moonObj.maxTotalScrapValue);
                             moonEntry.TrySetValue(enabledMoonSettings, "Interior Multiplier", ref moonObj.factorySizeMultiplier);
 
                             if (purchaseInfo != null)
@@ -2213,6 +2338,14 @@ namespace LunarConfig.Objects.Config
                             {
                                 notConfiguredOutsideMapObjectMoons.Add(dawnMoon);
                             }
+
+                            foreach (NamespacedKey tag in dawnMoon._tags)
+                            {
+                                if (tag.Namespace != "dawn_lib")
+                                {
+                                    everyMoonTag.Add(tag.Key);
+                                }
+                            }
                         }
                     }
                     catch (Exception e)
@@ -2240,6 +2373,7 @@ namespace LunarConfig.Objects.Config
             moonsInitialized = true;
             MiniLogger.LogInfo("Completed Initializing Moons");
 
+            InitTagInjection();
             InitMapObjectCurves();
             InitItemWeights();
             InitEnemyWeights();
@@ -2380,6 +2514,207 @@ namespace LunarConfig.Objects.Config
             }
             
             MiniLogger.LogInfo("Completed Initializing Unlockables");
+        }
+
+        public void InitWeatherInjection()
+        {
+            if (!centralInitialized)
+            {
+                InitCentral();
+            }
+
+            MiniLogger.LogInfo("Initializing Weather Injection");
+            if (configureWeatherInjection)
+            {
+                LunarConfigFile weatherInjectionFile = AddFile(LunarConfig.WEATHER_INJECTION_FILE, LunarConfig.WEATHER_INJECTION_FILE_NAME);
+                weatherInjectionFile.file.SaveOnConfigSet = false;
+
+                foreach (var weather in LethalContent.Weathers)
+                {
+                    string uuid = UUIDify(weather.Key.ToString());
+
+                    try
+                    {
+                        string niceUUID = NiceifyDawnUUID(uuid);
+                        DawnWeatherEffectInfo dawnWeather = weather.Value;
+                        LunarConfigEntry weatherEntry = weatherInjectionFile.AddEntry($"{niceUUID} - {uuid}");
+
+                        weatherKeys[uuid] = dawnWeather.TypedKey;
+
+                        // GETTING VALUES (for config)
+                        weatherEntry.AddField("Configure Content", "Enable to change any of the settings below.", false);
+
+                        string defaultScrap = "";
+                        string defaultDayEnemies = "";
+                        string defaultInteriorEnemies = "";
+                        string defaultOutsideEnemies = "";
+                        string defaultDungeons = "";
+
+                        weatherEntry.TryAddField(enabledWeatherInjectionSettings, "Spawnable Scrap", "The scrap injected into the pool with this weather.\nDenoted with NAME:RARITY, separated with commas.", defaultScrap);
+                        weatherEntry.TryAddField(enabledWeatherInjectionSettings, "Spawnable Daytime Enemies", "The daytime enemies injected into the pool with this weather.\nDenoted with NAME:RARITY, separated with commas.", defaultDayEnemies);
+                        weatherEntry.TryAddField(enabledWeatherInjectionSettings, "Spawnable Interior Enemies", "The interior enemies injected into the pool with this weather.\nDenoted with NAME:RARITY, separated with commas.", defaultInteriorEnemies);
+                        weatherEntry.TryAddField(enabledWeatherInjectionSettings, "Spawnable Outside Enemies", "The outside enemies injected into the pool with this weather.\nDenoted with NAME:RARITY, separated with commas.", defaultOutsideEnemies);
+                        weatherEntry.TryAddField(enabledWeatherInjectionSettings, "Possible Interiors", "The interior injected into the pool with this weather.\nDenoted with NAME:RARITY, separated with commas.", defaultDungeons);
+
+                        // SETTING VALUES
+                        if (weatherEntry.GetValue<bool>("Configure Content"))
+                        {
+                            if (enabledWeatherInjectionSettings.Contains("Spawnable Scrap")) { cachedWeatherSpawnableScrap[uuid] = weatherEntry.GetValue<string>("Spawnable Scrap"); }
+                            if (enabledWeatherInjectionSettings.Contains("Spawnable Daytime Enemies")) { cachedWeatherDaytimeEnemies[uuid] = weatherEntry.GetValue<string>("Spawnable Daytime Enemies"); }
+                            if (enabledWeatherInjectionSettings.Contains("Spawnable Interior Enemies")) { cachedWeatherInteriorEnemies[uuid] = weatherEntry.GetValue<string>("Spawnable Interior Enemies"); }
+                            if (enabledWeatherInjectionSettings.Contains("Spawnable Outside Enemies")) { cachedWeatherOutsideEnemies[uuid] = weatherEntry.GetValue<string>("Spawnable Outside Enemies"); }
+                            if (enabledWeatherInjectionSettings.Contains("Possible Interiors")) { cachedWeatherDungeons[uuid] = weatherEntry.GetValue<string>("Possible Interiors"); }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        MiniLogger.LogError($"LunarConfig encountered an issue while configuring {uuid}, please report this!\n{e}");
+                    }
+                }
+
+                ClearOrphanedEntries(weatherInjectionFile.file);
+                weatherInjectionFile.file.Save();
+                weatherInjectionFile.file.SaveOnConfigSet = true;
+            }
+
+            weatherInjectionInitialized = true;
+            MiniLogger.LogInfo("Completed Initializing Weather Injection");
+
+            InitItemWeights();
+            InitEnemyWeights();
+            InitDungeonWeights();
+        }
+
+        public void InitDungeonInjection()
+        {
+            if (!centralInitialized)
+            {
+                InitCentral();
+            }
+
+            MiniLogger.LogInfo("Initializing Dungeon Injection");
+            if (configureDungeonInjection)
+            {
+                LunarConfigFile dungeonInjectionFile = AddFile(LunarConfig.DUNGEON_INJECTION_FILE, LunarConfig.DUNGEON_INJECTION_FILE_NAME);
+                dungeonInjectionFile.file.SaveOnConfigSet = false;
+
+                foreach (var dungeon in LethalContent.Dungeons)
+                {
+                    string uuid = UUIDify(dungeon.Key.ToString());
+
+                    try
+                    {
+                        string niceUUID = NiceifyDawnUUID(uuid);
+                        DawnDungeonInfo dawnDungeon = dungeon.Value;
+                        LunarConfigEntry dungeonEntry = dungeonInjectionFile.AddEntry($"{niceUUID} - {uuid}");
+
+                        dungeonKeys[uuid] = dawnDungeon.TypedKey;
+
+                        // GETTING VALUES (for config)
+                        dungeonEntry.AddField("Configure Content", "Enable to change any of the settings below.", false);
+
+                        string defaultScrap = "";
+                        string defaultDayEnemies = "";
+                        string defaultInteriorEnemies = "";
+                        string defaultOutsideEnemies = "";
+
+                        dungeonEntry.TryAddField(enabledDungeonInjectionSettings, "Spawnable Scrap", "The scrap injected into the pool with this dungeon.\nDenoted with NAME:RARITY, separated with commas.", defaultScrap);
+                        dungeonEntry.TryAddField(enabledDungeonInjectionSettings, "Spawnable Daytime Enemies", "The daytime enemies injected into the pool with this dungeon.\nDenoted with NAME:RARITY, separated with commas.", defaultDayEnemies);
+                        dungeonEntry.TryAddField(enabledDungeonInjectionSettings, "Spawnable Interior Enemies", "The interior enemies injected into the pool with this dungeon.\nDenoted with NAME:RARITY, separated with commas.", defaultInteriorEnemies);
+                        dungeonEntry.TryAddField(enabledDungeonInjectionSettings, "Spawnable Outside Enemies", "The outside enemies injected into the pool with this dungeon.\nDenoted with NAME:RARITY, separated with commas.", defaultOutsideEnemies);
+
+                        // SETTING VALUES
+                        if (dungeonEntry.GetValue<bool>("Configure Content"))
+                        {
+                            if (enabledDungeonInjectionSettings.Contains("Spawnable Scrap")) { cachedDungeonSpawnableScrap[uuid] = dungeonEntry.GetValue<string>("Spawnable Scrap"); }
+                            if (enabledDungeonInjectionSettings.Contains("Spawnable Daytime Enemies")) { cachedDungeonDaytimeEnemies[uuid] = dungeonEntry.GetValue<string>("Spawnable Daytime Enemies"); }
+                            if (enabledDungeonInjectionSettings.Contains("Spawnable Interior Enemies")) { cachedDungeonInteriorEnemies[uuid] = dungeonEntry.GetValue<string>("Spawnable Interior Enemies"); }
+                            if (enabledDungeonInjectionSettings.Contains("Spawnable Outside Enemies")) { cachedDungeonOutsideEnemies[uuid] = dungeonEntry.GetValue<string>("Spawnable Outside Enemies"); }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        MiniLogger.LogError($"LunarConfig encountered an issue while configuring {uuid}, please report this!\n{e}");
+                    }
+                }
+
+                ClearOrphanedEntries(dungeonInjectionFile.file);
+                dungeonInjectionFile.file.Save();
+                dungeonInjectionFile.file.SaveOnConfigSet = true;
+            }
+
+            dungeonInjectionInitialized = true;
+            MiniLogger.LogInfo("Completed Initializing Dungeon Injection");
+
+            InitItemWeights();
+            InitEnemyWeights();
+        }
+
+        public void InitTagInjection()
+        {
+            if (!centralInitialized)
+            {
+                InitCentral();
+            }
+
+            MiniLogger.LogInfo("Initializing Tag Injection");
+            if (configureTagInjection)
+            {
+                LunarConfigFile tagInjectionFile = AddFile(LunarConfig.TAG_INJECTION_FILE, LunarConfig.TAG_INJECTION_FILE_NAME);
+                tagInjectionFile.file.SaveOnConfigSet = false;
+
+                foreach (var tag in everyMoonTag)
+                {
+                    string uuid = tag;
+
+                    try
+                    {
+                        string niceUUID = NiceifyDawnUUID(uuid);
+                        string namespacedUUID = $"lunartaginjection:{uuid}";
+                        LunarConfigEntry tagEntry = tagInjectionFile.AddEntry($"{niceUUID} - {uuid}");
+
+                        // GETTING VALUES (for config)
+                        tagEntry.AddField("Configure Content", "Enable to change any of the settings below.", false);
+
+                        string defaultScrap = "";
+                        string defaultDayEnemies = "";
+                        string defaultInteriorEnemies = "";
+                        string defaultOutsideEnemies = "";
+                        string defaultDungeons = "";
+
+                        tagEntry.TryAddField(enabledTagInjectionSettings, "Spawnable Scrap", "The scrap injected into the pool with this tag.\nDenoted with NAME:RARITY, separated with commas.", defaultScrap);
+                        tagEntry.TryAddField(enabledTagInjectionSettings, "Spawnable Daytime Enemies", "The daytime enemies injected into the pool with this tag.\nDenoted with NAME:RARITY, separated with commas.", defaultDayEnemies);
+                        tagEntry.TryAddField(enabledTagInjectionSettings, "Spawnable Interior Enemies", "The interior enemies injected into the pool with this tag.\nDenoted with NAME:RARITY, separated with commas.", defaultInteriorEnemies);
+                        tagEntry.TryAddField(enabledTagInjectionSettings, "Spawnable Outside Enemies", "The outside enemies injected into the pool with this tag.\nDenoted with NAME:RARITY, separated with commas.", defaultOutsideEnemies);
+                        tagEntry.TryAddField(enabledTagInjectionSettings, "Possible Interiors", "The interior injected into the pool with this tag.\nDenoted with NAME:RARITY, separated with commas.", defaultDungeons);
+
+                        // SETTING VALUES
+                        if (tagEntry.GetValue<bool>("Configure Content"))
+                        {
+                            if (enabledTagInjectionSettings.Contains("Spawnable Scrap")) { cachedTagSpawnableScrap[namespacedUUID] = tagEntry.GetValue<string>("Spawnable Scrap"); }
+                            if (enabledTagInjectionSettings.Contains("Spawnable Daytime Enemies")) { cachedTagDaytimeEnemies[namespacedUUID] = tagEntry.GetValue<string>("Spawnable Daytime Enemies"); }
+                            if (enabledTagInjectionSettings.Contains("Spawnable Interior Enemies")) { cachedTagInteriorEnemies[namespacedUUID] = tagEntry.GetValue<string>("Spawnable Interior Enemies"); }
+                            if (enabledTagInjectionSettings.Contains("Spawnable Outside Enemies")) { cachedTagOutsideEnemies[namespacedUUID] = tagEntry.GetValue<string>("Spawnable Outside Enemies"); }
+                            if (enabledTagInjectionSettings.Contains("Possible Interiors")) { cachedTagDungeons[namespacedUUID] = tagEntry.GetValue<string>("Possible Interiors"); }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        MiniLogger.LogError($"LunarConfig encountered an issue while configuring {uuid}, please report this!\n{e}");
+                    }
+                }
+
+                ClearOrphanedEntries(tagInjectionFile.file);
+                tagInjectionFile.file.Save();
+                tagInjectionFile.file.SaveOnConfigSet = true;
+            }
+
+            tagInjectionInitialized = true;
+            MiniLogger.LogInfo("Completed Initializing Tag Injection");
+
+            InitItemWeights();
+            InitEnemyWeights();
+            InitDungeonWeights();
         }
 
         public LunarConfigFile AddFile(string path, string name)
