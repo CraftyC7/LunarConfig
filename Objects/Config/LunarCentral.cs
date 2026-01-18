@@ -268,7 +268,6 @@ namespace LunarConfig.Objects.Config
         {
             Dictionary<string, int> baseWeights = new Dictionary<string, int>();
             Dictionary<string, float> multiplierWeights = new Dictionary<string, float>();
-            Dictionary<string, int> overwrittenWeights = new Dictionary<string, int>();
 
             string[] entries = weightString.Split(",");
 
@@ -288,10 +287,6 @@ namespace LunarConfig.Objects.Config
                     {
                         multiplierWeights[id] = multiplierWeights.GetValueOrDefault(id, 1) / float.Parse(CleanNumber(weight));
                     }
-                    else if (weight.Contains("="))
-                    {
-                        overwrittenWeights[id] = int.Parse(CleanNumber(weight));
-                    }
                     else
                     {
                         baseWeights[id] = baseWeights.GetValueOrDefault(id, 0) + int.Parse(CleanNumber(weight));
@@ -300,21 +295,10 @@ namespace LunarConfig.Objects.Config
                 catch { }
             }
 
-            foreach (var multiplier in multiplierWeights)
-            {
-                string key = multiplier.Key;
-                baseWeights[key] = (int)Math.Round(baseWeights.GetValueOrDefault(key, 0) * multiplier.Value);
-            }
-
-            foreach (var over in overwrittenWeights)
-            {
-                string key = over.Key;
-                baseWeights[key] = over.Value;
-            }
-
             baseWeights = baseWeights.Where(kvp => kvp.Value > 0).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            multiplierWeights = multiplierWeights.Where(kvp => kvp.Value != 1).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
-            return string.Join(", ", baseWeights.Select(kvp => $"{kvp.Key}=+{kvp.Value}"));
+            return string.Join(", ", baseWeights.Select(kvp => $"{kvp.Key}=+{kvp.Value}")) + ((baseWeights.Count > 0 && multiplierWeights.Count > 0) ? ", " : "") + string.Join(", ", multiplierWeights.Select(kvp => $"{kvp.Key}=*{kvp.Value}"));
         }
 
         // LUNAR
@@ -601,6 +585,12 @@ namespace LunarConfig.Objects.Config
             centralFile.file.Save();
             centralFile.file.SaveOnConfigSet = true;
 
+            everyMoonTag.Add("all");
+            everyMoonTag.Add("free");
+            everyMoonTag.Add("paid");
+            everyMoonTag.Add("custom");
+            everyMoonTag.Add("vanilla");
+
             centralInitialized = true;
         }
 
@@ -719,15 +709,18 @@ namespace LunarConfig.Objects.Config
                                 foreach (string tag in RemoveWhitespace(itemEntry.GetValue<string>("Tags")).ToLower().Split(","))
                                 {
                                     string[] splits = tag.Split(":");
-                                    if (splits.Length != 2)
+                                    if (splits.Length == 1 && !splits[0].IsNullOrWhiteSpace())
+                                    {
+                                        newTags.Add(new NamespacedKey("lunarcontenttag", splits[0]));
+                                    }
+                                    else if (splits.Length == 2 && splits[0] != "dawn_lib")
+                                    {
+                                        newTags.Add(new NamespacedKey(splits[0], splits[1]));
+                                    }
+                                    else
                                     {
                                         MiniLogger.LogWarning($"Incorrectly formatted tag '{tag}' found on {uuid}");
                                         continue;
-                                    }
-
-                                    if (splits[0] != "dawn_lib")
-                                    {
-                                        newTags.Add(new NamespacedKey(splits[0], splits[1]));
                                     }
                                 }
 
@@ -1087,15 +1080,18 @@ namespace LunarConfig.Objects.Config
                                 foreach (string tag in RemoveWhitespace(enemyEntry.GetValue<string>("Tags")).ToLower().Split(","))
                                 {
                                     string[] splits = tag.Split(":");
-                                    if (splits.Length != 2)
+                                    if (splits.Length == 1 && !splits[0].IsNullOrWhiteSpace())
+                                    {
+                                        newTags.Add(new NamespacedKey("lunarcontenttag", splits[0]));
+                                    }
+                                    else if (splits.Length == 2 && splits[0] != "dawn_lib")
+                                    {
+                                        newTags.Add(new NamespacedKey(splits[0], splits[1]));
+                                    }
+                                    else
                                     {
                                         MiniLogger.LogWarning($"Incorrectly formatted tag '{tag}' found on {uuid}");
                                         continue;
-                                    }
-
-                                    if (splits[0] != "dawn_lib")
-                                    {
-                                        newTags.Add(new NamespacedKey(splits[0], splits[1]));
                                     }
                                 }
 
@@ -1198,11 +1194,56 @@ namespace LunarConfig.Objects.Config
         {
             if (moonsInitialized && enemiesInitialized && weatherInjectionInitialized && dungeonInjectionInitialized && !enemyWeightsInitialized)
             {
-                if (enabledMoonSettings.Contains("Spawnable Daytime Enemies"))
+                if (enabledMoonSettings.Contains("Spawnable Daytime Enemies") || enabledDungeonInjectionSettings.Contains("Spawnable Daytime Enemies") || enabledWeatherInjectionSettings.Contains("Spawnable Daytime Enemies") || enabledTagInjectionSettings.Contains("Spawnable Daytime Enemies"))
                 {
                     MiniLogger.LogInfo("Initializing Daytime Weights");
 
                     foreach (var cache in cachedDaytimeEnemies)
+                    {
+                        foreach (var item in cache.Value.Split(","))
+                        {
+                            string[] splits = item.Split(":");
+
+                            string id = splits[0];
+
+                            string? dawnID = GetDawnUUID(enemies, id);
+                            if (dawnID == null) { continue; }
+
+                            daytimeEnemyWeightString[dawnID] = daytimeEnemyWeightString.GetValueOrDefault(dawnID, "") + cache.Key + ":" + CleanString(splits[1]) + ",";
+                        }
+                    }
+
+                    foreach (var cache in cachedWeatherDaytimeEnemies)
+                    {
+                        foreach (var item in cache.Value.Split(","))
+                        {
+                            string[] splits = item.Split(":");
+
+                            string id = splits[0];
+
+                            string? dawnID = GetDawnUUID(enemies, id);
+                            if (dawnID == null) { continue; }
+
+                            daytimeEnemyWeatherString[dawnID] = daytimeEnemyWeatherString.GetValueOrDefault(dawnID, "") + cache.Key + ":" + CleanString(splits[1]) + ",";
+                        }
+                    }
+
+                    foreach (var cache in cachedDungeonDaytimeEnemies)
+                    {
+                        foreach (var item in cache.Value.Split(","))
+                        {
+                            string[] splits = item.Split(":");
+
+                            string id = splits[0];
+
+                            string? dawnID = GetDawnUUID(enemies, id);
+                            if (dawnID == null) { continue; }
+
+                            daytimeEnemyDungeonString[dawnID] = daytimeEnemyDungeonString.GetValueOrDefault(dawnID, "") + cache.Key + ":" + CleanString(splits[1]) + ",";
+                        }
+                    }
+
+                    foreach (var cache in cachedTagDaytimeEnemies)
                     {
                         foreach (var item in cache.Value.Split(","))
                         {
@@ -1245,8 +1286,10 @@ namespace LunarConfig.Objects.Config
                             SpawnWeightsPreset weights = new();
 
                             List<NamespacedConfigWeight> Moons = NamespacedConfigWeight.ConvertManyFromString(ComprehendWeights(daytimeEnemyWeightString.GetValueOrDefault(enemy.Key.ToString(), "")));
+                            List<NamespacedConfigWeight> Weathers = NamespacedConfigWeight.ConvertManyFromString(ComprehendWeights(daytimeEnemyWeatherString.GetValueOrDefault(enemy.Key.ToString(), "")));
+                            List<NamespacedConfigWeight> Dungeons = NamespacedConfigWeight.ConvertManyFromString(ComprehendWeights(daytimeEnemyDungeonString.GetValueOrDefault(enemy.Key.ToString(), "")));
 
-                            weights.SetupSpawnWeightsPreset(Moons, new List<NamespacedConfigWeight>(), new List<NamespacedConfigWeight>());
+                            weights.SetupSpawnWeightsPreset(Moons, Dungeons, Weathers);
 
                             weightBuilder.SetGlobalWeight(weights);
 
@@ -1270,11 +1313,56 @@ namespace LunarConfig.Objects.Config
                     MiniLogger.LogInfo("Completed Initializing Daytime Weights");
                 }
 
-                if (enabledMoonSettings.Contains("Spawnable Interior Enemies"))
+                if (enabledMoonSettings.Contains("Spawnable Interior Enemies") || enabledDungeonInjectionSettings.Contains("Spawnable Interior Enemies") || enabledWeatherInjectionSettings.Contains("Spawnable Interior Enemies") || enabledTagInjectionSettings.Contains("Spawnable Interior Enemies"))
                 {
                     MiniLogger.LogInfo("Initializing Interior Weights");
 
                     foreach (var cache in cachedInteriorEnemies)
+                    {
+                        foreach (var item in cache.Value.Split(","))
+                        {
+                            string[] splits = item.Split(":");
+
+                            string id = splits[0];
+
+                            string? dawnID = GetDawnUUID(enemies, id);
+                            if (dawnID == null) { continue; }
+
+                            interiorEnemyWeightString[dawnID] = interiorEnemyWeightString.GetValueOrDefault(dawnID, "") + cache.Key + ":" + CleanString(splits[1]) + ",";
+                        }
+                    }
+
+                    foreach (var cache in cachedWeatherInteriorEnemies)
+                    {
+                        foreach (var item in cache.Value.Split(","))
+                        {
+                            string[] splits = item.Split(":");
+
+                            string id = splits[0];
+
+                            string? dawnID = GetDawnUUID(enemies, id);
+                            if (dawnID == null) { continue; }
+
+                            interiorEnemyWeatherString[dawnID] = interiorEnemyWeatherString.GetValueOrDefault(dawnID, "") + cache.Key + ":" + CleanString(splits[1]) + ",";
+                        }
+                    }
+
+                    foreach (var cache in cachedDungeonInteriorEnemies)
+                    {
+                        foreach (var item in cache.Value.Split(","))
+                        {
+                            string[] splits = item.Split(":");
+
+                            string id = splits[0];
+
+                            string? dawnID = GetDawnUUID(enemies, id);
+                            if (dawnID == null) { continue; }
+
+                            interiorEnemyDungeonString[dawnID] = interiorEnemyDungeonString.GetValueOrDefault(dawnID, "") + cache.Key + ":" + CleanString(splits[1]) + ",";
+                        }
+                    }
+
+                    foreach (var cache in cachedTagInteriorEnemies)
                     {
                         foreach (var item in cache.Value.Split(","))
                         {
@@ -1317,8 +1405,10 @@ namespace LunarConfig.Objects.Config
                             SpawnWeightsPreset weights = new();
 
                             List<NamespacedConfigWeight> Moons = NamespacedConfigWeight.ConvertManyFromString(ComprehendWeights(interiorEnemyWeightString.GetValueOrDefault(enemy.Key.ToString(), "")));
+                            List<NamespacedConfigWeight> Weathers = NamespacedConfigWeight.ConvertManyFromString(ComprehendWeights(interiorEnemyWeatherString.GetValueOrDefault(enemy.Key.ToString(), "")));
+                            List<NamespacedConfigWeight> Dungeons = NamespacedConfigWeight.ConvertManyFromString(ComprehendWeights(interiorEnemyDungeonString.GetValueOrDefault(enemy.Key.ToString(), "")));
 
-                            weights.SetupSpawnWeightsPreset(Moons, new List<NamespacedConfigWeight>(), new List<NamespacedConfigWeight>());
+                            weights.SetupSpawnWeightsPreset(Moons, Dungeons, Weathers);
 
                             weightBuilder.SetGlobalWeight(weights);
 
@@ -1342,11 +1432,56 @@ namespace LunarConfig.Objects.Config
                     MiniLogger.LogInfo("Completed Initializing Interior Weights");
                 }
 
-                if (enabledMoonSettings.Contains("Spawnable Outside Enemies"))
+                if (enabledMoonSettings.Contains("Spawnable Outside Enemies") || enabledDungeonInjectionSettings.Contains("Spawnable Outside Enemies") || enabledWeatherInjectionSettings.Contains("Spawnable Outside Enemies") || enabledTagInjectionSettings.Contains("Spawnable Outside Enemies"))
                 {
                     MiniLogger.LogInfo("Initializing Outside Weights");
 
                     foreach (var cache in cachedOutsideEnemies)
+                    {
+                        foreach (var item in cache.Value.Split(","))
+                        {
+                            string[] splits = item.Split(":");
+
+                            string id = splits[0];
+
+                            string? dawnID = GetDawnUUID(enemies, id);
+                            if (dawnID == null) { continue; }
+
+                            outsideEnemyWeightString[dawnID] = outsideEnemyWeightString.GetValueOrDefault(dawnID, "") + cache.Key + ":" + CleanString(splits[1]) + ",";
+                        }
+                    }
+
+                    foreach (var cache in cachedWeatherOutsideEnemies)
+                    {
+                        foreach (var item in cache.Value.Split(","))
+                        {
+                            string[] splits = item.Split(":");
+
+                            string id = splits[0];
+
+                            string? dawnID = GetDawnUUID(enemies, id);
+                            if (dawnID == null) { continue; }
+
+                            outsideEnemyWeatherString[dawnID] = outsideEnemyWeatherString.GetValueOrDefault(dawnID, "") + cache.Key + ":" + CleanString(splits[1]) + ",";
+                        }
+                    }
+
+                    foreach (var cache in cachedDungeonOutsideEnemies)
+                    {
+                        foreach (var item in cache.Value.Split(","))
+                        {
+                            string[] splits = item.Split(":");
+
+                            string id = splits[0];
+
+                            string? dawnID = GetDawnUUID(enemies, id);
+                            if (dawnID == null) { continue; }
+
+                            outsideEnemyDungeonString[dawnID] = outsideEnemyDungeonString.GetValueOrDefault(dawnID, "") + cache.Key + ":" + CleanString(splits[1]) + ",";
+                        }
+                    }
+
+                    foreach (var cache in cachedTagOutsideEnemies)
                     {
                         foreach (var item in cache.Value.Split(","))
                         {
@@ -1389,8 +1524,10 @@ namespace LunarConfig.Objects.Config
                             SpawnWeightsPreset weights = new();
 
                             List<NamespacedConfigWeight> Moons = NamespacedConfigWeight.ConvertManyFromString(ComprehendWeights(outsideEnemyWeightString.GetValueOrDefault(enemy.Key.ToString(), "")));
+                            List<NamespacedConfigWeight> Weathers = NamespacedConfigWeight.ConvertManyFromString(ComprehendWeights(outsideEnemyWeatherString.GetValueOrDefault(enemy.Key.ToString(), "")));
+                            List<NamespacedConfigWeight> Dungeons = NamespacedConfigWeight.ConvertManyFromString(ComprehendWeights(outsideEnemyDungeonString.GetValueOrDefault(enemy.Key.ToString(), "")));
 
-                            weights.SetupSpawnWeightsPreset(Moons, new List<NamespacedConfigWeight>(), new List<NamespacedConfigWeight>());
+                            weights.SetupSpawnWeightsPreset(Moons, Dungeons, Weathers);
 
                             weightBuilder.SetGlobalWeight(weights);
 
@@ -1465,15 +1602,18 @@ namespace LunarConfig.Objects.Config
                                 foreach (string tag in RemoveWhitespace(dungeonEntry.GetValue<string>("Tags")).ToLower().Split(","))
                                 {
                                     string[] splits = tag.Split(":");
-                                    if (splits.Length != 2)
+                                    if (splits.Length == 1 && !splits[0].IsNullOrWhiteSpace())
+                                    {
+                                        newTags.Add(new NamespacedKey("lunarcontenttag", splits[0]));
+                                    }
+                                    else if (splits.Length == 2 && splits[0] != "dawn_lib")
+                                    {
+                                        newTags.Add(new NamespacedKey(splits[0], splits[1]));
+                                    }
+                                    else
                                     {
                                         MiniLogger.LogWarning($"Incorrectly formatted tag '{tag}' found on {uuid}");
                                         continue;
-                                    }
-
-                                    if (splits[0] != "dawn_lib")
-                                    {
-                                        newTags.Add(new NamespacedKey(splits[0], splits[1]));
                                     }
                                 }
 
@@ -1555,6 +1695,36 @@ namespace LunarConfig.Objects.Config
                     }
                 }
 
+                foreach (var cache in cachedWeatherDungeons)
+                {
+                    foreach (var item in cache.Value.Split(","))
+                    {
+                        string[] splits = item.Split(":");
+
+                        string id = splits[0];
+
+                        string? dawnID = GetDawnUUID(dungeons, id);
+                        if (dawnID == null) { continue; }
+
+                        dungeonWeatherString[dawnID] = dungeonWeatherString.GetValueOrDefault(dawnID, "") + cache.Key + ":" + CleanString(splits[1]) + ",";
+                    }
+                }
+
+                foreach (var cache in cachedTagDungeons)
+                {
+                    foreach (var item in cache.Value.Split(","))
+                    {
+                        string[] splits = item.Split(":");
+
+                        string id = splits[0];
+
+                        string? dawnID = GetDawnUUID(dungeons, id);
+                        if (dawnID == null) { continue; }
+
+                        dungeonWeightString[dawnID] = dungeonWeightString.GetValueOrDefault(dawnID, "") + cache.Key + ":" + CleanString(splits[1]) + ",";
+                    }
+                }
+
                 foreach (var dungeon in LethalContent.Dungeons)
                 {
                     string uuid = UUIDify(dungeon.Key.ToString());
@@ -1577,8 +1747,9 @@ namespace LunarConfig.Objects.Config
                         SpawnWeightsPreset weights = new();
 
                         List<NamespacedConfigWeight> Moons = NamespacedConfigWeight.ConvertManyFromString(ComprehendWeights(dungeonWeightString.GetValueOrDefault(key, "")));
+                        List<NamespacedConfigWeight> Weathers = NamespacedConfigWeight.ConvertManyFromString(ComprehendWeights(dungeonWeatherString.GetValueOrDefault(key, "")));
 
-                        weights.SetupSpawnWeightsPreset(Moons, new List<NamespacedConfigWeight>(), new List<NamespacedConfigWeight>());
+                        weights.SetupSpawnWeightsPreset(Moons, new List<NamespacedConfigWeight>(), Weathers);
 
                         weightBuilder.SetGlobalWeight(weights);
 
@@ -1681,15 +1852,18 @@ namespace LunarConfig.Objects.Config
                                 foreach (string tag in RemoveWhitespace(objEntry.GetValue<string>("Tags")).ToLower().Split(","))
                                 {
                                     string[] splits = tag.Split(":");
-                                    if (splits.Length != 2)
+                                    if (splits.Length == 1 && !splits[0].IsNullOrWhiteSpace())
+                                    {
+                                        newTags.Add(new NamespacedKey("lunarcontenttag", splits[0]));
+                                    }
+                                    else if (splits.Length == 2 && splits[0] != "dawn_lib")
+                                    {
+                                        newTags.Add(new NamespacedKey(splits[0], splits[1]));
+                                    }
+                                    else
                                     {
                                         MiniLogger.LogWarning($"Incorrectly formatted tag '{tag}' found on {uuid}");
                                         continue;
-                                    }
-
-                                    if (splits[0] != "dawn_lib")
-                                    {
-                                        newTags.Add(new NamespacedKey(splits[0], splits[1]));
                                     }
                                 }
 
@@ -1999,8 +2173,8 @@ namespace LunarConfig.Objects.Config
                         moonEntry.TryAddField(enabledMoonSettings, "Max Outside Power", "The amount of outside power capacity that a moon has.", moonObj.maxOutsideEnemyPowerCount);
                         moonEntry.TryAddField(enabledMoonSettings, "Min Scrap", "The minimum amount of scrap items that can spawn on a moon.", moonObj.minScrap);
                         moonEntry.TryAddField(enabledMoonSettings, "Max Scrap", "The maximum amount of scrap items that can spawn on a moon.", moonObj.maxScrap);
-                        moonEntry.TryAddField(enabledMoonSettings, "Min Scrap Total", "NOTE: This setting is essentially unused in the vanilla game except for Single Item Days, Lunar does not implement any new functionality.\nThe minimum amount of scrap value that can spawn on a moon.", moonObj.minTotalScrapValue);
-                        moonEntry.TryAddField(enabledMoonSettings, "Max Scrap Total", "NOTE: This setting is essentially unused in the vanilla game except for Single Item Days, Lunar does not implement any new functionality.\nThe maximum amount of scrap value that can spawn on a moon.", moonObj.maxTotalScrapValue);
+                        moonEntry.TryAddField(enabledMoonSettings, "Min Scrap Total", "NOTE: This setting is essentially unused in the vanilla, Lunar does not implement any new functionality.\nThe minimum amount of scrap value that can spawn on a moon.", moonObj.minTotalScrapValue);
+                        moonEntry.TryAddField(enabledMoonSettings, "Max Scrap Total", "NOTE: This setting is essentially unused in the vanilla, Lunar does not implement any new functionality.\nThe maximum amount of scrap value that can spawn on a moon.", moonObj.maxTotalScrapValue);
                         moonEntry.TryAddField(enabledMoonSettings, "Interior Multiplier", "Changes the size of the interior generated.", moonObj.factorySizeMultiplier);
 
                         if (purchaseInfo != null)
@@ -2034,17 +2208,24 @@ namespace LunarConfig.Objects.Config
                         {
                             DawnItemInfo ite = item.Value;
 
-                            if (ite.ScrapInfo == null) { continue; }
-
-                            int? rarity = ite.ScrapInfo.Weights.GetFor(dawnMoon);
-
-                            if (rarity != null && rarity > 0)
+                            try
                             {
-                                if (defaultScrap != "")
+                                if (ite.ScrapInfo == null) { continue; }
+                            
+                                int? rarity = ite.ScrapInfo.Weights.GetFor(dawnMoon);
+
+                                if (rarity != null && rarity > 0)
                                 {
-                                    defaultScrap += ", ";
+                                    if (defaultScrap != "")
+                                    {
+                                        defaultScrap += ", ";
+                                    }
+                                    defaultScrap += ite.Item.itemName + ":" + rarity;
                                 }
-                                defaultScrap += ite.Item.itemName + ":" + rarity;
+                            }
+                            catch (Exception e)
+                            {
+                                MiniLogger.LogWarning($"Failed to grab weight for {ite.Key.ToString()} on {numberlessName}\n{e}");
                             }
                         }
 
@@ -2055,46 +2236,53 @@ namespace LunarConfig.Objects.Config
                         {
                             DawnEnemyInfo ene = enemy.Value;
 
-                            if (ene.Daytime != null)
+                            try
                             {
-                                int? rarity = ene.Daytime.Weights.GetFor(dawnMoon);
-
-                                if (rarity != null && rarity > 0)
+                                if (ene.Daytime != null)
                                 {
-                                    if (defaultDayEnemies != "")
+                                    int? rarity = ene.Daytime.Weights.GetFor(dawnMoon);
+
+                                    if (rarity != null && rarity > 0)
                                     {
-                                        defaultDayEnemies += ", ";
+                                        if (defaultDayEnemies != "")
+                                        {
+                                            defaultDayEnemies += ", ";
+                                        }
+                                        defaultDayEnemies += ene.EnemyType.enemyName + ":" + rarity;
                                     }
-                                    defaultDayEnemies += ene.EnemyType.enemyName + ":" + rarity;
+                                }
+
+                                if (ene.Inside != null)
+                                {
+                                    int? rarity = ene.Inside.Weights.GetFor(dawnMoon);
+
+                                    if (rarity != null && rarity > 0)
+                                    {
+                                        if (defaultInteriorEnemies != "")
+                                        {
+                                            defaultInteriorEnemies += ", ";
+                                        }
+                                        defaultInteriorEnemies += ene.EnemyType.enemyName + ":" + rarity;
+                                    }
+                                }
+
+                                if (ene.Outside != null)
+                                {
+                                    int? rarity = ene.Outside.Weights.GetFor(dawnMoon);
+
+                                    if (rarity != null && rarity > 0)
+                                    {
+                                        if (defaultOutsideEnemies != "")
+                                        {
+                                            defaultOutsideEnemies += ", ";
+                                        }
+                                        defaultOutsideEnemies += ene.EnemyType.enemyName + ":" + rarity;
+                                    }
                                 }
                             }
-
-                            if (ene.Inside != null)
+                            catch (Exception e)
                             {
-                                int? rarity = ene.Inside.Weights.GetFor(dawnMoon);
-
-                                if (rarity != null && rarity > 0)
-                                {
-                                    if (defaultInteriorEnemies != "")
-                                    {
-                                        defaultInteriorEnemies += ", ";
-                                    }
-                                    defaultInteriorEnemies += ene.EnemyType.enemyName + ":" + rarity;
-                                }
-                            }
-
-                            if (ene.Outside != null)
-                            {
-                                int? rarity = ene.Outside.Weights.GetFor(dawnMoon);
-
-                                if (rarity != null && rarity > 0)
-                                {
-                                    if (defaultOutsideEnemies != "")
-                                    {
-                                        defaultOutsideEnemies += ", ";
-                                    }
-                                    defaultOutsideEnemies += ene.EnemyType.enemyName + ":" + rarity;
-                                }
+                                MiniLogger.LogWarning($"Failed to grab weight for {ene.Key.ToString()} on {numberlessName}\n{e}");
                             }
                         }
 
@@ -2102,16 +2290,24 @@ namespace LunarConfig.Objects.Config
                         foreach (var dungeon in LethalContent.Dungeons)
                         {
                             DawnDungeonInfo dun = dungeon.Value;
-                            int? rarity = dun.Weights.GetFor(dawnMoon);
 
-                            if (rarity != null && rarity > 0)
+                            try
                             {
-                                if (defaultDungeons != "")
-                                {
-                                    defaultDungeons += ", ";
-                                }
+                                int? rarity = dun.Weights.GetFor(dawnMoon);
 
-                                defaultDungeons += dun.DungeonFlow.name + ":" + rarity;
+                                if (rarity != null && rarity > 0)
+                                {
+                                    if (defaultDungeons != "")
+                                    {
+                                        defaultDungeons += ", ";
+                                    }
+
+                                    defaultDungeons += dun.DungeonFlow.name + ":" + rarity;
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                MiniLogger.LogWarning($"Failed to grab weight for {dun.Key.ToString()} on {numberlessName}\n{e}");
                             }
                         }
 
@@ -2172,17 +2368,18 @@ namespace LunarConfig.Objects.Config
                                 foreach (string tag in RemoveWhitespace(moonEntry.GetValue<string>("Tags")).ToLower().Split(","))
                                 {
                                     string[] splits = tag.Split(":");
-                                    if (splits.Length != 2)
+                                    if (splits.Length == 1 && !splits[0].IsNullOrWhiteSpace())
+                                    {
+                                        newTags.Add(new NamespacedKey("lunarcontenttag", splits[0]));
+                                    }
+                                    else if (splits.Length == 2 && splits[0] != "dawn_lib")
+                                    {
+                                        newTags.Add(new NamespacedKey(splits[0], splits[1]));
+                                    }
+                                    else
                                     {
                                         MiniLogger.LogWarning($"Incorrectly formatted tag '{tag}' found on {uuid}");
                                         continue;
-                                    }
-
-                                    if (splits[0] != "dawn_lib")
-                                    {
-                                        NamespacedKey newTag = new NamespacedKey(splits[0], splits[1]);
-                                        newTags.Add(newTag);
-                                        everyMoonTag.Add(newTag.Key);
                                     }
                                 }
 
@@ -2460,15 +2657,18 @@ namespace LunarConfig.Objects.Config
                                 foreach (string tag in RemoveWhitespace(unlockableEntry.GetValue<string>("Tags")).ToLower().Split(","))
                                 {
                                     string[] splits = tag.Split(":");
-                                    if (splits.Length != 2)
+                                    if (splits.Length == 1 && !splits[0].IsNullOrWhiteSpace())
+                                    {
+                                        newTags.Add(new NamespacedKey("lunarcontenttag", splits[0]));
+                                    }
+                                    else if (splits.Length == 2 && splits[0] != "dawn_lib")
+                                    {
+                                        newTags.Add(new NamespacedKey(splits[0], splits[1]));
+                                    }
+                                    else
                                     {
                                         MiniLogger.LogWarning($"Incorrectly formatted tag '{tag}' found on {uuid}");
                                         continue;
-                                    }
-
-                                    if (splits[0] != "dawn_lib")
-                                    {
-                                        newTags.Add(new NamespacedKey(splits[0], splits[1]));
                                     }
                                 }
 

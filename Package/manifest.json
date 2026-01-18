@@ -1,11 +1,11 @@
 {
     "name": "LunarConfig",
     "author": "Crafty",
-    "version_number": "0.2.8",
+    "version_number": "0.3.2",
     "website_url": "https://github.com/CraftyC7/LunarConfig",
     "description": "An all-in-one configuration solution for changing almost anything about almost everything!",
     "dependencies": [
         "BepInEx-BepInExPack-5.4.2304",
-        "TeamXiaolan-DawnLib-0.5.16"
+        "TeamXiaolan-DawnLib-0.6.2"
     ]
 }

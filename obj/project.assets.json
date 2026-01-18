@@ -680,7 +680,7 @@
           }
         }
       },
-      "TeamXiaolan.DawnLib/0.5.10": {
+      "TeamXiaolan.DawnLib/0.6.0": {
         "type": "package",
         "dependencies": {
           "Evaisa.LethalLib": "1.1.1"
@@ -692,10 +692,10 @@
           "lib/netstandard2.1/com.github.teamxiaolan.dawnlib.dll": {}
         }
       },
-      "TeamXiaolan.DawnLib.DuskMod/0.5.10": {
+      "TeamXiaolan.DawnLib.DuskMod/0.6.0": {
         "type": "package",
         "dependencies": {
-          "TeamXiaolan.DawnLib": "0.5.10"
+          "TeamXiaolan.DawnLib": "0.6.0"
         },
         "compile": {
           "lib/netstandard2.1/com.github.teamxiaolan.dawnlib.dusk.dll": {}
@@ -2767,27 +2767,27 @@
         "system.threading.tasks.nuspec"
       ]
     },
-    "TeamXiaolan.DawnLib/0.5.10": {
-      "sha512": "uMjRVJknM7KsSg+ylEfqeDiYe5YKqRDAnSZxgWzVZCfFByqEjAs6Tuv44jvNC0FOqgomkOkSoC7q2N2GpuNnEg==",
+    "TeamXiaolan.DawnLib/0.6.0": {
+      "sha512": "xPGY7TNKGLVsKKJdIzOtM5MNxEekf8QI352/7cDfyEFCwKl931nMntIHo1lTDssKw48PFP9qfBF3lMwlD9Osyg==",
       "type": "package",
-      "path": "teamxiaolan.dawnlib/0.5.10",
+      "path": "teamxiaolan.dawnlib/0.6.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "lib/netstandard2.1/com.github.teamxiaolan.dawnlib.dll",
-        "teamxiaolan.dawnlib.0.5.10.nupkg.sha512",
+        "teamxiaolan.dawnlib.0.6.0.nupkg.sha512",
         "teamxiaolan.dawnlib.nuspec"
       ]
     },
-    "TeamXiaolan.DawnLib.DuskMod/0.5.10": {
-      "sha512": "090BgP0Zp2vFu3i+Gd09m7+y0a4IqFxNrXrSu/E8q7jxIfCwjgEBI9FoHYKJmC6KNPng9gEleto+5gIYuJeJtg==",
+    "TeamXiaolan.DawnLib.DuskMod/0.6.0": {
+      "sha512": "2vYfOmbg0nigxXf+efdCjPE/b6frC+fHw97x1BegkgnvvijYdQPaMZnwidzKP2b6zXsfC8ccO+Jp72t3j86N0g==",
       "type": "package",
-      "path": "teamxiaolan.dawnlib.duskmod/0.5.10",
+      "path": "teamxiaolan.dawnlib.duskmod/0.6.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "lib/netstandard2.1/com.github.teamxiaolan.dawnlib.dusk.dll",
-        "teamxiaolan.dawnlib.duskmod.0.5.10.nupkg.sha512",
+        "teamxiaolan.dawnlib.duskmod.0.6.0.nupkg.sha512",
         "teamxiaolan.dawnlib.duskmod.nuspec"
       ]
     },
@@ -3007,8 +3007,8 @@
       "BepInEx.Core >= 5.*",
       "BepInEx.PluginInfoProps >= 2.*",
       "LethalCompany.GameLibs.Steam >= *-*",
-      "TeamXiaolan.DawnLib >= 0.5.10",
-      "TeamXiaolan.DawnLib.DuskMod >= 0.5.10",
+      "TeamXiaolan.DawnLib >= 0.6.0",
+      "TeamXiaolan.DawnLib.DuskMod >= 0.6.0",
       "UnityEngine.Modules >= 2022.3.9"
     ]
   },
@@ -3094,12 +3094,12 @@
           "TeamXiaolan.DawnLib": {
             "suppressParent": "All",
             "target": "Package",
-            "version": "[0.5.10, )"
+            "version": "[0.6.0, )"
           },
           "TeamXiaolan.DawnLib.DuskMod": {
             "suppressParent": "All",
             "target": "Package",
-            "version": "[0.5.10, )"
+            "version": "[0.6.0, )"
           },
           "UnityEngine.Modules": {
             "include": "Compile",

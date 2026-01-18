@@ -1,8 +1,30 @@
+## Version 0.3.2
+
+Fixes?
+- Added failsafes if an item's weight cannot be gotten so it won't error the entire moon.
+
+## Version 0.3.1
+
+Fixes
+- Fixed multipliers not working with injection right.
+- Removed using the '=' operator in weight strings.
+- Automatically adds a namespace to tags that do not have one.
+
+# Version 0.3.0 - INJECTION UPDATE
+
+Features
+- Basic injection is added based on dungeons, tags, and weather.
+- Includes injecting scrap, enemies, and dungeons!
+- Added a setting for changing the unused total scrap values.
+
+Fixes
+- Moved to DawnLib's curve system.
+
 ## Version 0.2.8
 
 Features
 - Added tags on everything! (mostly useless for now)
-- Added configuration for unlockables (furniture, suits, ship upgrades)
+- Added configuration for unlockables. (furniture, suits, ship upgrades)
 
 Fixes
 - Prevented meddling with DawnLib tags.
