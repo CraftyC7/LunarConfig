@@ -1,3 +1,20 @@
+## Version 0.3.5
+
+Fixes
+- Compatible with the newest DawnLib version.
+- Fixed an issue with Has Time?
+- Maybe unintentionally fixed other things who knows.
+
+## Version 0.3.4
+
+Fixes
+- Fixed an obscure mistake where disabling configuring tags for items would break configuring enemies.
+
+## Version 0.3.3
+
+Fixes
+- Added compatability with new Dawn version.
+
 ## Version 0.3.2
 
 Fixes?

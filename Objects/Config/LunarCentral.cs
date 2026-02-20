@@ -10,7 +10,6 @@ using Dusk;
 using Dusk.Weights;
 using EasyTextEffects.Editor.MyBoxCopy.Extensions;
 using HarmonyLib;
-using LethalLib.Modules;
 using Steamworks.Ugc;
 using System;
 using System.Collections.Generic;
@@ -31,6 +30,9 @@ namespace LunarConfig.Objects.Config
         public Dictionary<string, LunarConfigFile> files = new Dictionary<string, LunarConfigFile>();
 
         public static HashSet<String> everyMoonTag = new HashSet<String>();
+
+        public static bool mapObjectKeysInitialized = false;
+        public static Dictionary<string, string> mapObjectKeys = new Dictionary<string, string>();
 
         public static Dictionary<string, string> items = new Dictionary<string, string>();
         public static Dictionary<string, string> enemies = new Dictionary<string, string>();
@@ -144,7 +146,7 @@ namespace LunarConfig.Objects.Config
         // UTILS
         public static string UUIDify(string uuid)
         {
-            return uuid.Replace("=", "").Replace("\n", "").Replace("\t", "").Replace("\\", "").Replace("\"", "").Replace("\'", "").Replace("[", "").Replace("]", "");
+            return uuid.Replace("=", "").Replace("\n", "").Replace("\t", "").Replace("\\", "").Replace("\"", "").Replace("\'", "").Replace("[", "").Replace("]", "").Replace("`", "");
         }
 
         public static string CleanString(string str)
@@ -159,13 +161,7 @@ namespace LunarConfig.Objects.Config
 
         public static string NiceifyDawnUUID(string uuid)
         {
-            TextInfo textInfo = Thread.CurrentThread.CurrentCulture.TextInfo;
-            string name = uuid;
-            if (uuid.Contains(":"))
-            {
-                name = uuid.Split(":")[1];
-            }
-            return textInfo.ToTitleCase(name.Replace("_", " "));
+            return NamespacedKey.NormalizeStringForNamespacedKey(uuid, true);
         }
 
         // Taken from LLL
@@ -299,6 +295,14 @@ namespace LunarConfig.Objects.Config
             multiplierWeights = multiplierWeights.Where(kvp => kvp.Value != 1).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
             return string.Join(", ", baseWeights.Select(kvp => $"{kvp.Key}=+{kvp.Value}")) + ((baseWeights.Count > 0 && multiplierWeights.Count > 0) ? ", " : "") + string.Join(", ", multiplierWeights.Select(kvp => $"{kvp.Key}=*{kvp.Value}"));
+        }
+
+        public void InitObjectKeys()
+        {
+            foreach (var obj in LethalContent.MapObjects)
+            {
+                mapObjectKeys[NiceifyDawnUUID(obj.Key.Key)] = obj.Key.ToString();
+            }
         }
 
         // LUNAR
@@ -613,7 +617,7 @@ namespace LunarConfig.Objects.Config
 
                     try
                     {
-                        string niceUUID = NiceifyDawnUUID(uuid);
+                        string niceUUID = NiceifyDawnUUID(item.Key.Key);
                         DawnItemInfo dawnItem = item.Value;
                         LunarConfigEntry itemEntry = itemFile.AddEntry($"{niceUUID} - {uuid}");
 
@@ -912,6 +916,7 @@ namespace LunarConfig.Objects.Config
                 {
                     foreach (var item in cache.Value.Split(","))
                     {
+                        MiniLogger.LogInfo(item);
                         string[] splits = item.Split(":");
 
                         string id = splits[0];
@@ -940,14 +945,15 @@ namespace LunarConfig.Objects.Config
 
                             foreach (var moon in notConfiguredScrapMoons)
                             {
-                                int? rarity = scrapInfo.Weights.GetFor(moon);
+                                SpawnWeightContext ctx = new(moon, null, null);
+                                int? rarity = scrapInfo.Weights.GetFor(moon, ctx);
                                 if (rarity != null && rarity > 0) { itemWeightString[key] = itemWeightString.GetValueOrDefault(key, "") + moon.Key.ToString() + ":" + rarity + ","; }
                             }
                         }
 
                         if (!dawnItem.HasTag(DawnLibTags.LunarConfig)) { dawnItem.Internal_AddTag(DawnLibTags.LunarConfig); }
 
-                        WeightTableBuilder<DawnMoonInfo> weightBuilder = new();
+                        WeightTableBuilder<DawnMoonInfo, SpawnWeightContext> weightBuilder = new();
                         SpawnWeightsPreset weights = new();
 
                         List<NamespacedConfigWeight> Moons = NamespacedConfigWeight.ConvertManyFromString(ComprehendWeights(itemWeightString.GetValueOrDefault(item.Key.ToString(), "")));
@@ -997,7 +1003,7 @@ namespace LunarConfig.Objects.Config
 
                     try
                     {
-                        string niceUUID = NiceifyDawnUUID(uuid);
+                        string niceUUID = NiceifyDawnUUID(enemy.Key.Key);
                         DawnEnemyInfo dawnEnemy = enemy.Value;
                         LunarConfigEntry enemyEntry = enemyFile.AddEntry($"{niceUUID} - {uuid}");
                         EnemyType enemyObj = dawnEnemy.EnemyType;
@@ -1062,7 +1068,7 @@ namespace LunarConfig.Objects.Config
                         
                         if (word != null) { enemyEntry.TryAddField(enabledEnemySettings, "Bestiary Keyword", "The keyword to view the bestiary entry of an enemy.", word.word); }
 
-                        enemyEntry.TryAddField(enabledItemSettings, "Tags", "Tags allocated to the enemy.\nSeparate tags with commas.", String.Join(", ", dawnEnemy.AllTags().Where(tag => tag.Namespace != "dawn_lib")));
+                        enemyEntry.TryAddField(enabledEnemySettings, "Tags", "Tags allocated to the enemy.\nSeparate tags with commas.", String.Join(", ", dawnEnemy.AllTags().Where(tag => tag.Namespace != "dawn_lib")));
 
                         // LLL Backcompat
                         if (backCompat) { MigrateSection(enemyFile.file, $"LLL - {enemyObj.enemyName}", $"{niceUUID} - {uuid}"); }
@@ -1275,14 +1281,15 @@ namespace LunarConfig.Objects.Config
 
                                 foreach (var moon in notConfiguredDaytimeMoons)
                                 {
-                                    int? rarity = location.Weights.GetFor(moon);
+                                    SpawnWeightContext ctx = new(moon, null, null);
+                                    int? rarity = location.Weights.GetFor(moon, ctx);
                                     if (rarity != null && rarity > 0) { daytimeEnemyWeightString[key] = daytimeEnemyWeightString.GetValueOrDefault(key, "") + moon.Key.ToString() + ":" + rarity + ","; }
                                 }
                             }
 
                             if (!dawnEnemy.HasTag(DawnLibTags.LunarConfig)) { dawnEnemy.Internal_AddTag(DawnLibTags.LunarConfig); }
 
-                            WeightTableBuilder<DawnMoonInfo> weightBuilder = new();
+                            WeightTableBuilder<DawnMoonInfo, SpawnWeightContext> weightBuilder = new();
                             SpawnWeightsPreset weights = new();
 
                             List<NamespacedConfigWeight> Moons = NamespacedConfigWeight.ConvertManyFromString(ComprehendWeights(daytimeEnemyWeightString.GetValueOrDefault(enemy.Key.ToString(), "")));
@@ -1394,14 +1401,15 @@ namespace LunarConfig.Objects.Config
 
                                 foreach (var moon in notConfiguredInteriorMoons)
                                 {
-                                    int? rarity = location.Weights.GetFor(moon);
+                                    SpawnWeightContext ctx = new(moon, null, null);
+                                    int? rarity = location.Weights.GetFor(moon, ctx);
                                     if (rarity != null && rarity > 0) { interiorEnemyWeightString[key] = interiorEnemyWeightString.GetValueOrDefault(key, "") + moon.Key.ToString() + ":" + rarity + ","; }
                                 }
                             }
 
                             if (!dawnEnemy.HasTag(DawnLibTags.LunarConfig)) { dawnEnemy.Internal_AddTag(DawnLibTags.LunarConfig); }
 
-                            WeightTableBuilder<DawnMoonInfo> weightBuilder = new();
+                            WeightTableBuilder<DawnMoonInfo, SpawnWeightContext> weightBuilder = new();
                             SpawnWeightsPreset weights = new();
 
                             List<NamespacedConfigWeight> Moons = NamespacedConfigWeight.ConvertManyFromString(ComprehendWeights(interiorEnemyWeightString.GetValueOrDefault(enemy.Key.ToString(), "")));
@@ -1513,14 +1521,15 @@ namespace LunarConfig.Objects.Config
 
                                 foreach (var moon in notConfiguredOutsideMoons)
                                 {
-                                    int? rarity = location.Weights.GetFor(moon);
+                                    SpawnWeightContext ctx = new(moon, null, null);
+                                    int? rarity = location.Weights.GetFor(moon, ctx);
                                     if (rarity != null && rarity > 0) { outsideEnemyWeightString[key] = outsideEnemyWeightString.GetValueOrDefault(key, "") + moon.Key.ToString() + ":" + rarity + ","; }
                                 }
                             }
 
                             if (!dawnEnemy.HasTag(DawnLibTags.LunarConfig)) { dawnEnemy.Internal_AddTag(DawnLibTags.LunarConfig); }
 
-                            WeightTableBuilder<DawnMoonInfo> weightBuilder = new();
+                            WeightTableBuilder<DawnMoonInfo, SpawnWeightContext> weightBuilder = new();
                             SpawnWeightsPreset weights = new();
 
                             List<NamespacedConfigWeight> Moons = NamespacedConfigWeight.ConvertManyFromString(ComprehendWeights(outsideEnemyWeightString.GetValueOrDefault(enemy.Key.ToString(), "")));
@@ -1574,7 +1583,7 @@ namespace LunarConfig.Objects.Config
 
                     try
                     {
-                        string niceUUID = NiceifyDawnUUID(uuid);
+                        string niceUUID = NiceifyDawnUUID(dungeon.Key.Key);
                         DawnDungeonInfo dawnDungeon = dungeon.Value;
                         LunarConfigEntry dungeonEntry = dungeonFile.AddEntry($"{niceUUID} - {uuid}");
 
@@ -1737,13 +1746,14 @@ namespace LunarConfig.Objects.Config
 
                         foreach (var moon in notConfiguredDungeonMoons)
                         {
-                            int? rarity = dungeon.Value.Weights.GetFor(moon);
+                            SpawnWeightContext ctx = new(moon, null, null);
+                            int? rarity = dungeon.Value.Weights.GetFor(moon, ctx);
                             if (rarity != null && rarity > 0) { dungeonWeightString[key] = dungeonWeightString.GetValueOrDefault(key, "") + moon.Key.ToString() + ":" + rarity + ","; }
                         }
 
                         if (!dawnDungeon.HasTag(DawnLibTags.LunarConfig)) { dawnDungeon.Internal_AddTag(DawnLibTags.LunarConfig); }
 
-                        WeightTableBuilder<DawnMoonInfo> weightBuilder = new();
+                        WeightTableBuilder<DawnMoonInfo, SpawnWeightContext> weightBuilder = new();
                         SpawnWeightsPreset weights = new();
 
                         List<NamespacedConfigWeight> Moons = NamespacedConfigWeight.ConvertManyFromString(ComprehendWeights(dungeonWeightString.GetValueOrDefault(key, "")));
@@ -1785,7 +1795,7 @@ namespace LunarConfig.Objects.Config
 
                     try
                     {
-                        string niceUUID = NiceifyDawnUUID(uuid);
+                        string niceUUID = NiceifyDawnUUID(obj.Key.Key);
                         DawnMapObjectInfo dawnObj = obj.Value;
                         LunarConfigEntry objEntry = mapObjectFile.AddEntry($"{niceUUID} - {uuid}");
 
@@ -1887,7 +1897,7 @@ namespace LunarConfig.Objects.Config
                             
                             if (insideInfo == null)
                             {
-                                CurveTableBuilder<DawnMoonInfo> blankTable = new();
+                                CurveTableBuilder<DawnMoonInfo, SpawnWeightContext> blankTable = new();
 
                                 dawnObj.InsideInfo = new DawnInsideMapObjectInfo(blankTable.Build(), false, false, false, false, false, false);
                                 insideInfo = dawnObj.InsideInfo;
@@ -1903,7 +1913,7 @@ namespace LunarConfig.Objects.Config
 
                             if (outsideInfo == null)
                             {
-                                CurveTableBuilder<DawnMoonInfo> blankTable = new();
+                                CurveTableBuilder<DawnMoonInfo, SpawnWeightContext> blankTable = new();
 
                                 dawnObj.OutsideInfo = new DawnOutsideMapObjectInfo(blankTable.Build(), false, 1, Array.Empty<string>(), Vector3.zero, true, 0);
                                 outsideInfo = dawnObj.OutsideInfo;
@@ -1975,7 +1985,7 @@ namespace LunarConfig.Objects.Config
                             {
                                 AnimationCurve curve = StringToCurve(CleanString(kvp.Value));
 
-                                TrySetInsideCurve(GetDawnUUID(mapObjects, id), curve, dawnMoon);
+                                TrySetInsideCurve(id, curve, dawnMoon);
                             }
                         }
                     }
@@ -1997,14 +2007,15 @@ namespace LunarConfig.Objects.Config
 
                                 foreach (var moon in notConfiguredInsideMapObjectMoons)
                                 {
-                                    AnimationCurve? rarity = dawnCurveInfo.SpawnWeights.GetFor(moon);
+                                    SpawnWeightContext ctx = new(moon, null, null);
+                                    AnimationCurve? rarity = dawnCurveInfo.SpawnWeights.GetFor(moon, ctx);
                                     if (rarity != null) { TrySetInsideCurve(key, rarity, moon.TypedKey); }
                                 }
                             }
 
                             if (!dawnObj.HasTag(DawnLibTags.LunarConfig)) { dawnObj.Internal_AddTag(DawnLibTags.LunarConfig); }
 
-                            CurveTableBuilder<DawnMoonInfo> curveBuilder = new();
+                            CurveTableBuilder<DawnMoonInfo, SpawnWeightContext> curveBuilder = new();
 
                             if (defaultInsideMapObjectCurves.TryGetValue(uuid, out Dictionary<NamespacedKey<DawnMoonInfo>, AnimationCurve> moonVars))
                             {
@@ -2014,7 +2025,7 @@ namespace LunarConfig.Objects.Config
                                 }
                             }
 
-                            ProviderTable<AnimationCurve?, DawnMoonInfo> newTable = curveBuilder.Build();
+                            ProviderTable<AnimationCurve?, DawnMoonInfo, SpawnWeightContext> newTable = curveBuilder.Build();
 
                             // SET WEIGHTS
                             if (dawnCurveInfo != null)
@@ -2051,7 +2062,7 @@ namespace LunarConfig.Objects.Config
                             {
                                 AnimationCurve curve = StringToCurve(CleanString(kvp.Value));
 
-                                TrySetOutsideCurve(GetDawnUUID(mapObjects, id), curve, dawnMoon);
+                                TrySetOutsideCurve(id, curve, dawnMoon);
                             }
                         }
                     }
@@ -2073,14 +2084,15 @@ namespace LunarConfig.Objects.Config
 
                                 foreach (var moon in notConfiguredOutsideMapObjectMoons)
                                 {
-                                    AnimationCurve? rarity = dawnCurveInfo.SpawnWeights.GetFor(moon);
-                                    if (rarity != null) { TrySetOutsideCurve(key, (AnimationCurve)rarity, moon.TypedKey); }
+                                    SpawnWeightContext ctx = new(moon, null, null);
+                                    AnimationCurve? rarity = dawnCurveInfo.SpawnWeights.GetFor(moon, ctx);
+                                    if (rarity != null) { TrySetOutsideCurve(key, rarity, moon.TypedKey); }
                                 }
                             }
 
                             if (!dawnObj.HasTag(DawnLibTags.LunarConfig)) { dawnObj.Internal_AddTag(DawnLibTags.LunarConfig); }
 
-                            CurveTableBuilder<DawnMoonInfo> curveBuilder = new();
+                            CurveTableBuilder<DawnMoonInfo, SpawnWeightContext> curveBuilder = new();
 
                             if (defaultOutsideMapObjectCurves.TryGetValue(uuid, out Dictionary<NamespacedKey<DawnMoonInfo>, AnimationCurve> moonVars))
                             {
@@ -2090,7 +2102,7 @@ namespace LunarConfig.Objects.Config
                                 }
                             }
 
-                            ProviderTable<AnimationCurve?, DawnMoonInfo> newTable = curveBuilder.Build();
+                            ProviderTable<AnimationCurve?, DawnMoonInfo, SpawnWeightContext> newTable = curveBuilder.Build();
 
                             // SET WEIGHTS
                             if (dawnCurveInfo != null)
@@ -2136,8 +2148,9 @@ namespace LunarConfig.Objects.Config
 
                     try
                     {
-                        string niceUUID = NiceifyDawnUUID(uuid);
+                        string niceUUID = NiceifyDawnUUID(moon.Key.Key);
                         DawnMoonInfo dawnMoon = moon.Value;
+                        SpawnWeightContext ctx = new(dawnMoon, null, null);
                         LunarConfigEntry moonEntry = moonFile.AddEntry($"{niceUUID} - {uuid}");
                         SelectableLevel moonObj = dawnMoon.Level;
                         DawnPurchaseInfo purchaseInfo = null;
@@ -2211,8 +2224,8 @@ namespace LunarConfig.Objects.Config
                             try
                             {
                                 if (ite.ScrapInfo == null) { continue; }
-                            
-                                int? rarity = ite.ScrapInfo.Weights.GetFor(dawnMoon);
+
+                                int? rarity = ite.ScrapInfo.Weights.GetFor(dawnMoon, ctx);
 
                                 if (rarity != null && rarity > 0)
                                 {
@@ -2240,7 +2253,7 @@ namespace LunarConfig.Objects.Config
                             {
                                 if (ene.Daytime != null)
                                 {
-                                    int? rarity = ene.Daytime.Weights.GetFor(dawnMoon);
+                                    int? rarity = ene.Daytime.Weights.GetFor(dawnMoon, ctx);
 
                                     if (rarity != null && rarity > 0)
                                     {
@@ -2254,7 +2267,7 @@ namespace LunarConfig.Objects.Config
 
                                 if (ene.Inside != null)
                                 {
-                                    int? rarity = ene.Inside.Weights.GetFor(dawnMoon);
+                                    int? rarity = ene.Inside.Weights.GetFor(dawnMoon, ctx);
 
                                     if (rarity != null && rarity > 0)
                                     {
@@ -2268,7 +2281,7 @@ namespace LunarConfig.Objects.Config
 
                                 if (ene.Outside != null)
                                 {
-                                    int? rarity = ene.Outside.Weights.GetFor(dawnMoon);
+                                    int? rarity = ene.Outside.Weights.GetFor(dawnMoon, ctx);
 
                                     if (rarity != null && rarity > 0)
                                     {
@@ -2293,7 +2306,7 @@ namespace LunarConfig.Objects.Config
 
                             try
                             {
-                                int? rarity = dun.Weights.GetFor(dawnMoon);
+                                int? rarity = dun.Weights.GetFor(dawnMoon, ctx);
 
                                 if (rarity != null && rarity > 0)
                                 {
@@ -2322,6 +2335,12 @@ namespace LunarConfig.Objects.Config
                         moonEntry.TryAddField(enabledMoonSettings, "Spawnable Outside Enemies", "The base outside enemies that can spawn on the moon.\nDenoted with NAME:RARITY, separated with commas.", defaultOutsideEnemies);
                         moonEntry.TryAddField(enabledMoonSettings, "Possible Interiors", "The base interiors that can spawn on the moon.\nDenoted with NAME:RARITY, separated with commas.", defaultDungeons);
 
+                        if (!mapObjectKeysInitialized)
+                        {
+                            InitObjectKeys();
+                            mapObjectKeysInitialized = true;
+                        }
+
                         foreach (var obj in LethalContent.MapObjects.Values)
                         {
                             if (enabledMapObjectSettings.Contains("(Inside) Level Curves"))
@@ -2330,13 +2349,13 @@ namespace LunarConfig.Objects.Config
 
                                 if (obj.InsideInfo != null)
                                 {
-                                    inCurve = obj.InsideInfo.SpawnWeights.GetFor(dawnMoon);
+                                    inCurve = obj.InsideInfo.SpawnWeights.GetFor(dawnMoon, ctx);
                                 }
 
                                 string inString = null;
                                 if (inCurve == null) { inString = ""; } else { inString = CurveToString(inCurve); }
 
-                                moonEntry.AddField($"Inside Curve - {NiceifyDawnUUID(obj.Key.ToString())}", "NOTE: Any object that does not have a NetworkObject component, which is typically the Vanilla outside objects, will NOT be able to spawn inside!\nThe animation curve of this object spawning on the interior of this moon.", inString);
+                                moonEntry.AddField($"Inside Curve - {NiceifyDawnUUID(obj.Key.Key)}", "NOTE: Any object that does not have a NetworkObject component, which is typically the Vanilla outside objects, will NOT be able to spawn inside!\nThe animation curve of this object spawning on the interior of this moon.", inString);
                             }
 
                             if (enabledMapObjectSettings.Contains("(Outside) Level Curves"))
@@ -2345,13 +2364,13 @@ namespace LunarConfig.Objects.Config
 
                                 if (obj.OutsideInfo != null)
                                 {
-                                    outCurve = obj.OutsideInfo.SpawnWeights.GetFor(dawnMoon);
+                                    outCurve = obj.OutsideInfo.SpawnWeights.GetFor(dawnMoon, ctx);
                                 }
 
                                 string outString = null;
                                 if (outCurve == null) { outString = ""; } else { outString = CurveToString(outCurve); }
 
-                                moonEntry.AddField($"Outside Curve - {NiceifyDawnUUID(obj.Key.ToString())}", "The animation curve of this object spawning on the interior of this moon.", outString);
+                                moonEntry.AddField($"Outside Curve - {NiceifyDawnUUID(obj.Key.Key)}", "The animation curve of this object spawning on the interior of this moon.", outString);
                             }
                         }
 
@@ -2407,7 +2426,7 @@ namespace LunarConfig.Objects.Config
                             moonEntry.TrySetValue(enabledMoonSettings, "Has Time?", ref moonObj.planetHasTime);
                             moonEntry.TrySetValue(enabledMoonSettings, "Time Multiplier", ref moonObj.DaySpeedMultiplier);
                             if (enabledMoonSettings.Contains("Can Be Challenge Moon?")) { definedChallengeMoons[moonObj] = moonEntry.GetValue<bool>("Can Be Challenge Moon?"); }
-                            if (enabledMoonSettings.Contains("Can Be Challenge Moon?")) { definedChallengeMoonTimes[moonObj] = moonEntry.GetValue<bool>("Has Time?"); }
+                            if (enabledMoonSettings.Contains("Has Time?")) { definedChallengeMoonTimes[moonObj] = moonEntry.GetValue<bool>("Has Time?"); }
                             moonEntry.TrySetValue(enabledMoonSettings, "Daytime Probability Range", ref moonObj.daytimeEnemiesProbabilityRange);
                             if (enabledMoonSettings.Contains("Daytime Curve")) { moonObj.daytimeEnemySpawnChanceThroughDay = StringToCurve(moonEntry.GetValue<string>("Daytime Curve")); }
                             moonEntry.TrySetValue(enabledMoonSettings, "Max Daytime Power", ref moonObj.maxDaytimeEnemyPowerCount);
@@ -2472,7 +2491,7 @@ namespace LunarConfig.Objects.Config
                                             moonDict = new Dictionary<string, string>();
                                         }
 
-                                        moonDict.Add(field.Key.Replace("Inside Curve - ", ""), (string)field.Value.BoxedValue);
+                                        moonDict.Add(mapObjectKeys[field.Key.Replace("Inside Curve - ", "")], (string)field.Value.BoxedValue);
 
                                         cachedInsideMapObjects[dawnMoon.TypedKey] = moonDict;
                                     }
@@ -2489,7 +2508,7 @@ namespace LunarConfig.Objects.Config
                                             moonDict = new Dictionary<string, string>();
                                         }
 
-                                        moonDict.Add(field.Key.Replace("Outside Curve - ", ""), (string)field.Value.BoxedValue);
+                                        moonDict.Add(mapObjectKeys[field.Key.Replace("Outside Curve - ", "")], (string)field.Value.BoxedValue);
 
                                         cachedOutsideMapObjects[dawnMoon.TypedKey] = moonDict;
                                     }
@@ -2596,7 +2615,7 @@ namespace LunarConfig.Objects.Config
 
                     try
                     {
-                        string niceUUID = NiceifyDawnUUID(uuid);
+                        string niceUUID = NiceifyDawnUUID(unlockable.Key.Key);
                         DawnUnlockableItemInfo dawnUnlockable = unlockable.Value;
                         LunarConfigEntry unlockableEntry = unlockableFile.AddEntry($"{niceUUID} - {uuid}");
 
@@ -2735,7 +2754,7 @@ namespace LunarConfig.Objects.Config
 
                     try
                     {
-                        string niceUUID = NiceifyDawnUUID(uuid);
+                        string niceUUID = NiceifyDawnUUID(weather.Key.Key);
                         DawnWeatherEffectInfo dawnWeather = weather.Value;
                         LunarConfigEntry weatherEntry = weatherInjectionFile.AddEntry($"{niceUUID} - {uuid}");
 
@@ -2804,7 +2823,7 @@ namespace LunarConfig.Objects.Config
 
                     try
                     {
-                        string niceUUID = NiceifyDawnUUID(uuid);
+                        string niceUUID = NiceifyDawnUUID(dungeon.Key.Key);
                         DawnDungeonInfo dawnDungeon = dungeon.Value;
                         LunarConfigEntry dungeonEntry = dungeonInjectionFile.AddEntry($"{niceUUID} - {uuid}");
 
@@ -2869,9 +2888,8 @@ namespace LunarConfig.Objects.Config
 
                     try
                     {
-                        string niceUUID = NiceifyDawnUUID(uuid);
                         string namespacedUUID = $"lunartaginjection:{uuid}";
-                        LunarConfigEntry tagEntry = tagInjectionFile.AddEntry($"{niceUUID} - {uuid}");
+                        LunarConfigEntry tagEntry = tagInjectionFile.AddEntry($"{uuid}");
 
                         // GETTING VALUES (for config)
                         tagEntry.AddField("Configure Content", "Enable to change any of the settings below.", false);

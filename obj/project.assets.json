@@ -65,22 +65,6 @@
           "build/BepInEx.PluginInfoProps.props": {}
         }
       },
-      "Evaisa.LethalLib/1.1.1": {
-        "type": "package",
-        "dependencies": {
-          "BepInEx.Core": "5.4.21"
-        },
-        "compile": {
-          "lib/netstandard2.1/LethalLib.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/netstandard2.1/LethalLib.dll": {
-            "related": ".xml"
-          }
-        }
-      },
       "HarmonyX/2.7.0": {
         "type": "package",
         "dependencies": {
@@ -680,30 +664,6 @@
           }
         }
       },
-      "TeamXiaolan.DawnLib/0.6.0": {
-        "type": "package",
-        "dependencies": {
-          "Evaisa.LethalLib": "1.1.1"
-        },
-        "compile": {
-          "lib/netstandard2.1/com.github.teamxiaolan.dawnlib.dll": {}
-        },
-        "runtime": {
-          "lib/netstandard2.1/com.github.teamxiaolan.dawnlib.dll": {}
-        }
-      },
-      "TeamXiaolan.DawnLib.DuskMod/0.6.0": {
-        "type": "package",
-        "dependencies": {
-          "TeamXiaolan.DawnLib": "0.6.0"
-        },
-        "compile": {
-          "lib/netstandard2.1/com.github.teamxiaolan.dawnlib.dusk.dll": {}
-        },
-        "runtime": {
-          "lib/netstandard2.1/com.github.teamxiaolan.dawnlib.dusk.dll": {}
-        }
-      },
       "UnityEngine.Modules/2022.3.9": {
         "type": "package",
         "compile": {
@@ -859,20 +819,6 @@
         "bepinex.plugininfoprops.2.1.0.nupkg.sha512",
         "bepinex.plugininfoprops.nuspec",
         "build/BepInEx.PluginInfoProps.props"
-      ]
-    },
-    "Evaisa.LethalLib/1.1.1": {
-      "sha512": "ZHy0gSo79ImSE0SXOTG6Qy0YrSzzBHk93VajkQmH4cgM5um0LL0CAnVa4pAV4bK9bXTCgjJrsAg4hCLWfiYe4Q==",
-      "type": "package",
-      "path": "evaisa.lethallib/1.1.1",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "README.md",
-        "evaisa.lethallib.1.1.1.nupkg.sha512",
-        "evaisa.lethallib.nuspec",
-        "lib/netstandard2.1/LethalLib.dll",
-        "lib/netstandard2.1/LethalLib.xml"
       ]
     },
     "HarmonyX/2.7.0": {
@@ -2767,30 +2713,6 @@
         "system.threading.tasks.nuspec"
       ]
     },
-    "TeamXiaolan.DawnLib/0.6.0": {
-      "sha512": "xPGY7TNKGLVsKKJdIzOtM5MNxEekf8QI352/7cDfyEFCwKl931nMntIHo1lTDssKw48PFP9qfBF3lMwlD9Osyg==",
-      "type": "package",
-      "path": "teamxiaolan.dawnlib/0.6.0",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "lib/netstandard2.1/com.github.teamxiaolan.dawnlib.dll",
-        "teamxiaolan.dawnlib.0.6.0.nupkg.sha512",
-        "teamxiaolan.dawnlib.nuspec"
-      ]
-    },
-    "TeamXiaolan.DawnLib.DuskMod/0.6.0": {
-      "sha512": "2vYfOmbg0nigxXf+efdCjPE/b6frC+fHw97x1BegkgnvvijYdQPaMZnwidzKP2b6zXsfC8ccO+Jp72t3j86N0g==",
-      "type": "package",
-      "path": "teamxiaolan.dawnlib.duskmod/0.6.0",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "lib/netstandard2.1/com.github.teamxiaolan.dawnlib.dusk.dll",
-        "teamxiaolan.dawnlib.duskmod.0.6.0.nupkg.sha512",
-        "teamxiaolan.dawnlib.duskmod.nuspec"
-      ]
-    },
     "UnityEngine.Modules/2022.3.9": {
       "sha512": "sSxqZjd05U0NWlX+eappdlsEuXFvDRHkUaClDVTocGRzCmIwNvgGJIPh22lGklIpNZ3cJZneYJkIUnEIazR8VA==",
       "type": "package",
@@ -3007,8 +2929,6 @@
       "BepInEx.Core >= 5.*",
       "BepInEx.PluginInfoProps >= 2.*",
       "LethalCompany.GameLibs.Steam >= *-*",
-      "TeamXiaolan.DawnLib >= 0.6.0",
-      "TeamXiaolan.DawnLib.DuskMod >= 0.6.0",
       "UnityEngine.Modules >= 2022.3.9"
     ]
   },
@@ -3090,16 +3010,6 @@
             "suppressParent": "All",
             "target": "Package",
             "version": "[*-*, )"
-          },
-          "TeamXiaolan.DawnLib": {
-            "suppressParent": "All",
-            "target": "Package",
-            "version": "[0.6.0, )"
-          },
-          "TeamXiaolan.DawnLib.DuskMod": {
-            "suppressParent": "All",
-            "target": "Package",
-            "version": "[0.6.0, )"
           },
           "UnityEngine.Modules": {
             "include": "Compile",

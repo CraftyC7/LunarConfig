@@ -14,9 +14,9 @@
           "BepInEx.Core": "5.4.21",
           "BepInEx.PluginInfoProps": "2.1.0",
           "LethalCompany.GameLibs.Steam": "73.0.0-ngd.0",
-          "TeamXiaolan.DawnLib": "0.6.0",
-          "TeamXiaolan.DawnLib.DuskMod": "0.6.0",
-          "UnityEngine.Modules": "2022.3.9"
+          "UnityEngine.Modules": "2022.3.9",
+          "com.github.teamxiaolan.dawnlib": "0.8.5.0",
+          "com.github.teamxiaolan.dawnlib.dusk": "0.8.5.0"
         },
         "runtime": {
           "Crafty.LunarConfig.dll": {}
@@ -66,17 +66,6 @@
         }
       },
       "BepInEx.PluginInfoProps/2.1.0": {},
-      "Evaisa.LethalLib/1.1.1": {
-        "dependencies": {
-          "BepInEx.Core": "5.4.21"
-        },
-        "runtime": {
-          "lib/netstandard2.1/LethalLib.dll": {
-            "assemblyVersion": "1.0.0.0",
-            "fileVersion": "1.1.1.0"
-          }
-        }
-      },
       "HarmonyX/2.7.0": {
         "dependencies": {
           "MonoMod.RuntimeDetour": "21.12.13.1",
@@ -408,29 +397,31 @@
           "System.Runtime": "4.3.0"
         }
       },
-      "TeamXiaolan.DawnLib/0.6.0": {
-        "dependencies": {
-          "Evaisa.LethalLib": "1.1.1"
-        },
+      "UnityEngine.Modules/2022.3.9": {},
+      "com.github.teamxiaolan.dawnlib/0.8.5.0": {
         "runtime": {
-          "lib/netstandard2.1/com.github.teamxiaolan.dawnlib.dll": {
-            "assemblyVersion": "0.6.0.0",
-            "fileVersion": "0.6.0.0"
+          "com.github.teamxiaolan.dawnlib.dll": {
+            "assemblyVersion": "0.8.5.0",
+            "fileVersion": "0.8.5.0"
           }
         }
       },
-      "TeamXiaolan.DawnLib.DuskMod/0.6.0": {
-        "dependencies": {
-          "TeamXiaolan.DawnLib": "0.6.0"
-        },
+      "com.github.teamxiaolan.dawnlib.dusk/0.8.5.0": {
         "runtime": {
-          "lib/netstandard2.1/com.github.teamxiaolan.dawnlib.dusk.dll": {
-            "assemblyVersion": "0.6.0.0",
-            "fileVersion": "0.6.0.0"
+          "com.github.teamxiaolan.dawnlib.dusk.dll": {
+            "assemblyVersion": "0.8.5.0",
+            "fileVersion": "0.8.5.0"
           }
         }
       },
-      "UnityEngine.Modules/2022.3.9": {}
+      "com.github.teamxiaolan.dawnlib.interfaces/0.8.5.0": {
+        "runtime": {
+          "com.github.teamxiaolan.dawnlib.interfaces.dll": {
+            "assemblyVersion": "0.8.5.0",
+            "fileVersion": "0.8.5.0"
+          }
+        }
+      }
     }
   },
   "libraries": {
@@ -473,13 +464,6 @@
       "sha512": "sha512-VCG3QRiqNdW9ku2FEcNsbK+HKxrZmW0VxwMNyLNO7h0xGorU+C6vBHN8Qq4eAL5fU11Uks5x2uoYdqEoKD3P8A==",
       "path": "bepinex.plugininfoprops/2.1.0",
       "hashPath": "bepinex.plugininfoprops.2.1.0.nupkg.sha512"
-    },
-    "Evaisa.LethalLib/1.1.1": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-ZHy0gSo79ImSE0SXOTG6Qy0YrSzzBHk93VajkQmH4cgM5um0LL0CAnVa4pAV4bK9bXTCgjJrsAg4hCLWfiYe4Q==",
-      "path": "evaisa.lethallib/1.1.1",
-      "hashPath": "evaisa.lethallib.1.1.1.nupkg.sha512"
     },
     "HarmonyX/2.7.0": {
       "type": "package",
@@ -726,26 +710,27 @@
       "path": "system.threading.tasks/4.3.0",
       "hashPath": "system.threading.tasks.4.3.0.nupkg.sha512"
     },
-    "TeamXiaolan.DawnLib/0.6.0": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-xPGY7TNKGLVsKKJdIzOtM5MNxEekf8QI352/7cDfyEFCwKl931nMntIHo1lTDssKw48PFP9qfBF3lMwlD9Osyg==",
-      "path": "teamxiaolan.dawnlib/0.6.0",
-      "hashPath": "teamxiaolan.dawnlib.0.6.0.nupkg.sha512"
-    },
-    "TeamXiaolan.DawnLib.DuskMod/0.6.0": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-2vYfOmbg0nigxXf+efdCjPE/b6frC+fHw97x1BegkgnvvijYdQPaMZnwidzKP2b6zXsfC8ccO+Jp72t3j86N0g==",
-      "path": "teamxiaolan.dawnlib.duskmod/0.6.0",
-      "hashPath": "teamxiaolan.dawnlib.duskmod.0.6.0.nupkg.sha512"
-    },
     "UnityEngine.Modules/2022.3.9": {
       "type": "package",
       "serviceable": true,
       "sha512": "sha512-sSxqZjd05U0NWlX+eappdlsEuXFvDRHkUaClDVTocGRzCmIwNvgGJIPh22lGklIpNZ3cJZneYJkIUnEIazR8VA==",
       "path": "unityengine.modules/2022.3.9",
       "hashPath": "unityengine.modules.2022.3.9.nupkg.sha512"
+    },
+    "com.github.teamxiaolan.dawnlib/0.8.5.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "com.github.teamxiaolan.dawnlib.dusk/0.8.5.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "com.github.teamxiaolan.dawnlib.interfaces/0.8.5.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
     }
   }
 }

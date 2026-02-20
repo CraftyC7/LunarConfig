@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using LunarConfig.Objects.Config;
-using LethalLib.Modules;
 using Dawn;
 
 namespace LunarConfig.Patches

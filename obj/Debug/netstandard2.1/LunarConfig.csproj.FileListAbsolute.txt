@@ -19,3 +19,7 @@ C:\Users\pataa\Desktop\LCDev\LunarConfig\obj\Debug\netstandard2.1\LunarConfig.cs
 C:\Users\pataa\Desktop\LCDev\LunarConfig\obj\Debug\netstandard2.1\LunarConfig.sourcelink.json
 C:\Users\pataa\Desktop\LCDev\LunarConfig\obj\Debug\netstandard2.1\Crafty.LunarConfig.dll
 C:\Users\craft\OneDrive\Desktop\LCDev\LunarConfig\obj\Debug\netstandard2.1\LunarConfig.IgnoresAccessChecksTo.cs
+C:\Users\pataa\Desktop\LCDev\LunarConfig\bin\Debug\netstandard2.1\com.github.teamxiaolan.dawnlib.dll
+C:\Users\pataa\Desktop\LCDev\LunarConfig\bin\Debug\netstandard2.1\com.github.teamxiaolan.dawnlib.dusk.dll
+C:\Users\pataa\Desktop\LCDev\LunarConfig\bin\Debug\netstandard2.1\com.github.teamxiaolan.dawnlib.interfaces.dll
+C:\Users\pataa\Desktop\LCDev\LunarConfig\obj\Debug\netstandard2.1\LunarCon.0B10FED2.Up2Date
