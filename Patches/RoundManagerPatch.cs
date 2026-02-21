@@ -43,7 +43,7 @@ namespace LunarConfig.Patches
                 
                     DawnMoonInfo dawnMoon = __instance.currentLevel.GetDawnInfo();
                     string uuid = LunarCentral.UUIDify(dawnMoon.Key.ToString());
-                    LunarConfigEntry configuredMoon = moonFile.entries[$"{LunarCentral.NiceifyDawnUUID(uuid)} - {uuid}"];
+                    LunarConfigEntry configuredMoon = moonFile.entries[$"{LunarCentral.NiceifyDawnUUID(dawnMoon.Key.Key)} - {uuid}"];
                     HashSet<string> enabledSettings = LunarCentral.enabledMoonSettings;
 
                     if (configuredMoon.GetValue<bool>("Configure Content"))

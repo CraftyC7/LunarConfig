@@ -1,3 +1,8 @@
+## Version 0.3.7
+
+Fixes
+- Fixed an error around setting multipliers.
+
 ## Version 0.3.6
 
 Fixes
