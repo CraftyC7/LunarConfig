@@ -916,7 +916,6 @@ namespace LunarConfig.Objects.Config
                 {
                     foreach (var item in cache.Value.Split(","))
                     {
-                        MiniLogger.LogInfo(item);
                         string[] splits = item.Split(":");
 
                         string id = splits[0];
