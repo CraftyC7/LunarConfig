@@ -29,7 +29,7 @@ namespace LunarConfig.Objects.Config
     {
         public Dictionary<string, LunarConfigFile> files = new Dictionary<string, LunarConfigFile>();
 
-        public static HashSet<String> everyMoonTag = new HashSet<String>();
+        public static HashSet<NamespacedKey> everyMoonTag = new HashSet<NamespacedKey>();
 
         public static bool mapObjectKeysInitialized = false;
         public static Dictionary<string, string> mapObjectKeys = new Dictionary<string, string>();
@@ -589,11 +589,7 @@ namespace LunarConfig.Objects.Config
             centralFile.file.Save();
             centralFile.file.SaveOnConfigSet = true;
 
-            everyMoonTag.Add("all");
-            everyMoonTag.Add("free");
-            everyMoonTag.Add("paid");
-            everyMoonTag.Add("custom");
-            everyMoonTag.Add("vanilla");
+            everyMoonTag.Add(new NamespacedKey("lunarcontenttag", "all"));
 
             centralInitialized = true;
         }
@@ -2558,7 +2554,7 @@ namespace LunarConfig.Objects.Config
                             {
                                 if (tag.Namespace != "dawn_lib")
                                 {
-                                    everyMoonTag.Add(tag.Key);
+                                    everyMoonTag.Add(tag);
                                 }
                             }
                         }
@@ -2883,12 +2879,10 @@ namespace LunarConfig.Objects.Config
 
                 foreach (var tag in everyMoonTag)
                 {
-                    string uuid = tag;
-
                     try
                     {
-                        string namespacedUUID = $"lunartaginjection:{uuid}";
-                        LunarConfigEntry tagEntry = tagInjectionFile.AddEntry($"{uuid}");
+                        string namespacedUUID = tag.ToString();
+                        LunarConfigEntry tagEntry = tagInjectionFile.AddEntry($"{NiceifyDawnUUID(tag.Key)} - {namespacedUUID}");
 
                         // GETTING VALUES (for config)
                         tagEntry.AddField("Configure Content", "Enable to change any of the settings below.", false);
@@ -2917,7 +2911,7 @@ namespace LunarConfig.Objects.Config
                     }
                     catch (Exception e)
                     {
-                        MiniLogger.LogError($"LunarConfig encountered an issue while configuring {uuid}, please report this!\n{e}");
+                        MiniLogger.LogError($"LunarConfig encountered an issue while configuring {tag}, please report this!\n{e}");
                     }
                 }
 
