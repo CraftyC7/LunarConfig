@@ -79,6 +79,16 @@
               "target": "Package",
               "version": "[*-*, )"
             },
+            "TeamXiaolan.DawnLib": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[0.8.15, )"
+            },
+            "TeamXiaolan.DawnLib.DuskMod": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[0.8.15, )"
+            },
             "UnityEngine.Modules": {
               "include": "Compile",
               "suppressParent": "All",

@@ -1,3 +1,15 @@
+## Version 0.3.9
+
+Fixes
+- Fixed an issue Lunar had with handling negative weights.
+
+## Version 0.3.8
+
+NOTICE: Your map object curve settings will be reset on this update, there's not much I can do about it.
+
+Fixes
+- Fixed duplicate map objects breaking everything (Like E Gypt's).
+
 ## Version 0.3.7
 
 Fixes

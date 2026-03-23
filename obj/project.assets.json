@@ -664,6 +664,27 @@
           }
         }
       },
+      "TeamXiaolan.DawnLib/0.8.15": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.1/com.github.teamxiaolan.dawnlib.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.1/com.github.teamxiaolan.dawnlib.dll": {}
+        }
+      },
+      "TeamXiaolan.DawnLib.DuskMod/0.8.15": {
+        "type": "package",
+        "dependencies": {
+          "TeamXiaolan.DawnLib": "0.8.15"
+        },
+        "compile": {
+          "lib/netstandard2.1/com.github.teamxiaolan.dawnlib.dusk.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.1/com.github.teamxiaolan.dawnlib.dusk.dll": {}
+        }
+      },
       "UnityEngine.Modules/2022.3.9": {
         "type": "package",
         "compile": {
@@ -2713,6 +2734,30 @@
         "system.threading.tasks.nuspec"
       ]
     },
+    "TeamXiaolan.DawnLib/0.8.15": {
+      "sha512": "BtPZ9QDWQDKmrQuTdJsPdCMXvJqRHzZYRGHd43Y7/BULEFbHKGeUdcFb9APbG+dXS7fQdVRgHE7rAbBWkbHAtA==",
+      "type": "package",
+      "path": "teamxiaolan.dawnlib/0.8.15",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/netstandard2.1/com.github.teamxiaolan.dawnlib.dll",
+        "teamxiaolan.dawnlib.0.8.15.nupkg.sha512",
+        "teamxiaolan.dawnlib.nuspec"
+      ]
+    },
+    "TeamXiaolan.DawnLib.DuskMod/0.8.15": {
+      "sha512": "LGH/b2rxuml4gb8Yeh0uyBd6ZiqSjDNAL0AVnx97Mk1SiBBwS+Lb4N+24pwPs54wIEqSUg0EhcA46FMUAuvmsQ==",
+      "type": "package",
+      "path": "teamxiaolan.dawnlib.duskmod/0.8.15",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/netstandard2.1/com.github.teamxiaolan.dawnlib.dusk.dll",
+        "teamxiaolan.dawnlib.duskmod.0.8.15.nupkg.sha512",
+        "teamxiaolan.dawnlib.duskmod.nuspec"
+      ]
+    },
     "UnityEngine.Modules/2022.3.9": {
       "sha512": "sSxqZjd05U0NWlX+eappdlsEuXFvDRHkUaClDVTocGRzCmIwNvgGJIPh22lGklIpNZ3cJZneYJkIUnEIazR8VA==",
       "type": "package",
@@ -2929,6 +2974,8 @@
       "BepInEx.Core >= 5.*",
       "BepInEx.PluginInfoProps >= 2.*",
       "LethalCompany.GameLibs.Steam >= *-*",
+      "TeamXiaolan.DawnLib >= 0.8.15",
+      "TeamXiaolan.DawnLib.DuskMod >= 0.8.15",
       "UnityEngine.Modules >= 2022.3.9"
     ]
   },
@@ -3010,6 +3057,16 @@
             "suppressParent": "All",
             "target": "Package",
             "version": "[*-*, )"
+          },
+          "TeamXiaolan.DawnLib": {
+            "suppressParent": "All",
+            "target": "Package",
+            "version": "[0.8.15, )"
+          },
+          "TeamXiaolan.DawnLib.DuskMod": {
+            "suppressParent": "All",
+            "target": "Package",
+            "version": "[0.8.15, )"
           },
           "UnityEngine.Modules": {
             "include": "Compile",

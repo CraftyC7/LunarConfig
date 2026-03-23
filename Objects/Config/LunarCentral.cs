@@ -33,7 +33,7 @@ namespace LunarConfig.Objects.Config
 
         public static bool mapObjectKeysInitialized = false;
         public static Dictionary<string, string> mapObjectKeys = new Dictionary<string, string>();
-
+        
         public static Dictionary<string, string> items = new Dictionary<string, string>();
         public static Dictionary<string, string> enemies = new Dictionary<string, string>();
         public static Dictionary<string, string> moons = new Dictionary<string, string>();
@@ -291,10 +291,10 @@ namespace LunarConfig.Objects.Config
                 catch { }
             }
 
-            baseWeights = baseWeights.Where(kvp => kvp.Value > 0).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            baseWeights = baseWeights.Where(kvp => kvp.Value != 0).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             multiplierWeights = multiplierWeights.Where(kvp => kvp.Value != 1).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-
-            return string.Join(", ", baseWeights.Select(kvp => $"{kvp.Key}=+{kvp.Value}")) + ((baseWeights.Count > 0 && multiplierWeights.Count > 0) ? ", " : "") + string.Join(", ", multiplierWeights.Select(kvp => $"{kvp.Key}=*{kvp.Value}"));
+            
+            return string.Join(", ", baseWeights.Select(kvp => $"{kvp.Key}={kvp.Value}")) + ((baseWeights.Count > 0 && multiplierWeights.Count > 0) ? ", " : "") + string.Join(", ", multiplierWeights.Select(kvp => $"{kvp.Key}=*{kvp.Value}"));
         }
 
         public void InitObjectKeys()
@@ -365,7 +365,7 @@ namespace LunarConfig.Objects.Config
                 configItems.AddField("Request Node Text", "Enable this to enable configuring this property in item config entries.", false);
                 configItems.AddField("Receipt Node Text", "Enable this to enable configuring this property in item config entries.", false);
                 configItems.AddField("Cost", "Disable this to disable configuring this property in item config entries.", true);
-                configItems.AddField("Tags", "Disable this to disable configuring this property in moon config entries.", true);
+                configItems.AddField("Tags", "Disable this to disable configuring this property in item config entries.", true);
 
                 foreach (var setting in configItems.fields.Keys)
                 {
@@ -407,7 +407,7 @@ namespace LunarConfig.Objects.Config
                 configEnemies.AddField("Bestiary Text", "Enable this to enable configuring this property in enemy config entries.", false);
                 configEnemies.AddField("Bestiary Keyword", "Enable this to enable configuring this property in enemy config entries.", false);
 
-                configEnemies.AddField("Tags", "Disable this to disable configuring this property in moon config entries.", true);
+                configEnemies.AddField("Tags", "Disable this to disable configuring this property in enemy config entries.", true);
 
                 foreach (var setting in configEnemies.fields.Keys)
                 {
@@ -463,12 +463,12 @@ namespace LunarConfig.Objects.Config
             if (configureDungeons)
             {
                 LunarConfigEntry configDungeons = centralFile.AddEntry("Enabled Dungeon Settings");
-                configDungeons.AddField("Random Size Min", "Disable this to disable configuring this property in item config entries.", true);
-                configDungeons.AddField("Random Size Max", "Disable this to disable configuring this property in item config entries.", true);
-                configDungeons.AddField("Map Tile Size", "Disable this to disable configuring this property in item config entries.", true);
-                configDungeons.AddField("Clamp Range Min", "Disable this to disable configuring this property in item config entries.", true);
-                configDungeons.AddField("Clamp Range Max", "Disable this to disable configuring this property in item config entries.", true);
-                configDungeons.AddField("Tags", "Disable this to disable configuring this property in moon config entries.", true);
+                configDungeons.AddField("Random Size Min", "Disable this to disable configuring this property in dungeon config entries.", true);
+                configDungeons.AddField("Random Size Max", "Disable this to disable configuring this property in dungeon config entries.", true);
+                configDungeons.AddField("Map Tile Size", "Disable this to disable configuring this property in dungeon config entries.", true);
+                configDungeons.AddField("Clamp Range Min", "Disable this to disable configuring this property in dungeon config entries.", true);
+                configDungeons.AddField("Clamp Range Max", "Disable this to disable configuring this property in dungeon config entries.", true);
+                configDungeons.AddField("Tags", "Disable this to disable configuring this property in dungeon config entries.", true);
 
                 foreach (var setting in configDungeons.fields.Keys)
                 {
@@ -494,7 +494,7 @@ namespace LunarConfig.Objects.Config
                 configMapObjects.AddField("(Outside) Spawnable Floor Tags", "Disable this to disable configuring this property in map object config entries.", true);
                 configMapObjects.AddField("(Outside) Face Away From Wall?", "Disable this to disable configuring this property in map object config entries.", true);
                 configMapObjects.AddField("(Outside) Level Curves", "Disable this to disable configuring this property in map object config entries.", true);
-                configMapObjects.AddField("Tags", "Disable this to disable configuring this property in moon config entries.", true);
+                configMapObjects.AddField("Tags", "Disable this to disable configuring this property in map object config entries.", true);
 
                 foreach (var setting in configMapObjects.fields.Keys)
                 {
@@ -535,11 +535,11 @@ namespace LunarConfig.Objects.Config
             if (configureWeatherInjection)
             {
                 LunarConfigEntry configWeatherInjection = centralFile.AddEntry("Enabled Weather Injection Settings");
-                configWeatherInjection.AddField("Spawnable Scrap", "Disable this to disable configuring this property in unlockable config entries.", true);
-                configWeatherInjection.AddField("Spawnable Daytime Enemies", "Disable this to disable configuring this property in unlockable config entries.", true);
-                configWeatherInjection.AddField("Spawnable Interior Enemies", "Disable this to disable configuring this property in unlockable config entries.", true);
-                configWeatherInjection.AddField("Spawnable Outside Enemies", "Disable this to disable configuring this property in unlockable config entries.", true);
-                configWeatherInjection.AddField("Possible Interiors", "Disable this to disable configuring this property in unlockable config entries.", true);
+                configWeatherInjection.AddField("Spawnable Scrap", "Disable this to disable configuring this property in weather injection config entries.", true);
+                configWeatherInjection.AddField("Spawnable Daytime Enemies", "Disable this to disable configuring this property in weather injection config entries.", true);
+                configWeatherInjection.AddField("Spawnable Interior Enemies", "Disable this to disable configuring this property in weather injection config entries.", true);
+                configWeatherInjection.AddField("Spawnable Outside Enemies", "Disable this to disable configuring this property in weather injection config entries.", true);
+                configWeatherInjection.AddField("Possible Interiors", "Disable this to disable configuring this property in weather injection config entries.", true);
 
                 foreach (var setting in configWeatherInjection.fields.Keys)
                 {
@@ -553,10 +553,10 @@ namespace LunarConfig.Objects.Config
             if (configureDungeonInjection)
             {
                 LunarConfigEntry configDungeonInjection = centralFile.AddEntry("Enabled Dungeon Injection Settings");
-                configDungeonInjection.AddField("Spawnable Scrap", "Disable this to disable configuring this property in unlockable config entries.", true);
-                configDungeonInjection.AddField("Spawnable Daytime Enemies", "Disable this to disable configuring this property in unlockable config entries.", true);
-                configDungeonInjection.AddField("Spawnable Interior Enemies", "Disable this to disable configuring this property in unlockable config entries.", true);
-                configDungeonInjection.AddField("Spawnable Outside Enemies", "Disable this to disable configuring this property in unlockable config entries.", true);
+                configDungeonInjection.AddField("Spawnable Scrap", "Disable this to disable configuring this property in dungeon injection config entries.", true);
+                configDungeonInjection.AddField("Spawnable Daytime Enemies", "Disable this to disable configuring this property in dungeon injection config entries.", true);
+                configDungeonInjection.AddField("Spawnable Interior Enemies", "Disable this to disable configuring this property in dungeon injection config entries.", true);
+                configDungeonInjection.AddField("Spawnable Outside Enemies", "Disable this to disable configuring this property in dungeon injection config entries.", true);
 
                 foreach (var setting in configDungeonInjection.fields.Keys)
                 {
@@ -570,11 +570,11 @@ namespace LunarConfig.Objects.Config
             if (configureTagInjection)
             {
                 LunarConfigEntry configTagInjection = centralFile.AddEntry("Enabled Tag Injection Settings");
-                configTagInjection.AddField("Spawnable Scrap", "Disable this to disable configuring this property in unlockable config entries.", true);
-                configTagInjection.AddField("Spawnable Daytime Enemies", "Disable this to disable configuring this property in unlockable config entries.", true);
-                configTagInjection.AddField("Spawnable Interior Enemies", "Disable this to disable configuring this property in unlockable config entries.", true);
-                configTagInjection.AddField("Spawnable Outside Enemies", "Disable this to disable configuring this property in unlockable config entries.", true);
-                configTagInjection.AddField("Possible Interiors", "Disable this to disable configuring this property in unlockable config entries.", true);
+                configTagInjection.AddField("Spawnable Scrap", "Disable this to disable configuring this property in tag injection config entries.", true);
+                configTagInjection.AddField("Spawnable Daytime Enemies", "Disable this to disable configuring this property in tag injection config entries.", true);
+                configTagInjection.AddField("Spawnable Interior Enemies", "Disable this to disable configuring this property in tag injection config entries.", true);
+                configTagInjection.AddField("Spawnable Outside Enemies", "Disable this to disable configuring this property in tag injection config entries.", true);
+                configTagInjection.AddField("Possible Interiors", "Disable this to disable configuring this property in tag injection config entries.", true);
 
                 foreach (var setting in configTagInjection.fields.Keys)
                 {
@@ -2354,7 +2354,7 @@ namespace LunarConfig.Objects.Config
                                 string inString = null;
                                 if (inCurve == null) { inString = ""; } else { inString = CurveToString(inCurve); }
 
-                                moonEntry.AddField($"Inside Curve - {NiceifyDawnUUID(obj.Key.Key)}", "NOTE: Any object that does not have a NetworkObject component, which is typically the Vanilla outside objects, will NOT be able to spawn inside!\nThe animation curve of this object spawning on the interior of this moon.", inString);
+                                moonEntry.AddField($"Inside Curve - {UUIDify(obj.Key.ToString())}", "NOTE: Any object that does not have a NetworkObject component, which is typically the Vanilla outside objects, will NOT be able to spawn inside!\nThe animation curve of this object spawning on the interior of this moon.", inString);
                             }
 
                             if (enabledMapObjectSettings.Contains("(Outside) Level Curves"))
@@ -2369,7 +2369,7 @@ namespace LunarConfig.Objects.Config
                                 string outString = null;
                                 if (outCurve == null) { outString = ""; } else { outString = CurveToString(outCurve); }
 
-                                moonEntry.AddField($"Outside Curve - {NiceifyDawnUUID(obj.Key.Key)}", "The animation curve of this object spawning on the interior of this moon.", outString);
+                                moonEntry.AddField($"Outside Curve - {UUIDify(obj.Key.ToString())}", "The animation curve of this object spawning on the interior of this moon.", outString);
                             }
                         }
 
@@ -2490,7 +2490,7 @@ namespace LunarConfig.Objects.Config
                                             moonDict = new Dictionary<string, string>();
                                         }
 
-                                        moonDict.Add(mapObjectKeys[field.Key.Replace("Inside Curve - ", "")], (string)field.Value.BoxedValue);
+                                        moonDict.Add(field.Key.Replace("Inside Curve - ", ""), (string)field.Value.BoxedValue);
 
                                         cachedInsideMapObjects[dawnMoon.TypedKey] = moonDict;
                                     }
@@ -2507,7 +2507,7 @@ namespace LunarConfig.Objects.Config
                                             moonDict = new Dictionary<string, string>();
                                         }
 
-                                        moonDict.Add(mapObjectKeys[field.Key.Replace("Outside Curve - ", "")], (string)field.Value.BoxedValue);
+                                        moonDict.Add(field.Key.Replace("Outside Curve - ", ""), (string)field.Value.BoxedValue);
 
                                         cachedOutsideMapObjects[dawnMoon.TypedKey] = moonDict;
                                     }
