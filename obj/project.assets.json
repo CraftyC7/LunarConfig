@@ -82,11 +82,11 @@
           }
         }
       },
-      "LethalCompany.GameLibs.Steam/73.0.0-ngd.0": {
+      "LethalCompany.GameLibs.Steam/81.0.0-ngd.0": {
         "type": "package",
         "dependencies": {
           "Newtonsoft.JSON": "13.0.3",
-          "UnityEngine.Modules": "2022.3.9"
+          "UnityEngine.Modules": "2022.3.62"
         },
         "compile": {
           "ref/netstandard2.1/AmazingAssets.TerrainToMesh.dll": {},
@@ -94,6 +94,9 @@
           "ref/netstandard2.1/Assembly-CSharp.dll": {},
           "ref/netstandard2.1/ClientNetworkTransform.dll": {},
           "ref/netstandard2.1/DissonanceVoip.dll": {},
+          "ref/netstandard2.1/DunGen.Integration.ASPP.dll": {},
+          "ref/netstandard2.1/DunGen.Integration.UnityNav.dll": {},
+          "ref/netstandard2.1/DunGen.dll": {},
           "ref/netstandard2.1/EasyTextEffects.dll": {},
           "ref/netstandard2.1/Facepunch Transport for Netcode for GameObjects.dll": {},
           "ref/netstandard2.1/Facepunch.Steamworks.Win64.dll": {},
@@ -150,9 +153,19 @@
           "ref/netstandard2.1/Unity.TextMeshPro.dll": {},
           "ref/netstandard2.1/Unity.Timeline.dll": {},
           "ref/netstandard2.1/Unity.VisualEffectGraph.Runtime.dll": {},
+          "ref/netstandard2.1/Unity.XR.CoreUtils.dll": {},
+          "ref/netstandard2.1/Unity.XR.Management.dll": {},
+          "ref/netstandard2.1/Unity.XR.OpenXR.Features.ConformanceAutomation.dll": {},
+          "ref/netstandard2.1/Unity.XR.OpenXR.Features.MetaQuestSupport.dll": {},
+          "ref/netstandard2.1/Unity.XR.OpenXR.Features.MockRuntime.dll": {},
+          "ref/netstandard2.1/Unity.XR.OpenXR.Features.OculusQuestSupport.dll": {},
+          "ref/netstandard2.1/Unity.XR.OpenXR.Features.RuntimeDebugger.dll": {},
+          "ref/netstandard2.1/Unity.XR.OpenXR.dll": {},
           "ref/netstandard2.1/UnityEngine.ARModule.dll": {},
           "ref/netstandard2.1/UnityEngine.NVIDIAModule.dll": {},
+          "ref/netstandard2.1/UnityEngine.SpatialTracking.dll": {},
           "ref/netstandard2.1/UnityEngine.UI.dll": {},
+          "ref/netstandard2.1/UnityEngine.XR.LegacyInputHelpers.dll": {},
           "ref/netstandard2.1/com.olegknyazev.softmask.dll": {}
         }
       },
@@ -664,7 +677,7 @@
           }
         }
       },
-      "TeamXiaolan.DawnLib/0.8.15": {
+      "TeamXiaolan.DawnLib/0.9.2": {
         "type": "package",
         "compile": {
           "lib/netstandard2.1/com.github.teamxiaolan.dawnlib.dll": {}
@@ -673,10 +686,10 @@
           "lib/netstandard2.1/com.github.teamxiaolan.dawnlib.dll": {}
         }
       },
-      "TeamXiaolan.DawnLib.DuskMod/0.8.15": {
+      "TeamXiaolan.DawnLib.DuskMod/0.9.2": {
         "type": "package",
         "dependencies": {
-          "TeamXiaolan.DawnLib": "0.8.15"
+          "TeamXiaolan.DawnLib": "0.9.2"
         },
         "compile": {
           "lib/netstandard2.1/com.github.teamxiaolan.dawnlib.dusk.dll": {}
@@ -685,7 +698,7 @@
           "lib/netstandard2.1/com.github.teamxiaolan.dawnlib.dusk.dll": {}
         }
       },
-      "UnityEngine.Modules/2022.3.9": {
+      "UnityEngine.Modules/2022.3.62": {
         "type": "package",
         "compile": {
           "lib/netstandard2.0/UnityEngine.AIModule.dll": {},
@@ -861,20 +874,23 @@
         "logo_mini.png"
       ]
     },
-    "LethalCompany.GameLibs.Steam/73.0.0-ngd.0": {
-      "sha512": "iaHCHoJTFiTnAyAYIrEbjCJOOuhcJ42+KJnEbmCmf4UdkhjSwwio2bcdPCbchodB9kEp+3v3ATgkBwYn56/Gdw==",
+    "LethalCompany.GameLibs.Steam/81.0.0-ngd.0": {
+      "sha512": "Wq4UBgTco96fJSrIOLbgqeIC3/D1MEdvngv43aVVR51UOuAmHPE0Pid6AYtV4cXlE74RdCtmAJGFT3uK+tDZgg==",
       "type": "package",
-      "path": "lethalcompany.gamelibs.steam/73.0.0-ngd.0",
+      "path": "lethalcompany.gamelibs.steam/81.0.0-ngd.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "lethalcompany.gamelibs.steam.73.0.0-ngd.0.nupkg.sha512",
+        "lethalcompany.gamelibs.steam.81.0.0-ngd.0.nupkg.sha512",
         "lethalcompany.gamelibs.steam.nuspec",
         "ref/netstandard2.1/AmazingAssets.TerrainToMesh.dll",
         "ref/netstandard2.1/Assembly-CSharp-firstpass.dll",
         "ref/netstandard2.1/Assembly-CSharp.dll",
         "ref/netstandard2.1/ClientNetworkTransform.dll",
         "ref/netstandard2.1/DissonanceVoip.dll",
+        "ref/netstandard2.1/DunGen.Integration.ASPP.dll",
+        "ref/netstandard2.1/DunGen.Integration.UnityNav.dll",
+        "ref/netstandard2.1/DunGen.dll",
         "ref/netstandard2.1/EasyTextEffects.dll",
         "ref/netstandard2.1/Facepunch Transport for Netcode for GameObjects.dll",
         "ref/netstandard2.1/Facepunch.Steamworks.Win64.dll",
@@ -931,9 +947,19 @@
         "ref/netstandard2.1/Unity.TextMeshPro.dll",
         "ref/netstandard2.1/Unity.Timeline.dll",
         "ref/netstandard2.1/Unity.VisualEffectGraph.Runtime.dll",
+        "ref/netstandard2.1/Unity.XR.CoreUtils.dll",
+        "ref/netstandard2.1/Unity.XR.Management.dll",
+        "ref/netstandard2.1/Unity.XR.OpenXR.Features.ConformanceAutomation.dll",
+        "ref/netstandard2.1/Unity.XR.OpenXR.Features.MetaQuestSupport.dll",
+        "ref/netstandard2.1/Unity.XR.OpenXR.Features.MockRuntime.dll",
+        "ref/netstandard2.1/Unity.XR.OpenXR.Features.OculusQuestSupport.dll",
+        "ref/netstandard2.1/Unity.XR.OpenXR.Features.RuntimeDebugger.dll",
+        "ref/netstandard2.1/Unity.XR.OpenXR.dll",
         "ref/netstandard2.1/UnityEngine.ARModule.dll",
         "ref/netstandard2.1/UnityEngine.NVIDIAModule.dll",
+        "ref/netstandard2.1/UnityEngine.SpatialTracking.dll",
         "ref/netstandard2.1/UnityEngine.UI.dll",
+        "ref/netstandard2.1/UnityEngine.XR.LegacyInputHelpers.dll",
         "ref/netstandard2.1/com.olegknyazev.softmask.dll"
       ]
     },
@@ -2734,34 +2760,34 @@
         "system.threading.tasks.nuspec"
       ]
     },
-    "TeamXiaolan.DawnLib/0.8.15": {
-      "sha512": "BtPZ9QDWQDKmrQuTdJsPdCMXvJqRHzZYRGHd43Y7/BULEFbHKGeUdcFb9APbG+dXS7fQdVRgHE7rAbBWkbHAtA==",
+    "TeamXiaolan.DawnLib/0.9.2": {
+      "sha512": "qs6DOJtjje/3ymtlghQMKIYfCF//o9P+FoZEWtgNELe2lt3DR7pz0LRNwzUkM9YcqlCruSDINPsPp/LxGuMhww==",
       "type": "package",
-      "path": "teamxiaolan.dawnlib/0.8.15",
+      "path": "teamxiaolan.dawnlib/0.9.2",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "lib/netstandard2.1/com.github.teamxiaolan.dawnlib.dll",
-        "teamxiaolan.dawnlib.0.8.15.nupkg.sha512",
+        "teamxiaolan.dawnlib.0.9.2.nupkg.sha512",
         "teamxiaolan.dawnlib.nuspec"
       ]
     },
-    "TeamXiaolan.DawnLib.DuskMod/0.8.15": {
-      "sha512": "LGH/b2rxuml4gb8Yeh0uyBd6ZiqSjDNAL0AVnx97Mk1SiBBwS+Lb4N+24pwPs54wIEqSUg0EhcA46FMUAuvmsQ==",
+    "TeamXiaolan.DawnLib.DuskMod/0.9.2": {
+      "sha512": "h+SWhpNxkT0uJAlJz/BuO0Lbk62XvWX/yNFqhNWPV1qkVdLc/ZXs9ttQAov0yi8Xnww0MwnrbtMmllbSfwvT2A==",
       "type": "package",
-      "path": "teamxiaolan.dawnlib.duskmod/0.8.15",
+      "path": "teamxiaolan.dawnlib.duskmod/0.9.2",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "lib/netstandard2.1/com.github.teamxiaolan.dawnlib.dusk.dll",
-        "teamxiaolan.dawnlib.duskmod.0.8.15.nupkg.sha512",
+        "teamxiaolan.dawnlib.duskmod.0.9.2.nupkg.sha512",
         "teamxiaolan.dawnlib.duskmod.nuspec"
       ]
     },
-    "UnityEngine.Modules/2022.3.9": {
-      "sha512": "sSxqZjd05U0NWlX+eappdlsEuXFvDRHkUaClDVTocGRzCmIwNvgGJIPh22lGklIpNZ3cJZneYJkIUnEIazR8VA==",
+    "UnityEngine.Modules/2022.3.62": {
+      "sha512": "zpu5dELUCFt7Rvvzp50iTrfVusJg+2gmlcaytGEoHYuIP+AOv57X272czjp+sA8N1onPo/IiHFnOEFtT9rLJBA==",
       "type": "package",
-      "path": "unityengine.modules/2022.3.9",
+      "path": "unityengine.modules/2022.3.62",
       "files": [
         ".nupkg.metadata",
         "lib/net35/UnityEngine.AIModule.dll",
@@ -2962,7 +2988,7 @@
         "lib/netstandard2.0/UnityEngine.WindModule.dll",
         "lib/netstandard2.0/UnityEngine.XRModule.dll",
         "lib/netstandard2.0/UnityEngine.dll",
-        "unityengine.modules.2022.3.9.nupkg.sha512",
+        "unityengine.modules.2022.3.62.nupkg.sha512",
         "unityengine.modules.nuspec"
       ]
     }
@@ -2974,9 +3000,9 @@
       "BepInEx.Core >= 5.*",
       "BepInEx.PluginInfoProps >= 2.*",
       "LethalCompany.GameLibs.Steam >= *-*",
-      "TeamXiaolan.DawnLib >= 0.8.15",
-      "TeamXiaolan.DawnLib.DuskMod >= 0.8.15",
-      "UnityEngine.Modules >= 2022.3.9"
+      "TeamXiaolan.DawnLib >= 0.9.2",
+      "TeamXiaolan.DawnLib.DuskMod >= 0.9.2",
+      "UnityEngine.Modules >= 2022.3.62"
     ]
   },
   "packageFolders": {
@@ -3061,18 +3087,18 @@
           "TeamXiaolan.DawnLib": {
             "suppressParent": "All",
             "target": "Package",
-            "version": "[0.8.15, )"
+            "version": "[0.9.2, )"
           },
           "TeamXiaolan.DawnLib.DuskMod": {
             "suppressParent": "All",
             "target": "Package",
-            "version": "[0.8.15, )"
+            "version": "[0.9.2, )"
           },
           "UnityEngine.Modules": {
             "include": "Compile",
             "suppressParent": "All",
             "target": "Package",
-            "version": "[2022.3.9, )"
+            "version": "[2022.3.62, )"
           }
         },
         "imports": [

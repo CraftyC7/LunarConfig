@@ -1,3 +1,32 @@
+## Version 0.3.13
+
+Features
+- Added the Diversity Power Level field to enemy configs
+
+## Version 0.3.12
+
+Fixes
+- Actually added the aforementioned map object fields.
+
+## Version 0.3.11
+
+Features
+- Compatible with v80(1)!
+- Added 5 new fields to moon configs; Offset Time, Can Spawn Shrouds?, Outside Probability Range, Max Outside Diversity, Max Interior Diversity
+- Added 2 new fields to map object configs; (Inside) Allow In Mineshaft?, (Outside) Minimum AI Nodes Before Spawning
+
+Fixes
+- Fixed a tiny issue related to configuring map objects.
+- Fixed an issue where my invisible character fix also removed E.
+
+## Version 0.3.10
+
+Features
+- Added a blacklist for using a moon's 'Is Hidden & Is Locked' settings, in case you wish to configure a moon, but don't want Lunar messing with it's custom unlock.
+
+Fixes
+- Fixed an issue with curves breaking when trying to parse invisible characters.
+
 ## Version 0.3.9
 
 Fixes

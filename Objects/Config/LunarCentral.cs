@@ -16,11 +16,13 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.Rendering.HighDefinition;
 using UnityEngine.UIElements;
 using static ES3;
+using static IngamePlayerSettings;
 using static Unity.Properties.TypeUtility;
 
 namespace LunarConfig.Objects.Config
@@ -87,6 +89,8 @@ namespace LunarConfig.Objects.Config
         public static HashSet<string> enabledWeatherInjectionSettings = new HashSet<string>();
         public static HashSet<string> enabledDungeonInjectionSettings = new HashSet<string>();
         public static HashSet<string> enabledTagInjectionSettings = new HashSet<string>();
+
+        public static HashSet<string> enabledLockingMoons = new HashSet<string>();
 
         public static Dictionary<string, string> cachedSpawnableScrap = new Dictionary<string, string>();
         public static Dictionary<string, string> cachedDaytimeEnemies = new Dictionary<string, string>();
@@ -228,7 +232,7 @@ namespace LunarConfig.Objects.Config
 
         public static AnimationCurve StringToCurve(string data)
         {
-            return ConfigManager.ParseCurve(data);
+            return ConfigManager.ParseCurve(Regex.Replace(data, @"[^0-9,E.;\-]", ""));
         }
 
         public static void TrySetInsideCurve(string item, AnimationCurve curve, NamespacedKey<DawnMoonInfo> moon)
@@ -391,6 +395,7 @@ namespace LunarConfig.Objects.Config
                 configEnemies.AddField("Loudness Multiplier", "Disable this to disable configuring this property in enemy config entries.", true);
                 configEnemies.AddField("Max Count", "Disable this to disable configuring this property in enemy config entries.", true);
                 configEnemies.AddField("Power Level", "Disable this to disable configuring this property in enemy config entries.", true);
+                configEnemies.AddField("Diversity Power Level", "Disable this to disable configuring this property in enemy config entries.", true);
                 configEnemies.AddField("Probability Curve", "Disable this to disable configuring this property in enemy config entries.", true);
                 configEnemies.AddField("Use Falloff?", "Disable this to disable configuring this property in enemy config entries.", true);
                 configEnemies.AddField("Falloff Curve", "Disable this to disable configuring this property in enemy config entries.", true);
@@ -426,6 +431,8 @@ namespace LunarConfig.Objects.Config
                 configMoons.AddField("Description", "Disable this to disable configuring this property in moon config entries.", true);
                 configMoons.AddField("Route Price", "Disable this to disable configuring this property in moon config entries.", true);
                 configMoons.AddField("Is Hidden? & Is Locked?", "Disable this to disable configuring these properties in moon config entries.", true);
+                configMoons.AddField("Offset Time", "Enable this to enable configuring this property in moon config entries.", false);
+                configMoons.AddField("Can Spawn Shrouds?", "Disable this to disable configuring this property in moon config entries.", true);
                 configMoons.AddField("Can Be Challenge Moon?", "Disable this to disable configuring this property in moon config entries.", true);
                 configMoons.AddField("Has Time?", "Disable this to disable configuring this property in moon config entries.", true);
                 configMoons.AddField("Time Multiplier", "Disable this to disable configuring this property in moon config entries.", true);
@@ -436,9 +443,12 @@ namespace LunarConfig.Objects.Config
                 configMoons.AddField("Interior Probability Range", "Disable this to disable configuring this property in moon config entries.", true);
                 configMoons.AddField("Interior Curve", "Disable this to disable configuring this property in moon config entries.", true);
                 configMoons.AddField("Max Interior Power", "Disable this to disable configuring this property in moon config entries.", true);
+                configMoons.AddField("Max Interior Diversity", "Disable this to disable configuring this property in moon config entries.", true);
                 configMoons.AddField("Spawnable Interior Enemies", "Disable this to disable configuring this property in moon config entries.", true);
+                configMoons.AddField("Outside Probability Range", "Disable this to disable configuring this property in moon config entries.", true);
                 configMoons.AddField("Outside Curve", "Disable this to disable configuring this property in moon config entries.", true);
                 configMoons.AddField("Max Outside Power", "Disable this to disable configuring this property in moon config entries.", true);
+                configMoons.AddField("Max Outside Diversity", "Disable this to disable configuring this property in moon config entries.", true);
                 configMoons.AddField("Spawnable Outside Enemies", "Disable this to disable configuring this property in moon config entries.", true);
                 configMoons.AddField("Min Scrap", "Disable this to disable configuring this property in moon config entries.", true);
                 configMoons.AddField("Max Scrap", "Disable this to disable configuring this property in moon config entries.", true);
@@ -451,12 +461,19 @@ namespace LunarConfig.Objects.Config
                 configMoons.AddField("Possible Interiors", "Disable this to disable configuring this property in moon config entries.", true);
                 configMoons.AddField("Tags", "Disable this to disable configuring this property in moon config entries.", true);
 
+                configMoons.AddField("Is Hidden? & Is Locked? Blacklist", "Add moons here that LunarConfig will ignore Is Hidden? and Is Locked? settings for, regardless of whether Configure Content is enabled.\nThis setting uses the Appropriate Aliases of moons!", "");
+
                 foreach (var setting in configMoons.fields.Keys)
                 {
-                    if (configMoons.GetValue<bool>(setting))
+                    if (!setting.Equals("Is Hidden? & Is Locked? Blacklist") && configMoons.GetValue<bool>(setting))
                     {
                         enabledMoonSettings.Add(setting);
                     }
+                }
+
+                foreach (var mon in configMoons.GetValue<String>("Is Hidden? & Is Locked? Blacklist").Split(","))
+                {
+                    if (mon != "") { enabledLockingMoons.Add(CleanString(mon)); }
                 }
             }
 
@@ -488,11 +505,13 @@ namespace LunarConfig.Objects.Config
                 configMapObjects.AddField("(Inside) Require Distance Between Spawns?", "Disable this to disable configuring this property in map object config entries.", true);
                 configMapObjects.AddField("(Inside) Flush Against Wall?", "Disable this to disable configuring this property in map object config entries.", true);
                 configMapObjects.AddField("(Inside) Spawn Against Wall?", "Disable this to disable configuring this property in map object config entries.", true);
+                configMapObjects.AddField("(Inside) Allow In Mineshaft?", "Disable this to disable configuring this property in map object config entries.", true);
                 configMapObjects.AddField("(Inside) Level Curves", "Disable this to disable configuring this property in map object config entries.", true);
                 configMapObjects.AddField("(Outside) Align With Terrain?", "Disable this to disable configuring this property in map object config entries.", true);
                 configMapObjects.AddField("(Outside) Object Width", "Disable this to disable configuring this property in map object config entries.", true);
                 configMapObjects.AddField("(Outside) Spawnable Floor Tags", "Disable this to disable configuring this property in map object config entries.", true);
                 configMapObjects.AddField("(Outside) Face Away From Wall?", "Disable this to disable configuring this property in map object config entries.", true);
+                configMapObjects.AddField("(Outside) Minimum AI Nodes Before Spawning", "Disable this to disable configuring this property in map object config entries.", true);
                 configMapObjects.AddField("(Outside) Level Curves", "Disable this to disable configuring this property in map object config entries.", true);
                 configMapObjects.AddField("Tags", "Disable this to disable configuring this property in map object config entries.", true);
 
@@ -678,6 +697,19 @@ namespace LunarConfig.Objects.Config
                         itemEntry.TryAddField(enabledItemSettings, "Conductivity", "Specifies whether an item is conductive.", itemObj.isConductiveMetal);
                         itemEntry.TryAddField(enabledItemSettings, "Two-Handed", "Specifies whether an item is two-handed.", itemObj.twoHanded);
                         itemEntry.TryAddField(enabledItemSettings, "Is Scrap?", "Specifies if an item is scrap or gear.\nThis decides whether an item can be sold to the company for credits.", itemObj.isScrap);
+
+                        /*
+                        itemObj.canBeInspected;
+                        itemObj.disableHandsOnWall;
+                        itemObj.disallowUtilitySlot;
+                        itemObj.highestSalePercentage;
+                        itemObj.holdButtonUse;
+                        itemObj.floorYOffset;
+                        itemObj.isDefensiveWeapon;
+                        itemObj.itemSpawnsOnGround;
+                        itemObj.toolTips;
+                        itemObj.verticalOffset;
+                        */
 
                         string defaultInfoText = "This is probably an item.";
                         string defaultRequestText = "You are trying to buy an item.";
@@ -1048,6 +1080,7 @@ namespace LunarConfig.Objects.Config
                         enemyEntry.TryAddField(enabledEnemySettings, "Loudness Multiplier", "Multiplies the volume of an enemy's sounds.", enemyObj.loudnessMultiplier);
                         enemyEntry.TryAddField(enabledEnemySettings, "Max Count", "The maximum amount of an enemy that can be alive.", enemyObj.MaxCount);
                         enemyEntry.TryAddField(enabledEnemySettings, "Power Level", "The power level an enemy occupies.", enemyObj.PowerLevel);
+                        enemyEntry.TryAddField(enabledEnemySettings, "Diversity Power Level", "The diversity power level an enemy occupies.", enemyObj.DiversityPowerLevel);
                         enemyEntry.TryAddField(enabledEnemySettings, "Probability Curve", "Multiplies enemy spawn weight depending on time of day.\nKeyframes represented by x,y and separated by semicolons.", CurveToString(enemyObj.probabilityCurve));
                         enemyEntry.TryAddField(enabledEnemySettings, "Use Falloff?", "Whether or not to use the falloff curve.", enemyObj.useNumberSpawnedFalloff);
                         enemyEntry.TryAddField(enabledEnemySettings, "Falloff Curve", "Multiplier to enemy spawn weight depending on how many are already spawned.\nKeyframes represented by x,y and separated by semicolons.", CurveToString(enemyObj.numberSpawnedFalloff));
@@ -1131,6 +1164,7 @@ namespace LunarConfig.Objects.Config
                             enemyEntry.TrySetValue(enabledEnemySettings, "Loudness Multiplier", ref enemyObj.loudnessMultiplier);
                             enemyEntry.TrySetValue(enabledEnemySettings, "Max Count", ref enemyObj.MaxCount);
                             enemyEntry.TrySetValue(enabledEnemySettings, "Power Level", ref enemyObj.PowerLevel);
+                            enemyEntry.TrySetValue(enabledEnemySettings, "Diversity Power Level", ref enemyObj.DiversityPowerLevel);
                             if (enabledEnemySettings.Contains("Probability Curve")) { enemyObj.probabilityCurve = StringToCurve(enemyEntry.GetValue<string>("Probability Curve")); }
                             enemyEntry.TrySetValue(enabledEnemySettings, "Use Falloff?", ref enemyObj.useNumberSpawnedFalloff);
                             if (enabledEnemySettings.Contains("Falloff Curve")) { enemyObj.numberSpawnedFalloff = StringToCurve(enemyEntry.GetValue<string>("Falloff Curve")); }
@@ -1800,29 +1834,35 @@ namespace LunarConfig.Objects.Config
 
                         DawnInsideMapObjectInfo insideInfo = null;
                         DawnOutsideMapObjectInfo outsideInfo = null;
-
+                        IndoorMapHazardType insideObj = null;
+                        
                         if (dawnObj.InsideInfo != null)
                         {
                             insideInfo = dawnObj.InsideInfo;
+                            if (insideInfo.IndoorMapHazardType != null)
+                            {
+                                insideObj = insideInfo.IndoorMapHazardType;
+                            }
                         }
 
                         if (dawnObj.OutsideInfo != null)
                         {
                             outsideInfo = dawnObj.OutsideInfo;
                         }
-
+                        
                         // GETTING VALUES (for config)
                         objEntry.AddField("Configure Content", "Enable to change any of the settings below.", false);
-                        objEntry.AddField("Appropriate Aliases", "These are the names which LunarConfig will recognize as this object in other config options.\nThey are case-insensitve and do not regard whitespace.", $"{dawnObj.MapObject.name}");
+                        objEntry.AddField("Appropriate Aliases", "These are the names which LunarConfig will recognize as this object in other config options.\nThey are case-insensitve and do not regard whitespace.", "");
 
-                        if (insideInfo != null)
+                        if (insideObj != null)
                         {
-                            objEntry.TryAddField(enabledMapObjectSettings, "(Inside) Face Away From Wall?", "Specifies whether the object should spawn facing away from a wall.", insideInfo.SpawnFacingAwayFromWall);
-                            objEntry.TryAddField(enabledMapObjectSettings, "(Inside) Face Towards Wall?", "Specifies whether the object should spawn facing towards a wall.", insideInfo.SpawnFacingWall);
-                            objEntry.TryAddField(enabledMapObjectSettings, "(Inside) Disallow Near Entrance?", "Specifies whether the object should not spawn near an entrance.", insideInfo.DisallowSpawningNearEntrances);
-                            objEntry.TryAddField(enabledMapObjectSettings, "(Inside) Require Distance Between Spawns?", "Specifies whether the object should require distance between its spawns.", insideInfo.RequireDistanceBetweenSpawns);
-                            objEntry.TryAddField(enabledMapObjectSettings, "(Inside) Flush Against Wall?", "Specifies whether the object should spawn flush against a wall.", insideInfo.SpawnWithBackFlushAgainstWall);
-                            objEntry.TryAddField(enabledMapObjectSettings, "(Inside) Spawn Against Wall?", "Specifies whether the object should spawn against a wall.", insideInfo.SpawnWithBackToWall);
+                            objEntry.TryAddField(enabledMapObjectSettings, "(Inside) Face Away From Wall?", "Specifies whether the object should spawn facing away from a wall.", insideObj.spawnFacingAwayFromWall);
+                            objEntry.TryAddField(enabledMapObjectSettings, "(Inside) Face Towards Wall?", "Specifies whether the object should spawn facing towards a wall.", insideObj.spawnFacingWall);
+                            objEntry.TryAddField(enabledMapObjectSettings, "(Inside) Disallow Near Entrance?", "Specifies whether the object should not spawn near an entrance.", insideObj.disallowSpawningNearEntrances);
+                            objEntry.TryAddField(enabledMapObjectSettings, "(Inside) Require Distance Between Spawns?", "Specifies whether the object should require distance between its spawns.", insideObj.requireDistanceBetweenSpawns);
+                            objEntry.TryAddField(enabledMapObjectSettings, "(Inside) Flush Against Wall?", "Specifies whether the object should spawn flush against a wall.", insideObj.spawnWithBackFlushAgainstWall);
+                            objEntry.TryAddField(enabledMapObjectSettings, "(Inside) Spawn Against Wall?", "Specifies whether the object should spawn against a wall.", insideObj.spawnWithBackToWall);
+                            objEntry.TryAddField(enabledMapObjectSettings, "(Inside) Allow In Mineshaft?", "Specifies whether the object can spawn in the mineshaft.", insideObj.allowInMineshaft);
                         }
                         else
                         {
@@ -1832,14 +1872,16 @@ namespace LunarConfig.Objects.Config
                             objEntry.TryAddField(enabledMapObjectSettings, "(Inside) Require Distance Between Spawns?", "Specifies whether the object should require distance between its spawns.", false);
                             objEntry.TryAddField(enabledMapObjectSettings, "(Inside) Flush Against Wall?", "Specifies whether the object should spawn flush against a wall.", false);
                             objEntry.TryAddField(enabledMapObjectSettings, "(Inside) Spawn Against Wall?", "Specifies whether the object should spawn against a wall.", false);
+                            objEntry.TryAddField(enabledMapObjectSettings, "(Inside) Allow In Mineshaft?", "Specifies whether the object can spawn in the mineshaft.", true);
                         }
 
                         if (outsideInfo != null)
                         {
                             objEntry.TryAddField(enabledMapObjectSettings, "(Outside) Align With Terrain?", "Specifies whether the object should spawn aligned to the terrain.", outsideInfo.AlignWithTerrain);
-                            objEntry.TryAddField(enabledMapObjectSettings, "(Outside) Object Width", "Specifies the width of an object. (Don't ask, I don't know either)", outsideInfo.ObjectWidth);
-                            objEntry.TryAddField(enabledMapObjectSettings, "(Outside) Spawnable Floor Tags", "Specifies the tags of floor an object can spawn on.", string.Join(", ", outsideInfo.SpawnableFloorTags));
-                            objEntry.TryAddField(enabledMapObjectSettings, "(Outside) Face Away From Wall?", "Specifies whether the object should spawn facing away from a wall.", outsideInfo.SpawnFacingAwayFromWall);
+                            objEntry.TryAddField(enabledMapObjectSettings, "(Outside) Object Width", "Specifies the width of an object. (Don't ask, I don't know either)", outsideInfo.SpawnableOutsideObject.objectWidth);
+                            objEntry.TryAddField(enabledMapObjectSettings, "(Outside) Spawnable Floor Tags", "Specifies the tags of floor an object can spawn on.", string.Join(", ", outsideInfo.SpawnableOutsideObject.spawnableFloorTags));
+                            objEntry.TryAddField(enabledMapObjectSettings, "(Outside) Face Away From Wall?", "Specifies whether the object should spawn facing away from a wall.", outsideInfo.SpawnableOutsideObject.spawnFacingAwayFromWall);
+                            objEntry.TryAddField(enabledMapObjectSettings, "(Outside) Minimum AI Nodes Before Spawning", "Specifies the amount of AI nodes a moon needs before an outside object can spawn.", outsideInfo.MinimumAINodeSpawnRequirement);
                         }
                         else
                         {
@@ -1847,6 +1889,7 @@ namespace LunarConfig.Objects.Config
                             objEntry.TryAddField(enabledMapObjectSettings, "(Outside) Object Width", "Specifies the width of an object. (Don't ask, I don't know either)", 1);
                             objEntry.TryAddField(enabledMapObjectSettings, "(Outside) Spawnable Floor Tags", "Specifies the tags of floor an object can spawn on.", "");
                             objEntry.TryAddField(enabledMapObjectSettings, "(Outside) Face Away From Wall?", "Specifies whether the object should spawn facing away from a wall.", false);
+                            objEntry.TryAddField(enabledMapObjectSettings, "(Outside) Minimum AI Nodes Before Spawning", "Specifies the amount of AI nodes a moon needs before an outside object can spawn.", 0);
                         }
 
                         objEntry.TryAddField(enabledMapObjectSettings, "Tags", "Tags allocated to the map object.\nSeparate tags with commas.", String.Join(", ", dawnObj.AllTags().Where(tag => tag.Namespace != "dawn_lib")));
@@ -1897,44 +1940,62 @@ namespace LunarConfig.Objects.Config
                             if (insideInfo == null)
                             {
                                 CurveTableBuilder<DawnMoonInfo, SpawnWeightContext> blankTable = new();
+                                dawnObj.InsideInfo = new DawnInsideMapObjectInfo(new IndoorMapHazardType(), blankTable.Build());
+                                IndoorMapHazardType tempType = dawnObj.InsideInfo.IndoorMapHazardType;
 
-                                dawnObj.InsideInfo = new DawnInsideMapObjectInfo(blankTable.Build(), false, false, false, false, false, false);
+                                tempType.allowInMineshaft = true;
+                                tempType.disallowSpawningNearEntrances = false;
+                                tempType.requireDistanceBetweenSpawns = false;
+                                tempType.spawnFacingAwayFromWall = false;
+                                tempType.spawnFacingWall = false;
+                                tempType.spawnWithBackFlushAgainstWall = false;
+                                tempType.spawnWithBackToWall = false;
+
                                 insideInfo = dawnObj.InsideInfo;
+                                insideObj = insideInfo.IndoorMapHazardType;
                                 insideInfo.ParentInfo = dawnObj;
                             }
 
-                            if (enabledMapObjectSettings.Contains("(Inside) Face Away From Wall?")) { insideInfo.SpawnFacingAwayFromWall = objEntry.GetValue<bool>("(Inside) Face Away From Wall?"); }
-                            if (enabledMapObjectSettings.Contains("(Inside) Face Towards Wall?")) { insideInfo.SpawnFacingWall = objEntry.GetValue<bool>("(Inside) Face Towards Wall?"); }
-                            if (enabledMapObjectSettings.Contains("(Inside) Disallow Near Entrance?")) { insideInfo.DisallowSpawningNearEntrances = objEntry.GetValue<bool>("(Inside) Disallow Near Entrance?"); }
-                            if (enabledMapObjectSettings.Contains("(Inside) Require Distance Between Spawns?")) { insideInfo.RequireDistanceBetweenSpawns = objEntry.GetValue<bool>("(Inside) Require Distance Between Spawns?"); }
-                            if (enabledMapObjectSettings.Contains("(Inside) Flush Against Wall?")) { insideInfo.SpawnWithBackFlushAgainstWall = objEntry.GetValue<bool>("(Inside) Flush Against Wall?"); }
-                            if (enabledMapObjectSettings.Contains("(Inside) Spawn Against Wall?")) { insideInfo.SpawnWithBackToWall = objEntry.GetValue<bool>("(Inside) Spawn Against Wall?"); }
+                            if (enabledMapObjectSettings.Contains("(Inside) Face Away From Wall?")) { insideObj.spawnFacingAwayFromWall = objEntry.GetValue<bool>("(Inside) Face Away From Wall?"); }
+                            if (enabledMapObjectSettings.Contains("(Inside) Face Towards Wall?")) { insideObj.spawnFacingWall = objEntry.GetValue<bool>("(Inside) Face Towards Wall?"); }
+                            if (enabledMapObjectSettings.Contains("(Inside) Disallow Near Entrance?")) { insideObj.disallowSpawningNearEntrances = objEntry.GetValue<bool>("(Inside) Disallow Near Entrance?"); }
+                            if (enabledMapObjectSettings.Contains("(Inside) Require Distance Between Spawns?")) { insideObj.requireDistanceBetweenSpawns = objEntry.GetValue<bool>("(Inside) Require Distance Between Spawns?"); }
+                            if (enabledMapObjectSettings.Contains("(Inside) Flush Against Wall?")) { insideObj.spawnWithBackFlushAgainstWall = objEntry.GetValue<bool>("(Inside) Flush Against Wall?"); }
+                            if (enabledMapObjectSettings.Contains("(Inside) Spawn Against Wall?")) { insideObj.spawnWithBackToWall = objEntry.GetValue<bool>("(Inside) Spawn Against Wall?"); }
+                            if (enabledMapObjectSettings.Contains("(Inside) Allow In Mineshaft?")) { insideObj.allowInMineshaft = objEntry.GetValue<bool>("(Inside) Allow In Mineshaft?"); }
 
                             if (outsideInfo == null)
                             {
                                 CurveTableBuilder<DawnMoonInfo, SpawnWeightContext> blankTable = new();
 
-                                dawnObj.OutsideInfo = new DawnOutsideMapObjectInfo(blankTable.Build(), false, 1, Array.Empty<string>(), Vector3.zero, true, 0);
+                                dawnObj.OutsideInfo = new DawnOutsideMapObjectInfo(new SpawnableOutsideObject(), blankTable.Build(), true, 0);
                                 outsideInfo = dawnObj.OutsideInfo;
+                                outsideInfo.SpawnableOutsideObject.objectWidth = 1;
+                                outsideInfo.SpawnableOutsideObject.spawnableFloorTags = Array.Empty<string>();
+                                outsideInfo.SpawnableOutsideObject.rotationOffset = Vector3.zero;
+                                outsideInfo.SpawnableOutsideObject.spawnFacingAwayFromWall = false;
                                 outsideInfo.ParentInfo = dawnObj;
                             }
 
                             if (enabledMapObjectSettings.Contains("(Outside) Align With Terrain?")) { outsideInfo.AlignWithTerrain = objEntry.GetValue<bool>("(Outside) Align With Terrain?"); }
-                            if (enabledMapObjectSettings.Contains("(Outside) Object Width")) { outsideInfo.ObjectWidth = objEntry.GetValue<int>("(Outside) Object Width"); }
+                            if (enabledMapObjectSettings.Contains("(Outside) Object Width")) { outsideInfo.SpawnableOutsideObject.objectWidth = objEntry.GetValue<int>("(Outside) Object Width"); }
 
-                            string[] tags = objEntry.GetValue<string>("(Outside) Spawnable Floor Tags").Split(",");
-
-                            for (int i = 0; i < tags.Length; i++)
+                            if (enabledMapObjectSettings.Contains("(Outside) Spawnable Floor Tags")) 
                             {
-                                tags.SetValue(tags[i].Trim(), i);
-                            }
+                                string[] tags = objEntry.GetValue<string>("(Outside) Spawnable Floor Tags").Split(",");
 
-                            if (enabledMapObjectSettings.Contains("(Outside) Spawnable Floor Tags")) { outsideInfo.SpawnableFloorTags = tags; }
-                            if (enabledMapObjectSettings.Contains("(Outside) Face Away From Wall?")) { outsideInfo.SpawnFacingAwayFromWall = objEntry.GetValue<bool>("(Outside) Face Away From Wall?"); }
+                                for (int i = 0; i < tags.Length; i++)
+                                {
+                                    tags.SetValue(tags[i].Trim(), i);
+                                }
+
+                                outsideInfo.SpawnableOutsideObject.spawnableFloorTags = tags; 
+                            }
+                            if (enabledMapObjectSettings.Contains("(Outside) Face Away From Wall?")) { outsideInfo.SpawnableOutsideObject.spawnFacingAwayFromWall = objEntry.GetValue<bool>("(Outside) Face Away From Wall?"); }
+                            if (enabledMapObjectSettings.Contains("(Outside) Minimum AI Nodes Before Spawning")) { outsideInfo.MinimumAINodeSpawnRequirement = objEntry.GetValue<int>("(Outside) Minimum AI Nodes Before Spawning"); }
                         }
                         else
                         {
-                            mapObjects[CleanString(dawnObj.MapObject.name)] = uuid;
                             mapObjects[CleanString(niceUUID)] = uuid;
                         }
                     }
@@ -1954,7 +2015,6 @@ namespace LunarConfig.Objects.Config
                 {
                     string uuid = UUIDify(obj.Key.ToString());
 
-                    mapObjects[CleanString(obj.Value.MapObject.name)] = uuid;
                     mapObjects[CleanString(NiceifyDawnUUID(uuid))] = uuid;
                 }
             }
@@ -2033,7 +2093,17 @@ namespace LunarConfig.Objects.Config
                             }
                             else
                             {
-                                dawnObj.InsideInfo = new DawnInsideMapObjectInfo(newTable, false, false, false, false, false, false);
+                                dawnObj.InsideInfo = new DawnInsideMapObjectInfo(new IndoorMapHazardType(), newTable);
+                                IndoorMapHazardType tempType = dawnObj.InsideInfo.IndoorMapHazardType;
+
+                                tempType.allowInMineshaft = true;
+                                tempType.disallowSpawningNearEntrances = false;
+                                tempType.requireDistanceBetweenSpawns = false;
+                                tempType.spawnFacingAwayFromWall = false;
+                                tempType.spawnFacingWall = false;
+                                tempType.spawnWithBackFlushAgainstWall = false;
+                                tempType.spawnWithBackToWall = false;
+
                                 dawnObj.InsideInfo.ParentInfo = dawnObj;
                             }
                         }
@@ -2110,9 +2180,16 @@ namespace LunarConfig.Objects.Config
                             }
                             else
                             {
-                                MiniLogger.LogInfo($"{uuid} does not have an OutsideInfo");
-                                dawnObj.OutsideInfo = new DawnOutsideMapObjectInfo(newTable, false, 12, Array.Empty<string>(), Vector3.zero, false, 0);
-                                dawnObj.OutsideInfo.ParentInfo = dawnObj;
+                                dawnObj.OutsideInfo = new DawnOutsideMapObjectInfo(new SpawnableOutsideObject(), newTable, true, 0);
+
+                                DawnOutsideMapObjectInfo outsideInfo = dawnObj.OutsideInfo;
+
+                                outsideInfo = dawnObj.OutsideInfo;
+                                outsideInfo.SpawnableOutsideObject.objectWidth = 12;
+                                outsideInfo.SpawnableOutsideObject.spawnableFloorTags = Array.Empty<string>();
+                                outsideInfo.SpawnableOutsideObject.rotationOffset = Vector3.zero;
+                                outsideInfo.SpawnableOutsideObject.spawnFacingAwayFromWall = false;
+                                outsideInfo.ParentInfo = dawnObj;
                             }
                         }
                         catch (Exception e)
@@ -2173,6 +2250,8 @@ namespace LunarConfig.Objects.Config
                         moonEntry.TryAddField(enabledMoonSettings, "Risk Level", "Changes the risk level of the moon.\nThis setting is only cosmetic.", moonObj.riskLevel);
                         moonEntry.TryAddField(enabledMoonSettings, "Description", "The description given to the moon.\nNew lines are represented by semi-colons.\nDoes not modify terminal commands/nodes.", moonObj.LevelDescription.Replace("\n", ";"));
                         moonEntry.TryAddField(enabledMoonSettings, "Has Time?", "Defines whether a moon has time.", moonObj.planetHasTime);
+                        moonEntry.TryAddField(enabledMoonSettings, "Offset Time", "The offset time that a moon has.", moonObj.OffsetFromGlobalTime);
+                        moonEntry.TryAddField(enabledMoonSettings, "Can Spawn Shrouds?", "Defines whether a moon can spawn vain shrouds.", moonObj.canSpawnMold);
                         moonEntry.TryAddField(enabledMoonSettings, "Can Be Challenge Moon?", "Defines whether or not a moon can be selected for the weekly challenge moon.", moonObj.planetHasTime);
                         moonEntry.TryAddField(enabledMoonSettings, "Time Multiplier", "Multiplies the speed at which time progresses on a moon.\nIn order to not cause issues, it is best to only modify this setting while using Moon Day Speed Multiplier Patcher by WhiteSpike.", moonObj.DaySpeedMultiplier);
                         moonEntry.TryAddField(enabledMoonSettings, "Daytime Probability Range", "The amount of daytime enemies spawned that can differ from the curve.\nFor instance, if this value is 3, and at the current time and spawn cycle 2 daytime enemies should spawn, anywhere between 0 and 5 can spawn.", moonObj.daytimeEnemiesProbabilityRange);
@@ -2181,8 +2260,11 @@ namespace LunarConfig.Objects.Config
                         moonEntry.TryAddField(enabledMoonSettings, "Interior Probability Range", "The amount of interior enemies spawned that can differ from the curve.\nFor instance, if this value is 3, and at the current time and spawn cycle 2 interior enemies should spawn, anywhere between 0 and 5 can spawn.", moonObj.spawnProbabilityRange);
                         moonEntry.TryAddField(enabledMoonSettings, "Interior Curve", "Decides the amount of interior enemies that spawn as the day progresses.\nKeyframes represented by x,y and separated by semicolons.", CurveToString(moonObj.enemySpawnChanceThroughoutDay));
                         moonEntry.TryAddField(enabledMoonSettings, "Max Interior Power", "The amount of interior power capacity that a moon has.", moonObj.maxEnemyPowerCount);
+                        moonEntry.TryAddField(enabledMoonSettings, "Max Interior Diversity", "The amount of interior diversity capacity that a moon has.", moonObj.maxInsideDiversityPowerCount);
+                        moonEntry.TryAddField(enabledMoonSettings, "Outside Probability Range", "The amount of outside enemies spawned that can differ from the curve.\nFor instance, if this value is 3, and at the current time and spawn cycle 2 interior enemies should spawn, anywhere between 0 and 5 can spawn.", dawnMoon.OutsideEnemiesProbabilityRange);
                         moonEntry.TryAddField(enabledMoonSettings, "Outside Curve", "Decides the amount of outside enemies that spawn as the day progresses.\nKeyframes represented by x,y and separated by semicolons.", CurveToString(moonObj.outsideEnemySpawnChanceThroughDay));
                         moonEntry.TryAddField(enabledMoonSettings, "Max Outside Power", "The amount of outside power capacity that a moon has.", moonObj.maxOutsideEnemyPowerCount);
+                        moonEntry.TryAddField(enabledMoonSettings, "Max Outside Diversity", "The amount of outside diversity capacity that a moon has.", moonObj.maxOutsideDiversityPowerCount);
                         moonEntry.TryAddField(enabledMoonSettings, "Min Scrap", "The minimum amount of scrap items that can spawn on a moon.", moonObj.minScrap);
                         moonEntry.TryAddField(enabledMoonSettings, "Max Scrap", "The maximum amount of scrap items that can spawn on a moon.", moonObj.maxScrap);
                         moonEntry.TryAddField(enabledMoonSettings, "Min Scrap Total", "NOTE: This setting is essentially unused in the vanilla, Lunar does not implement any new functionality.\nThe minimum amount of scrap value that can spawn on a moon.", moonObj.minTotalScrapValue);
@@ -2379,6 +2461,8 @@ namespace LunarConfig.Objects.Config
                         // SETTING VALUES
                         if (moonEntry.GetValue<bool>("Configure Content"))
                         {
+                            bool lockingDisabled = false;
+
                             if (enabledMoonSettings.Contains("Tags"))
                             {
                                 HashSet<NamespacedKey> newTags = new HashSet<NamespacedKey>();
@@ -2416,13 +2500,20 @@ namespace LunarConfig.Objects.Config
 
                             foreach (var key in moonEntry.GetValue<string>("Appropriate Aliases").Split(","))
                             {
-                                if (!key.IsNullOrWhiteSpace()) { moons[CleanString(key)] = uuid; }
+                                if (!key.IsNullOrWhiteSpace()) 
+                                {
+                                    String cleanedString = CleanString(key);
+                                    moons[cleanedString] = uuid;
+                                    if (enabledLockingMoons.Contains(cleanedString)) { lockingDisabled = true; }
+                                }
                             }
 
                             moonEntry.TrySetValue(enabledMoonSettings, "Display Name", ref moonObj.PlanetName);
                             moonEntry.TrySetValue(enabledMoonSettings, "Risk Level", ref moonObj.riskLevel);
                             if (enabledMoonSettings.Contains("Description")) { moonObj.LevelDescription = moonEntry.GetValue<string>("Description").Replace(";", "\n"); }
                             moonEntry.TrySetValue(enabledMoonSettings, "Has Time?", ref moonObj.planetHasTime);
+                            moonEntry.TrySetValue(enabledMoonSettings, "Offset Time", ref moonObj.OffsetFromGlobalTime);
+                            moonEntry.TrySetValue(enabledMoonSettings, "Can Spawn Shrouds?", ref moonObj.canSpawnMold);
                             moonEntry.TrySetValue(enabledMoonSettings, "Time Multiplier", ref moonObj.DaySpeedMultiplier);
                             if (enabledMoonSettings.Contains("Can Be Challenge Moon?")) { definedChallengeMoons[moonObj] = moonEntry.GetValue<bool>("Can Be Challenge Moon?"); }
                             if (enabledMoonSettings.Contains("Has Time?")) { definedChallengeMoonTimes[moonObj] = moonEntry.GetValue<bool>("Has Time?"); }
@@ -2432,8 +2523,11 @@ namespace LunarConfig.Objects.Config
                             moonEntry.TrySetValue(enabledMoonSettings, "Interior Probability Range", ref moonObj.spawnProbabilityRange);
                             if (enabledMoonSettings.Contains("Interior Curve")) { moonObj.enemySpawnChanceThroughoutDay = StringToCurve(moonEntry.GetValue<string>("Interior Curve")); }
                             moonEntry.TrySetValue(enabledMoonSettings, "Max Interior Power", ref moonObj.maxEnemyPowerCount);
+                            moonEntry.TrySetValue(enabledMoonSettings, "Max Interior Diversity", ref moonObj.maxInsideDiversityPowerCount);
+                            if (enabledMoonSettings.Contains("Outside Probability Range")) { dawnMoon.OutsideEnemiesProbabilityRange = moonEntry.GetValue<float>("Outside Probability Range"); }
                             if (enabledMoonSettings.Contains("Outside Curve")) { moonObj.outsideEnemySpawnChanceThroughDay = StringToCurve(moonEntry.GetValue<string>("Outside Curve")); }
                             moonEntry.TrySetValue(enabledMoonSettings, "Max Outside Power", ref moonObj.maxOutsideEnemyPowerCount);
+                            moonEntry.TrySetValue(enabledMoonSettings, "Max Outside Diversity", ref moonObj.maxOutsideDiversityPowerCount);
                             moonEntry.TrySetValue(enabledMoonSettings, "Min Scrap", ref moonObj.minScrap);
                             moonEntry.TrySetValue(enabledMoonSettings, "Max Scrap", ref moonObj.maxScrap);
                             moonEntry.TrySetValue(enabledMoonSettings, "Min Scrap Total", ref moonObj.minTotalScrapValue);
@@ -2443,7 +2537,7 @@ namespace LunarConfig.Objects.Config
                             if (purchaseInfo != null)
                             {
                                 if (enabledMoonSettings.Contains("Route Price")) { purchaseInfo.Cost = new SimpleProvider<int>(moonEntry.GetValue<int>("Route Price")); }
-                                if (enabledMoonSettings.Contains("Is Hidden? & Is Locked?"))
+                                if (enabledMoonSettings.Contains("Is Hidden? & Is Locked?") && !lockingDisabled)
                                 {
                                     ITerminalPurchasePredicate predicate = ITerminalPurchasePredicate.AlwaysSuccess();
                                     bool isHidden = moonEntry.GetValue<bool>("Is Hidden?");
