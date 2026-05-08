@@ -2665,7 +2665,8 @@ namespace LunarConfig.Objects.Config
                 }
 
                 // This needs to be done after the original pass, so that any changes to Is Hidden/Locked apply correctly
-                if(enabledMoonSettings.Contains("Catalogue Index")) {
+                if(enabledMoonSettings.Contains("Catalogue Index")) 
+                {
                     List<DawnMoonInfo> originalCatalogueIndex = MoonRegistrationHandler.MoonGroupAlgorithm.Group(LethalContent.Moons.Values, true).SelectMany(it => it.Moons).ToList();
                     Dictionary<DawnMoonInfo, int> newCatalogueIndex = [];
 
