@@ -460,6 +460,7 @@ namespace LunarConfig.Objects.Config
                 configMoons.AddField("Spawnable Scrap", "Disable this to disable configuring this property in moon config entries.", true);
                 configMoons.AddField("Possible Interiors", "Disable this to disable configuring this property in moon config entries.", true);
                 configMoons.AddField("Tags", "Disable this to disable configuring this property in moon config entries.", true);
+                configMoons.AddField("Catalogue Index", "Disable this to disable configuring this property in moon config entries.", true);
 
                 configMoons.AddField("Is Hidden? & Is Locked? Blacklist", "Add moons here that LunarConfig will ignore Is Hidden? and Is Locked? settings for, regardless of whether Configure Content is enabled.\nThis setting uses the Appropriate Aliases of moons!", "");
 
@@ -2661,6 +2662,28 @@ namespace LunarConfig.Objects.Config
                     {
                         MiniLogger.LogError($"LunarConfig encountered an issue while configuring {uuid}, please report this!\n{e}");
                     }
+                }
+
+                // This needs to be done after the original pass, so that any changes to Is Hidden/Locked apply correctly
+                if(enabledMoonSettings.Contains("Catalogue Index")) 
+                {
+                    List<DawnMoonInfo> originalCatalogueIndex = MoonRegistrationHandler.MoonGroupAlgorithm.Group(LethalContent.Moons.Values, true).SelectMany(it => it.Moons).ToList();
+                    Dictionary<DawnMoonInfo, int> newCatalogueIndex = [];
+
+                    foreach(var moon in LethalContent.Moons)
+                    {
+                        string uuid = UUIDify(moon.Key.ToString());
+                        string niceUUID = NiceifyDawnUUID(moon.Key.Key);
+                        DawnMoonInfo dawnMoon = moon.Value;
+                        LunarConfigEntry moonEntry = moonFile.AddEntry($"{niceUUID} - {uuid}");
+
+                        moonEntry.AddField("Catalogue Index", "Changes the order in the moon catalogue in the terminal. A higher value means first/higher in the list.", originalCatalogueIndex.IndexOf(dawnMoon));
+                        newCatalogueIndex[dawnMoon] = moonEntry.GetValue<int>("Catalogue Index");
+                    }
+
+                    MoonRegistrationHandler.MoonGroupAlgorithm.OrderingSteps = [
+                        new LunarConfigCustomMoonOrder(newCatalogueIndex)  
+                    ];
                 }
 
                 ClearOrphanedEntries(moonFile.file);
