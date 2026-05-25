@@ -4,7 +4,7 @@
 Features
 - Added many new features to items, several are disabled by default as they're advanced!
 - Added the ability to configure the LLL tags of a moon, this option only appears if you have LLL installed!
-- Added the 'Increased Chance Interior' field to enemy configs (for enemies like maneaters)
+- Added the 'Disable Increased Chance Interior' field to enemy configs (for enemies like maneaters)
 - Removed 'Is Scrap?'
 
 Fixes
