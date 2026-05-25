@@ -1,3 +1,24 @@
+# Version 0.4.0 - The B.I.G. Update
+## Bug fixes, Item features, and General additions
+
+Features
+- Added many new features to items, several are disabled by default as they're advanced!
+- Added the ability to configure the LLL tags of a moon, this option only appears if you have LLL installed!
+- Added the 'Increased Chance Interior' field to enemy configs (for enemies like maneaters)
+- Removed 'Is Scrap?'
+
+Fixes
+- Fixed Lunar grabbing empty map object weights (and any other issues with grabbing things that weren't initialized)
+- Fixed an annoying spam message if Lunar tried to parse an empty tag on an entry
+- Fixed enabling configure content on a moon removing it's tags from LunarTagInjection
+- Fixed 'Catalogue Index' ignoring configure content
+- Fixed inside objects freezing the game if you tried to spawn them outside
+
+## Version 0.3.14
+
+Features
+- Added Catalogue Index option in moon entries for allowing a custom order of moons in the terminal.
+
 ## Version 0.3.13
 
 Features

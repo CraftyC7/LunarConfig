@@ -56,3 +56,4 @@ Hopefully as I have time I intend to add some of the following:
 
 * The Lethal Company Modding Discord, essentially enabling me to make this mod, as I likely couldn't have figured it out without some of the people there.
 * DawnLib, for being mostly easier to use than accessing 4 different libraries. (and Xu Xiaolan especially for tolerating me for months)
+* Bongo Xiaolan for writing the custom catalogue ordering code.

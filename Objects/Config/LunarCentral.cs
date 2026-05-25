@@ -58,6 +58,13 @@ namespace LunarConfig.Objects.Config
         public static bool dungeonsInitialized = false;
         public static bool mapObjectsInitialized = false;
 
+        public static bool moonItemsInitialized = false;
+        public static bool moonEnemiesInitialized = false;
+        public static bool moonDungeonsInitialized = false;
+        public static bool moonObjectsInitialized = false;
+
+        public static bool dungeonEnemiesInitialized = false;
+
         public static bool itemWeightsInitialized = false;
         public static bool enemyWeightsInitialized = false;
         public static bool dungeonWeightsInitialized = false;
@@ -362,7 +369,17 @@ namespace LunarConfig.Objects.Config
                 configItems.AddField("Weight", "Disable this to disable configuring this property in item config entries.", true);
                 configItems.AddField("Conductivity", "Disable this to disable configuring this property in item config entries.", true);
                 configItems.AddField("Two-Handed", "Disable this to disable configuring this property in item config entries.", true);
-                configItems.AddField("Is Scrap?", "Disable this to disable configuring this property in item config entries.", true);
+
+                configItems.AddField("Can Be Inspected", "Disable this to disable configuring this property in item config entries.", true);
+                configItems.AddField("Disable Hands On Wall", "Enable this to enable configuring this property in item config entries.", false);
+                configItems.AddField("Disallow Utility Slot", "Enable this to enable configuring this property in item config entries.", false);
+                configItems.AddField("Highest Sale Percentage", "Enable this to enable configuring this property in item config entries.", false);
+                configItems.AddField("Hold Button Use", "Enable this to enable configuring this property in item config entries.", false);
+                configItems.AddField("Floor Y Offset", "Enable this to enable configuring this property in item config entries.", false);
+                configItems.AddField("Is Defensive Weapon", "Enable this to enable configuring this property in item config entries.", false);
+                configItems.AddField("Spawns On Ground", "Enable this to enable configuring this property in item config entries.", false);
+                configItems.AddField("Tooltips", "Disable this to disable configuring this property in item config entries.", true);
+                configItems.AddField("Vertical Offset", "Enable this to enable configuring this property in item config entries.", false);
 
                 configItems.AddField("Sold In Shop?", "Enable this to enable configuring this property in item config entries.", false);
                 configItems.AddField("Info Node Text", "Enable this to enable configuring this property in item config entries.", false);
@@ -401,6 +418,7 @@ namespace LunarConfig.Objects.Config
                 configEnemies.AddField("Falloff Curve", "Disable this to disable configuring this property in enemy config entries.", true);
                 configEnemies.AddField("Group Spawn Count", "Disable this to disable configuring this property in enemy config entries.", true);
                 configEnemies.AddField("Normalized Time To Leave", "Disable this to disable configuring this property in enemy config entries.", true);
+                configEnemies.AddField("Disable Increased Chance Interior", "Enable this to enable configuring this property in enemy config entries.", false);
                 configEnemies.AddField("Enemy HP", "Disable this to disable configuring this property in enemy config entries.", true);
                 configEnemies.AddField("Can Die?", "Disable this to disable configuring this property in enemy config entries.", true);
                 configEnemies.AddField("Destroy On Death?", "Disable this to disable configuring this property in enemy config entries.", true);
@@ -455,11 +473,13 @@ namespace LunarConfig.Objects.Config
                 configMoons.AddField("Min Scrap Total", "Enable this to enable configuring this property in moon config entries.", false);
                 configMoons.AddField("Max Scrap Total", "Enable this to enable configuring this property in moon config entries.", false);
                 configMoons.AddField("Interior Multiplier", "Disable this to disable configuring this property in moon config entries.", true);
+                //configMoons.AddField("Disable Special Enemy", "Disable this to disable configuring this property in moon config entries.", true);
                 configMoons.AddField("Value Multiplier", "Disable this to disable configuring this property in moon config entries.", true);
                 configMoons.AddField("Amount Multiplier", "Disable this to disable configuring this property in moon config entries.", true);
                 configMoons.AddField("Spawnable Scrap", "Disable this to disable configuring this property in moon config entries.", true);
                 configMoons.AddField("Possible Interiors", "Disable this to disable configuring this property in moon config entries.", true);
                 configMoons.AddField("Tags", "Disable this to disable configuring this property in moon config entries.", true);
+                configMoons.AddField("LLL Tags", "Disable this to disable configuring this property in moon config entries.", true);
                 configMoons.AddField("Catalogue Index", "Disable this to disable configuring this property in moon config entries.", true);
 
                 configMoons.AddField("Is Hidden? & Is Locked? Blacklist", "Add moons here that LunarConfig will ignore Is Hidden? and Is Locked? settings for, regardless of whether Configure Content is enabled.\nThis setting uses the Appropriate Aliases of moons!", "");
@@ -697,20 +717,16 @@ namespace LunarConfig.Objects.Config
                         itemEntry.TryAddField(enabledItemSettings, "Weight", "Specifies the weight of an item.\nCalculated with: (x - 1) * 105 = weight in pounds.", useZeekWeight ? itemObj.weight : (itemObj.weight - 1) * 105);
                         itemEntry.TryAddField(enabledItemSettings, "Conductivity", "Specifies whether an item is conductive.", itemObj.isConductiveMetal);
                         itemEntry.TryAddField(enabledItemSettings, "Two-Handed", "Specifies whether an item is two-handed.", itemObj.twoHanded);
-                        itemEntry.TryAddField(enabledItemSettings, "Is Scrap?", "Specifies if an item is scrap or gear.\nThis decides whether an item can be sold to the company for credits.", itemObj.isScrap);
-
-                        /*
-                        itemObj.canBeInspected;
-                        itemObj.disableHandsOnWall;
-                        itemObj.disallowUtilitySlot;
-                        itemObj.highestSalePercentage;
-                        itemObj.holdButtonUse;
-                        itemObj.floorYOffset;
-                        itemObj.isDefensiveWeapon;
-                        itemObj.itemSpawnsOnGround;
-                        itemObj.toolTips;
-                        itemObj.verticalOffset;
-                        */
+                        itemEntry.TryAddField(enabledItemSettings, "Can Be Inspected", "Specifies whether an item can be inspected.", itemObj.canBeInspected);
+                        itemEntry.TryAddField(enabledItemSettings, "Disable Hands On Wall", "Specifies whether holding the item against a wall will put the hands up.", itemObj.disableHandsOnWall);
+                        itemEntry.TryAddField(enabledItemSettings, "Disallow Utility Slot", "Forces an item to not be allowed in the utility slot.", itemObj.disallowUtilitySlot);
+                        itemEntry.TryAddField(enabledItemSettings, "Highest Sale Percentage", "Specifies the highest shop sales percentage the item can have.", itemObj.highestSalePercentage);
+                        itemEntry.TryAddField(enabledItemSettings, "Hold Button Use", "Specifies whether holding a button triggers the item.", itemObj.holdButtonUse);
+                        itemEntry.TryAddField(enabledItemSettings, "Floor Y Offset", "Specifies y-offset of the item when on the floor.", itemObj.floorYOffset);
+                        itemEntry.TryAddField(enabledItemSettings, "Is Defensive Weapon", "Specifies whether an item is a weapon for certain interactions.", itemObj.isDefensiveWeapon);
+                        itemEntry.TryAddField(enabledItemSettings, "Spawns On Ground", "Specifies whether an item spawns on the ground.", itemObj.itemSpawnsOnGround);
+                        itemEntry.TryAddField(enabledItemSettings, "Tooltips", "Specifies the tooltips of an item.\nA semi-colon denotes a new line.", string.Join(",", itemObj.toolTips));
+                        itemEntry.TryAddField(enabledItemSettings, "Vertical Offset", "Specifies the vertical offset of an item.", itemObj.verticalOffset);
 
                         string defaultInfoText = "This is probably an item.";
                         string defaultRequestText = "You are trying to buy an item.";
@@ -756,7 +772,9 @@ namespace LunarConfig.Objects.Config
                                     }
                                     else
                                     {
-                                        MiniLogger.LogWarning($"Incorrectly formatted tag '{tag}' found on {uuid}");
+                                        if (!tag.IsNullOrWhiteSpace())
+                                            MiniLogger.LogWarning($"Incorrectly formatted tag '{tag}' found on {uuid}");
+
                                         continue;
                                     }
                                 }
@@ -811,7 +829,21 @@ namespace LunarConfig.Objects.Config
 
                             itemEntry.TrySetValue(enabledItemSettings, "Conductivity", ref itemObj.isConductiveMetal);
                             itemEntry.TrySetValue(enabledItemSettings, "Two-Handed", ref itemObj.twoHanded);
-                            itemEntry.TrySetValue(enabledItemSettings, "Is Scrap?", ref itemObj.isScrap);
+                            itemEntry.TrySetValue(enabledItemSettings, "Can Be Inspected", ref itemObj.canBeInspected);
+                            itemEntry.TrySetValue(enabledItemSettings, "Disable Hands On Wall", ref itemObj.disableHandsOnWall);
+                            itemEntry.TrySetValue(enabledItemSettings, "Disallow Utility Slot", ref itemObj.disallowUtilitySlot);
+                            itemEntry.TrySetValue(enabledItemSettings, "Highest Sale Percentage", ref itemObj.highestSalePercentage);
+                            itemEntry.TrySetValue(enabledItemSettings, "Hold Button Use", ref itemObj.holdButtonUse);
+                            itemEntry.TrySetValue(enabledItemSettings, "Floor Y Offset", ref itemObj.floorYOffset);
+                            itemEntry.TrySetValue(enabledItemSettings, "Is Defensive Weapon", ref itemObj.isDefensiveWeapon);
+                            itemEntry.TrySetValue(enabledItemSettings, "Spawns On Ground", ref itemObj.itemSpawnsOnGround);
+
+                            if (enabledItemSettings.Contains("Tooltips"))
+                            {
+                                itemObj.toolTips = itemEntry.GetValue<string>("Tooltips").Split(";");
+                            }
+
+                            itemEntry.TrySetValue(enabledItemSettings, "Vertical Offset", ref itemObj.verticalOffset);
 
                             if (enabledItemSettings.Contains("Sold In Shop?"))
                             {
@@ -857,7 +889,11 @@ namespace LunarConfig.Objects.Config
                             if (requestNode != null && enabledItemSettings.Contains("Request Node Text")) { requestNode.displayText = itemEntry.GetValue<string>("Request Node Text").Replace(";", "\n"); }
                             if (receiptNode != null && enabledItemSettings.Contains("Receipt Node Text")) { receiptNode.displayText = itemEntry.GetValue<string>("Receipt Node Text").Replace(";", "\n"); }
 
-                            if (purchaseInfo != null && enabledItemSettings.Contains("Cost")) { purchaseInfo.Cost = new SimpleProvider<int>(itemEntry.GetValue<int>("Cost")); }
+                            if (purchaseInfo != null && enabledItemSettings.Contains("Cost")) 
+                            { 
+                                purchaseInfo.Cost = new SimpleProvider<int>(itemEntry.GetValue<int>("Cost"));
+                                itemEntry.TrySetValue(enabledItemSettings, "Cost", ref itemObj.creditsWorth);
+                            }
                         }
                         else
                         {
@@ -889,6 +925,11 @@ namespace LunarConfig.Objects.Config
             }
 
             itemsInitialized = true;
+
+            if (moonsInitialized && !moonItemsInitialized)
+            {
+                InitMoonItems();
+            }
 
             MiniLogger.LogInfo("Completed Initializing Items");
             InitItemWeights();
@@ -1087,6 +1128,7 @@ namespace LunarConfig.Objects.Config
                         enemyEntry.TryAddField(enabledEnemySettings, "Falloff Curve", "Multiplier to enemy spawn weight depending on how many are already spawned.\nKeyframes represented by x,y and separated by semicolons.", CurveToString(enemyObj.numberSpawnedFalloff));
                         enemyEntry.TryAddField(enabledEnemySettings, "Group Spawn Count", "The amount of entities that will spawn of this type at once.\nNOTICE: In order for this setting to work, you may need VentSpawnFixes or a similar mod.", enemyObj.spawnInGroupsOf);
                         enemyEntry.TryAddField(enabledEnemySettings, "Normalized Time To Leave", "The time that an enemy leaves represented between 0 and 1 for the start and end of the day respectively.\nWARNING: Changing this for enemies that do not normally leave during the day may cause issues.", enemyObj.normalizedTimeInDayToLeave);
+                        enemyEntry.TryAddField(enabledEnemySettings, "Disable Increased Chance Interior", "Do not increase the enemies weight on it's increased chance interior.\nAllows use of injection instead.", false);
 
                         if (enemyAI != null) { enemyEntry.TryAddField(enabledEnemySettings, "Enemy HP", "The amount of HP an enemy has.", enemyAI.enemyHP); }
 
@@ -1096,7 +1138,7 @@ namespace LunarConfig.Objects.Config
                         enemyEntry.TryAddField(enabledEnemySettings, "Can Stun?", "Whether or not an enemy can be stunned.\nWARNING: Enabling this for enemies that have it disabled by default will likely cause issues, as the enemy most likely does not have stunning mechanics.", enemyObj.canBeStunned);
                         enemyEntry.TryAddField(enabledEnemySettings, "Stun Difficulty", "Modifies the difficulty of using the zap gun on this enemy.", enemyObj.stunGameDifficultyMultiplier);
                         enemyEntry.TryAddField(enabledEnemySettings, "Stun Time", "Modifies the duration this enemy stays stunned.", enemyObj.stunTimeMultiplier);
-
+                        
                         if (bestiary != null) { enemyEntry.TryAddField(enabledEnemySettings, "Bestiary Text", "The text of the terminal when viewing the bestiary of an enemy. New lines are represented by semi-colons.", bestiary.displayText.Replace("\n", ";")); }
                         
                         if (word != null) { enemyEntry.TryAddField(enabledEnemySettings, "Bestiary Keyword", "The keyword to view the bestiary entry of an enemy.", word.word); }
@@ -1129,7 +1171,9 @@ namespace LunarConfig.Objects.Config
                                     }
                                     else
                                     {
-                                        MiniLogger.LogWarning($"Incorrectly formatted tag '{tag}' found on {uuid}");
+                                        if (!tag.IsNullOrWhiteSpace())
+                                            MiniLogger.LogWarning($"Incorrectly formatted tag '{tag}' found on {uuid}");
+
                                         continue;
                                     }
                                 }
@@ -1171,6 +1215,7 @@ namespace LunarConfig.Objects.Config
                             if (enabledEnemySettings.Contains("Falloff Curve")) { enemyObj.numberSpawnedFalloff = StringToCurve(enemyEntry.GetValue<string>("Falloff Curve")); }
                             enemyEntry.TrySetValue(enabledEnemySettings, "Group Spawn Count", ref enemyObj.spawnInGroupsOf);
                             enemyEntry.TrySetValue(enabledEnemySettings, "Normalized Time To Leave", ref enemyObj.normalizedTimeInDayToLeave);
+                            if (enabledEnemySettings.Contains("Disable Increased Chance Interior") && enemyEntry.GetValue<bool>("Disable Increased Chance Interior")) { enemyObj.increasedChanceInterior = -1; }
 
                             if (enemyAI != null) { enemyEntry.TrySetValue(enabledEnemySettings, "Enemy HP", ref enemyAI.enemyHP); }
 
@@ -1225,6 +1270,11 @@ namespace LunarConfig.Objects.Config
             }
 
             enemiesInitialized = true;
+            if (moonsInitialized && !moonEnemiesInitialized)
+            {
+                InitMoonEnemies();
+            }
+
             MiniLogger.LogInfo("Completed Initializing Enemies");
 
             InitEnemyWeights();
@@ -1655,7 +1705,9 @@ namespace LunarConfig.Objects.Config
                                     }
                                     else
                                     {
-                                        MiniLogger.LogWarning($"Incorrectly formatted tag '{tag}' found on {uuid}");
+                                        if (!tag.IsNullOrWhiteSpace())
+                                            MiniLogger.LogWarning($"Incorrectly formatted tag '{tag}' found on {uuid}");
+
                                         continue;
                                     }
                                 }
@@ -1712,6 +1764,11 @@ namespace LunarConfig.Objects.Config
             }
 
             dungeonsInitialized = true;
+            if (moonsInitialized && !moonDungeonsInitialized)
+            {
+                InitMoonDungeons();
+            }
+
             MiniLogger.LogInfo("Completed Initializing Dungeons");
 
             InitDungeonWeights();
@@ -1915,7 +1972,9 @@ namespace LunarConfig.Objects.Config
                                     }
                                     else
                                     {
-                                        MiniLogger.LogWarning($"Incorrectly formatted tag '{tag}' found on {uuid}");
+                                        if (!tag.IsNullOrWhiteSpace())
+                                            MiniLogger.LogWarning($"Incorrectly formatted tag '{tag}' found on {uuid}");
+
                                         continue;
                                     }
                                 }
@@ -1975,6 +2034,8 @@ namespace LunarConfig.Objects.Config
                                 outsideInfo.SpawnableOutsideObject.spawnableFloorTags = Array.Empty<string>();
                                 outsideInfo.SpawnableOutsideObject.rotationOffset = Vector3.zero;
                                 outsideInfo.SpawnableOutsideObject.spawnFacingAwayFromWall = false;
+                                outsideInfo.SpawnableOutsideObject.prefabToSpawn = dawnObj.GetMapObjectPrefab();
+                                outsideInfo.SpawnableOutsideObject.name = dawnObj.Key.Key.ToCapitalized();
                                 outsideInfo.ParentInfo = dawnObj;
                             }
 
@@ -2021,6 +2082,11 @@ namespace LunarConfig.Objects.Config
             }
 
             mapObjectsInitialized = true;
+
+            if (moonsInitialized && !moonObjectsInitialized)
+            {
+                InitMoonObjects();
+            }
             MiniLogger.LogInfo("Completed Initializing Map Objects");
 
             InitMapObjectCurves();
@@ -2190,6 +2256,9 @@ namespace LunarConfig.Objects.Config
                                 outsideInfo.SpawnableOutsideObject.spawnableFloorTags = Array.Empty<string>();
                                 outsideInfo.SpawnableOutsideObject.rotationOffset = Vector3.zero;
                                 outsideInfo.SpawnableOutsideObject.spawnFacingAwayFromWall = false;
+                                outsideInfo.SpawnableOutsideObject.prefabToSpawn = dawnObj.GetMapObjectPrefab();
+                                outsideInfo.SpawnableOutsideObject.name = dawnObj.Key.Key.ToCapitalized();
+
                                 outsideInfo.ParentInfo = dawnObj;
                             }
                         }
@@ -2203,6 +2272,375 @@ namespace LunarConfig.Objects.Config
                 }
                 
                 mapObjectCurvesInitialized = true;
+            }
+        }
+
+        public void InitMoonItems()
+        {
+            MiniLogger.LogInfo("Initializing Moon Item Weights");
+            if (configureMoons)
+            {
+                LunarConfigFile moonFile = files[LunarConfig.MOON_FILE_NAME];
+                moonFile.file.SaveOnConfigSet = false;
+
+                foreach (var moon in LethalContent.Moons)
+                {
+                    string uuid = UUIDify(moon.Key.ToString());
+
+                    try
+                    {
+                        string niceUUID = NiceifyDawnUUID(moon.Key.Key);
+                        DawnMoonInfo dawnMoon = moon.Value;
+                        SpawnWeightContext ctx = new(dawnMoon, null, null);
+                        LunarConfigEntry moonEntry = moonFile.AddEntry($"{niceUUID} - {uuid}");
+                        string numberlessName = dawnMoon.GetNumberlessPlanetName();
+
+                        string defaultScrap = "";
+                        foreach (var item in LethalContent.Items)
+                        {
+                            DawnItemInfo ite = item.Value;
+
+                            try
+                            {
+                                if (ite.ScrapInfo == null) { continue; }
+
+                                int? rarity = ite.ScrapInfo.Weights.GetFor(dawnMoon, ctx);
+
+                                if (rarity != null && rarity > 0)
+                                {
+                                    if (defaultScrap != "")
+                                    {
+                                        defaultScrap += ", ";
+                                    }
+                                    defaultScrap += ite.Item.itemName + ":" + rarity;
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                MiniLogger.LogWarning($"Failed to grab weight for {ite.Key.ToString()} on {numberlessName}\n{e}");
+                            }
+                        }
+
+                        moonEntry.TryAddField(enabledMoonSettings, "Spawnable Scrap", "The base scrap that can spawn on the moon.\nDenoted with NAME:RARITY, separated with commas.", defaultScrap);
+
+                        if (moonEntry.GetValue<bool>("Configure Content"))
+                        {
+                            if (enabledMoonSettings.Contains("Spawnable Scrap")) { cachedSpawnableScrap[uuid] = moonEntry.GetValue<string>("Spawnable Scrap"); }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        MiniLogger.LogError($"LunarConfig encountered an issue while configuring {uuid}, please report this!\n{e}");
+                    }
+                }
+
+                moonFile.file.Save();
+                moonFile.file.SaveOnConfigSet = true;
+                moonItemsInitialized = true;
+
+                if (moonItemsInitialized && moonEnemiesInitialized && moonDungeonsInitialized && moonObjectsInitialized)
+                {
+                    ClearOrphanedEntries(moonFile.file);
+                }
+            }
+            else
+            {
+                moonItemsInitialized = true;
+            }
+        }
+
+        public void InitMoonEnemies()
+        {
+            MiniLogger.LogInfo("Initializing Moon Enemy Weights");
+            if (configureMoons)
+            {
+                LunarConfigFile moonFile = files[LunarConfig.MOON_FILE_NAME];
+                moonFile.file.SaveOnConfigSet = false;
+
+                foreach (var moon in LethalContent.Moons)
+                {
+                    string uuid = UUIDify(moon.Key.ToString());
+
+                    try
+                    {
+                        string niceUUID = NiceifyDawnUUID(moon.Key.Key);
+                        DawnMoonInfo dawnMoon = moon.Value;
+                        SpawnWeightContext ctx = new(dawnMoon, null, null);
+                        LunarConfigEntry moonEntry = moonFile.AddEntry($"{niceUUID} - {uuid}");
+                        SelectableLevel moonObj = dawnMoon.Level;
+                        string numberlessName = dawnMoon.GetNumberlessPlanetName();
+
+                        string defaultDayEnemies = "";
+                        string defaultInteriorEnemies = "";
+                        string defaultOutsideEnemies = "";
+                        foreach (var enemy in LethalContent.Enemies)
+                        {
+                            DawnEnemyInfo ene = enemy.Value;
+
+                            try
+                            {
+                                if (ene.Daytime != null)
+                                {
+                                    int? rarity = ene.Daytime.Weights.GetFor(dawnMoon, ctx);
+
+                                    if (rarity != null && rarity > 0)
+                                    {
+                                        if (defaultDayEnemies != "")
+                                        {
+                                            defaultDayEnemies += ", ";
+                                        }
+                                        defaultDayEnemies += ene.EnemyType.enemyName + ":" + rarity;
+                                    }
+                                }
+
+                                if (ene.Inside != null)
+                                {
+                                    int? rarity = ene.Inside.Weights.GetFor(dawnMoon, ctx);
+
+                                    if (rarity != null && rarity > 0)
+                                    {
+                                        if (defaultInteriorEnemies != "")
+                                        {
+                                            defaultInteriorEnemies += ", ";
+                                        }
+                                        defaultInteriorEnemies += ene.EnemyType.enemyName + ":" + rarity;
+                                    }
+                                }
+
+                                if (ene.Outside != null)
+                                {
+                                    int? rarity = ene.Outside.Weights.GetFor(dawnMoon, ctx);
+
+                                    if (rarity != null && rarity > 0)
+                                    {
+                                        if (defaultOutsideEnemies != "")
+                                        {
+                                            defaultOutsideEnemies += ", ";
+                                        }
+                                        defaultOutsideEnemies += ene.EnemyType.enemyName + ":" + rarity;
+                                    }
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                MiniLogger.LogWarning($"Failed to grab weight for {ene.Key.ToString()} on {numberlessName}\n{e}");
+                            }
+                        }
+
+                        moonEntry.TryAddField(enabledMoonSettings, "Spawnable Daytime Enemies", "The base daytime enemies that can spawn on the moon.\nDenoted with NAME:RARITY, separated with commas.", defaultDayEnemies);
+                        moonEntry.TryAddField(enabledMoonSettings, "Spawnable Interior Enemies", "The base interior enemies that can spawn on the moon.\nDenoted with NAME:RARITY, separated with commas.", defaultInteriorEnemies);
+                        moonEntry.TryAddField(enabledMoonSettings, "Spawnable Outside Enemies", "The base outside enemies that can spawn on the moon.\nDenoted with NAME:RARITY, separated with commas.", defaultOutsideEnemies);
+                        
+                        if (moonEntry.GetValue<bool>("Configure Content"))
+                        {
+                            if (enabledMoonSettings.Contains("Spawnable Daytime Enemies")) { cachedDaytimeEnemies[uuid] = moonEntry.GetValue<string>("Spawnable Daytime Enemies"); }
+                            if (enabledMoonSettings.Contains("Spawnable Interior Enemies")) { cachedInteriorEnemies[uuid] = moonEntry.GetValue<string>("Spawnable Interior Enemies"); }
+                            if (enabledMoonSettings.Contains("Spawnable Outside Enemies")) { cachedOutsideEnemies[uuid] = moonEntry.GetValue<string>("Spawnable Outside Enemies"); }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        MiniLogger.LogError($"LunarConfig encountered an issue while configuring {uuid}, please report this!\n{e}");
+                    }
+                }
+
+                moonFile.file.Save();
+                moonFile.file.SaveOnConfigSet = true;
+                moonEnemiesInitialized = true;
+
+                if (moonItemsInitialized && moonEnemiesInitialized && moonDungeonsInitialized && moonObjectsInitialized)
+                {
+                    ClearOrphanedEntries(moonFile.file);
+                }
+            }
+            else
+            {
+                moonEnemiesInitialized = true;
+            }
+        }
+
+        public void InitMoonDungeons()
+        {
+            MiniLogger.LogInfo("Initializing Moon Dungeon Weights");
+            if (configureMoons)
+            {
+                LunarConfigFile moonFile = files[LunarConfig.MOON_FILE_NAME];
+                moonFile.file.SaveOnConfigSet = false;
+
+                foreach (var moon in LethalContent.Moons)
+                {
+                    string uuid = UUIDify(moon.Key.ToString());
+
+                    try
+                    {
+                        string niceUUID = NiceifyDawnUUID(moon.Key.Key);
+                        DawnMoonInfo dawnMoon = moon.Value;
+                        SpawnWeightContext ctx = new(dawnMoon, null, null);
+                        LunarConfigEntry moonEntry = moonFile.AddEntry($"{niceUUID} - {uuid}");
+                        string numberlessName = dawnMoon.GetNumberlessPlanetName();
+
+                        string defaultDungeons = "";
+                        foreach (var dungeon in LethalContent.Dungeons)
+                        {
+                            DawnDungeonInfo dun = dungeon.Value;
+
+                            try
+                            {
+                                int? rarity = dun.Weights.GetFor(dawnMoon, ctx);
+
+                                if (rarity != null && rarity > 0)
+                                {
+                                    if (defaultDungeons != "")
+                                    {
+                                        defaultDungeons += ", ";
+                                    }
+
+                                    defaultDungeons += dun.DungeonFlow.name + ":" + rarity;
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                MiniLogger.LogWarning($"Failed to grab weight for {dun.Key.ToString()} on {numberlessName}\n{e}");
+                            }
+                        }
+
+                        moonEntry.TryAddField(enabledMoonSettings, "Possible Interiors", "The base interiors that can spawn on the moon.\nDenoted with NAME:RARITY, separated with commas.", defaultDungeons);
+
+                        if (moonEntry.GetValue<bool>("Configure Content"))
+                        {
+                            if (enabledMoonSettings.Contains("Possible Interiors")) { cachedDungeons[uuid] = moonEntry.GetValue<string>("Possible Interiors"); }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        MiniLogger.LogError($"LunarConfig encountered an issue while configuring {uuid}, please report this!\n{e}");
+                    }
+                }
+
+                moonFile.file.Save();
+                moonFile.file.SaveOnConfigSet = true;
+                moonDungeonsInitialized = true;
+
+                if (moonItemsInitialized && moonEnemiesInitialized && moonDungeonsInitialized && moonObjectsInitialized)
+                {
+                    ClearOrphanedEntries(moonFile.file);
+                }
+            }
+            else
+            {
+                moonDungeonsInitialized = true;
+            }
+        }
+
+        public void InitMoonObjects()
+        {
+            MiniLogger.LogInfo("Initializing Moon Object Weights");
+            if (configureMoons)
+            {
+                LunarConfigFile moonFile = files[LunarConfig.MOON_FILE_NAME];
+                moonFile.file.SaveOnConfigSet = false;
+
+                foreach (var moon in LethalContent.Moons)
+                {
+                    string uuid = UUIDify(moon.Key.ToString());
+
+                    try
+                    {
+                        string niceUUID = NiceifyDawnUUID(moon.Key.Key);
+                        DawnMoonInfo dawnMoon = moon.Value;
+                        SpawnWeightContext ctx = new(dawnMoon, null, null);
+                        LunarConfigEntry moonEntry = moonFile.AddEntry($"{niceUUID} - {uuid}");
+                        string numberlessName = dawnMoon.GetNumberlessPlanetName();
+
+                        foreach (var obj in LethalContent.MapObjects.Values)
+                        {
+                            if (enabledMapObjectSettings.Contains("(Inside) Level Curves"))
+                            {
+                                AnimationCurve? inCurve = null;
+
+                                if (obj.InsideInfo != null)
+                                {
+                                    inCurve = obj.InsideInfo.SpawnWeights.GetFor(dawnMoon, ctx);
+                                }
+
+                                string inString = null;
+                                if (inCurve == null) { inString = ""; } else { inString = CurveToString(inCurve); }
+
+                                moonEntry.AddField($"Inside Curve - {UUIDify(obj.Key.ToString())}", "NOTE: Any object that does not have a NetworkObject component, which is typically the Vanilla outside objects, will NOT be able to spawn inside!\nThe animation curve of this object spawning on the interior of this moon.", inString);
+                            }
+
+                            if (enabledMapObjectSettings.Contains("(Outside) Level Curves"))
+                            {
+                                AnimationCurve? outCurve = null;
+
+                                if (obj.OutsideInfo != null)
+                                {
+                                    outCurve = obj.OutsideInfo.SpawnWeights.GetFor(dawnMoon, ctx);
+                                }
+
+                                string outString = null;
+                                if (outCurve == null) { outString = ""; } else { outString = CurveToString(outCurve); }
+
+                                moonEntry.AddField($"Outside Curve - {UUIDify(obj.Key.ToString())}", "The animation curve of this object spawning on the interior of this moon.", outString);
+                            }
+                        }
+
+                        if (moonEntry.GetValue<bool>("Configure Content"))
+                        {
+                            if (enabledMapObjectSettings.Contains("(Inside) Level Curves"))
+                            {
+                                foreach (var field in moonEntry.fields)
+                                {
+                                    if (field.Key.StartsWith("Inside Curve - "))
+                                    {
+                                        if (!cachedInsideMapObjects.TryGetValue(dawnMoon.TypedKey, out var moonDict))
+                                        {
+                                            moonDict = new Dictionary<string, string>();
+                                        }
+
+                                        moonDict.Add(field.Key.Replace("Inside Curve - ", ""), (string)field.Value.BoxedValue);
+
+                                        cachedInsideMapObjects[dawnMoon.TypedKey] = moonDict;
+                                    }
+                                }
+                            }
+                            if (enabledMapObjectSettings.Contains("(Outside) Level Curves"))
+                            {
+                                foreach (var field in moonEntry.fields)
+                                {
+                                    if (field.Key.StartsWith("Outside Curve - "))
+                                    {
+                                        if (!cachedOutsideMapObjects.TryGetValue(dawnMoon.TypedKey, out var moonDict))
+                                        {
+                                            moonDict = new Dictionary<string, string>();
+                                        }
+
+                                        moonDict.Add(field.Key.Replace("Outside Curve - ", ""), (string)field.Value.BoxedValue);
+
+                                        cachedOutsideMapObjects[dawnMoon.TypedKey] = moonDict;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        MiniLogger.LogError($"LunarConfig encountered an issue while configuring {uuid}, please report this!\n{e}");
+                    }
+                }
+
+                moonFile.file.Save();
+                moonFile.file.SaveOnConfigSet = true;
+                moonObjectsInitialized = true;
+
+                if (moonItemsInitialized && moonEnemiesInitialized && moonDungeonsInitialized && moonObjectsInitialized)
+                {
+                    ClearOrphanedEntries(moonFile.file);
+                }
+            }
+            else
+            {
+                moonObjectsInitialized = true;
             }
         }
 
@@ -2271,7 +2709,8 @@ namespace LunarConfig.Objects.Config
                         moonEntry.TryAddField(enabledMoonSettings, "Min Scrap Total", "NOTE: This setting is essentially unused in the vanilla, Lunar does not implement any new functionality.\nThe minimum amount of scrap value that can spawn on a moon.", moonObj.minTotalScrapValue);
                         moonEntry.TryAddField(enabledMoonSettings, "Max Scrap Total", "NOTE: This setting is essentially unused in the vanilla, Lunar does not implement any new functionality.\nThe maximum amount of scrap value that can spawn on a moon.", moonObj.maxTotalScrapValue);
                         moonEntry.TryAddField(enabledMoonSettings, "Interior Multiplier", "Changes the size of the interior generated.", moonObj.factorySizeMultiplier);
-
+                        //moonEntry.TryAddField(enabledMoonSettings, "Disable Special Enemy", "Will disable the special enemy mechanics on this moon.", false);
+                        
                         if (purchaseInfo != null)
                         {
                             moonEntry.TryAddField(enabledMoonSettings, "Route Price", "Changes the price to route to the moon.", purchaseInfo.Cost.Provide());
@@ -2298,162 +2737,15 @@ namespace LunarConfig.Objects.Config
                             }
                         }
 
-                        string defaultScrap = "";
-                        foreach (var item in LethalContent.Items)
-                        {
-                            DawnItemInfo ite = item.Value;
-
-                            try
-                            {
-                                if (ite.ScrapInfo == null) { continue; }
-
-                                int? rarity = ite.ScrapInfo.Weights.GetFor(dawnMoon, ctx);
-
-                                if (rarity != null && rarity > 0)
-                                {
-                                    if (defaultScrap != "")
-                                    {
-                                        defaultScrap += ", ";
-                                    }
-                                    defaultScrap += ite.Item.itemName + ":" + rarity;
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                MiniLogger.LogWarning($"Failed to grab weight for {ite.Key.ToString()} on {numberlessName}\n{e}");
-                            }
-                        }
-
-                        string defaultDayEnemies = "";
-                        string defaultInteriorEnemies = "";
-                        string defaultOutsideEnemies = "";
-                        foreach (var enemy in LethalContent.Enemies)
-                        {
-                            DawnEnemyInfo ene = enemy.Value;
-
-                            try
-                            {
-                                if (ene.Daytime != null)
-                                {
-                                    int? rarity = ene.Daytime.Weights.GetFor(dawnMoon, ctx);
-
-                                    if (rarity != null && rarity > 0)
-                                    {
-                                        if (defaultDayEnemies != "")
-                                        {
-                                            defaultDayEnemies += ", ";
-                                        }
-                                        defaultDayEnemies += ene.EnemyType.enemyName + ":" + rarity;
-                                    }
-                                }
-
-                                if (ene.Inside != null)
-                                {
-                                    int? rarity = ene.Inside.Weights.GetFor(dawnMoon, ctx);
-
-                                    if (rarity != null && rarity > 0)
-                                    {
-                                        if (defaultInteriorEnemies != "")
-                                        {
-                                            defaultInteriorEnemies += ", ";
-                                        }
-                                        defaultInteriorEnemies += ene.EnemyType.enemyName + ":" + rarity;
-                                    }
-                                }
-
-                                if (ene.Outside != null)
-                                {
-                                    int? rarity = ene.Outside.Weights.GetFor(dawnMoon, ctx);
-
-                                    if (rarity != null && rarity > 0)
-                                    {
-                                        if (defaultOutsideEnemies != "")
-                                        {
-                                            defaultOutsideEnemies += ", ";
-                                        }
-                                        defaultOutsideEnemies += ene.EnemyType.enemyName + ":" + rarity;
-                                    }
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                MiniLogger.LogWarning($"Failed to grab weight for {ene.Key.ToString()} on {numberlessName}\n{e}");
-                            }
-                        }
-
-                        string defaultDungeons = "";
-                        foreach (var dungeon in LethalContent.Dungeons)
-                        {
-                            DawnDungeonInfo dun = dungeon.Value;
-
-                            try
-                            {
-                                int? rarity = dun.Weights.GetFor(dawnMoon, ctx);
-
-                                if (rarity != null && rarity > 0)
-                                {
-                                    if (defaultDungeons != "")
-                                    {
-                                        defaultDungeons += ", ";
-                                    }
-
-                                    defaultDungeons += dun.DungeonFlow.name + ":" + rarity;
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                MiniLogger.LogWarning($"Failed to grab weight for {dun.Key.ToString()} on {numberlessName}\n{e}");
-                            }
-                        }
-
                         moonEntry.TryAddField(enabledMoonSettings, "Value Multiplier", "The multiplier applied to the value of a moon's scrap.", 1f);
                         moonEntry.TryAddField(enabledMoonSettings, "Amount Multiplier", "The multiplier applied to the amount of scrap a moon has.", 1f);
 
                         moonEntry.TryAddField(enabledMoonSettings, "Tags", "Tags allocated to the moon.\nSeparate tags with commas.", String.Join(", ", dawnMoon.AllTags().Where(tag => tag.Namespace != "dawn_lib")));
 
-                        moonEntry.TryAddField(enabledMoonSettings, "Spawnable Scrap", "The base scrap that can spawn on the moon.\nDenoted with NAME:RARITY, separated with commas.", defaultScrap);
-                        moonEntry.TryAddField(enabledMoonSettings, "Spawnable Daytime Enemies", "The base daytime enemies that can spawn on the moon.\nDenoted with NAME:RARITY, separated with commas.", defaultDayEnemies);
-                        moonEntry.TryAddField(enabledMoonSettings, "Spawnable Interior Enemies", "The base interior enemies that can spawn on the moon.\nDenoted with NAME:RARITY, separated with commas.", defaultInteriorEnemies);
-                        moonEntry.TryAddField(enabledMoonSettings, "Spawnable Outside Enemies", "The base outside enemies that can spawn on the moon.\nDenoted with NAME:RARITY, separated with commas.", defaultOutsideEnemies);
-                        moonEntry.TryAddField(enabledMoonSettings, "Possible Interiors", "The base interiors that can spawn on the moon.\nDenoted with NAME:RARITY, separated with commas.", defaultDungeons);
-
                         if (!mapObjectKeysInitialized)
                         {
                             InitObjectKeys();
                             mapObjectKeysInitialized = true;
-                        }
-
-                        foreach (var obj in LethalContent.MapObjects.Values)
-                        {
-                            if (enabledMapObjectSettings.Contains("(Inside) Level Curves"))
-                            {
-                                AnimationCurve? inCurve = null;
-
-                                if (obj.InsideInfo != null)
-                                {
-                                    inCurve = obj.InsideInfo.SpawnWeights.GetFor(dawnMoon, ctx);
-                                }
-
-                                string inString = null;
-                                if (inCurve == null) { inString = ""; } else { inString = CurveToString(inCurve); }
-
-                                moonEntry.AddField($"Inside Curve - {UUIDify(obj.Key.ToString())}", "NOTE: Any object that does not have a NetworkObject component, which is typically the Vanilla outside objects, will NOT be able to spawn inside!\nThe animation curve of this object spawning on the interior of this moon.", inString);
-                            }
-
-                            if (enabledMapObjectSettings.Contains("(Outside) Level Curves"))
-                            {
-                                AnimationCurve? outCurve = null;
-
-                                if (obj.OutsideInfo != null)
-                                {
-                                    outCurve = obj.OutsideInfo.SpawnWeights.GetFor(dawnMoon, ctx);
-                                }
-
-                                string outString = null;
-                                if (outCurve == null) { outString = ""; } else { outString = CurveToString(outCurve); }
-
-                                moonEntry.AddField($"Outside Curve - {UUIDify(obj.Key.ToString())}", "The animation curve of this object spawning on the interior of this moon.", outString);
-                            }
                         }
 
                         // LLL Backcompat
@@ -2474,14 +2766,20 @@ namespace LunarConfig.Objects.Config
                                     if (splits.Length == 1 && !splits[0].IsNullOrWhiteSpace())
                                     {
                                         newTags.Add(new NamespacedKey("lunarcontenttag", splits[0]));
+
+                                        everyMoonTag.Add(splits[0]);
                                     }
                                     else if (splits.Length == 2 && splits[0] != "dawn_lib")
                                     {
                                         newTags.Add(new NamespacedKey(splits[0], splits[1]));
+
+                                        everyMoonTag.Add(splits[1]);
                                     }
                                     else
                                     {
-                                        MiniLogger.LogWarning($"Incorrectly formatted tag '{tag}' found on {uuid}");
+                                        if (!tag.IsNullOrWhiteSpace())
+                                            MiniLogger.LogWarning($"Incorrectly formatted tag '{tag}' found on {uuid}");
+
                                         continue;
                                     }
                                 }
@@ -2534,6 +2832,10 @@ namespace LunarConfig.Objects.Config
                             moonEntry.TrySetValue(enabledMoonSettings, "Min Scrap Total", ref moonObj.minTotalScrapValue);
                             moonEntry.TrySetValue(enabledMoonSettings, "Max Scrap Total", ref moonObj.maxTotalScrapValue);
                             moonEntry.TrySetValue(enabledMoonSettings, "Interior Multiplier", ref moonObj.factorySizeMultiplier);
+                            if (enabledMoonSettings.Contains("Disable Special Enemy") && moonEntry.GetValue<bool>("Disable Special Enemy"))
+                            {
+                                //moonObj.specialEnemyRarity = null;
+                            }
 
                             if (purchaseInfo != null)
                             {
@@ -2566,46 +2868,6 @@ namespace LunarConfig.Objects.Config
                                     }
 
                                     purchaseInfo.PurchasePredicate = predicate;
-                                }
-                            }
-
-                            if (enabledMoonSettings.Contains("Spawnable Scrap")) { cachedSpawnableScrap[uuid] = moonEntry.GetValue<string>("Spawnable Scrap"); }
-                            if (enabledMoonSettings.Contains("Spawnable Daytime Enemies")) { cachedDaytimeEnemies[uuid] = moonEntry.GetValue<string>("Spawnable Daytime Enemies"); }
-                            if (enabledMoonSettings.Contains("Spawnable Interior Enemies")) { cachedInteriorEnemies[uuid] = moonEntry.GetValue<string>("Spawnable Interior Enemies"); }
-                            if (enabledMoonSettings.Contains("Spawnable Outside Enemies")) { cachedOutsideEnemies[uuid] = moonEntry.GetValue<string>("Spawnable Outside Enemies"); }
-                            if (enabledMoonSettings.Contains("Possible Interiors")) { cachedDungeons[uuid] = moonEntry.GetValue<string>("Possible Interiors"); }
-                            if (enabledMapObjectSettings.Contains("(Inside) Level Curves"))
-                            {
-                                foreach (var field in moonEntry.fields)
-                                {
-                                    if (field.Key.StartsWith("Inside Curve - "))
-                                    {
-                                        if (!cachedInsideMapObjects.TryGetValue(dawnMoon.TypedKey, out var moonDict))
-                                        {
-                                            moonDict = new Dictionary<string, string>();
-                                        }
-
-                                        moonDict.Add(field.Key.Replace("Inside Curve - ", ""), (string)field.Value.BoxedValue);
-
-                                        cachedInsideMapObjects[dawnMoon.TypedKey] = moonDict;
-                                    }
-                                }
-                            }
-                            if (enabledMapObjectSettings.Contains("(Outside) Level Curves"))
-                            {
-                                foreach (var field in moonEntry.fields)
-                                {
-                                    if (field.Key.StartsWith("Outside Curve - "))
-                                    {
-                                        if (!cachedOutsideMapObjects.TryGetValue(dawnMoon.TypedKey, out var moonDict))
-                                        {
-                                            moonDict = new Dictionary<string, string>();
-                                        }
-
-                                        moonDict.Add(field.Key.Replace("Outside Curve - ", ""), (string)field.Value.BoxedValue);
-
-                                        cachedOutsideMapObjects[dawnMoon.TypedKey] = moonDict;
-                                    }
                                 }
                             }
                         }
@@ -2678,7 +2940,9 @@ namespace LunarConfig.Objects.Config
                         LunarConfigEntry moonEntry = moonFile.AddEntry($"{niceUUID} - {uuid}");
 
                         moonEntry.AddField("Catalogue Index", "Changes the order in the moon catalogue in the terminal. A higher value means first/higher in the list.", originalCatalogueIndex.IndexOf(dawnMoon));
-                        newCatalogueIndex[dawnMoon] = moonEntry.GetValue<int>("Catalogue Index");
+                        
+                        if (moonEntry.GetValue<bool>("Configure Content"))
+                            newCatalogueIndex[dawnMoon] = moonEntry.GetValue<int>("Catalogue Index");
                     }
 
                     MoonRegistrationHandler.MoonGroupAlgorithm.OrderingSteps = [
@@ -2686,7 +2950,6 @@ namespace LunarConfig.Objects.Config
                     ];
                 }
 
-                ClearOrphanedEntries(moonFile.file);
                 moonFile.file.Save();
                 moonFile.file.SaveOnConfigSet = true;
             }
@@ -2704,6 +2967,29 @@ namespace LunarConfig.Objects.Config
 
             moonsInitialized = true;
             MiniLogger.LogInfo("Completed Initializing Moons");
+
+            if (LunarConfig.LLLPresent)
+                LLLTags.Init();
+
+            if (itemsInitialized && !moonItemsInitialized)
+            {
+                InitMoonItems();
+            }
+
+            if (enemiesInitialized && !moonEnemiesInitialized)
+            {
+                InitMoonEnemies();
+            }
+
+            if (dungeonsInitialized && !moonDungeonsInitialized)
+            {
+                InitMoonDungeons();
+            }
+
+            if (mapObjectsInitialized && !moonObjectsInitialized)
+            {
+                InitMoonObjects();
+            }
 
             InitTagInjection();
             InitMapObjectCurves();
@@ -2802,7 +3088,9 @@ namespace LunarConfig.Objects.Config
                                     }
                                     else
                                     {
-                                        MiniLogger.LogWarning($"Incorrectly formatted tag '{tag}' found on {uuid}");
+                                        if (!tag.IsNullOrWhiteSpace())
+                                            MiniLogger.LogWarning($"Incorrectly formatted tag '{tag}' found on {uuid}");
+
                                         continue;
                                     }
                                 }

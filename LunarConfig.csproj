@@ -78,6 +78,10 @@
 		<PackageReference Include="TeamXiaolan.DawnLib.DuskMod" Version="0.9.14" PrivateAssets="all" Publicize="true" />
     </ItemGroup>
 
+	<ItemGroup>
+		<PackageReference Include="IAmBatby-LethalLevelLoader" Version="1.6.9" PrivateAssets="all" ExcludeAssets="runtime" Publicize="true" />
+	</ItemGroup>
+
     <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
         <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
     </ItemGroup>

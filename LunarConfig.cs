@@ -9,6 +9,7 @@ using System.IO;
 namespace LunarConfig
 {
     [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
+    [BepInDependency("imabatby.lethallevelloader", BepInDependency.DependencyFlags.SoftDependency)]
     public class LunarConfig : BaseUnityPlugin
     {
         internal static readonly string EXPORT_DIRECTORY = Path.Combine(Paths.ConfigPath, MyPluginInfo.PLUGIN_NAME);
@@ -43,6 +44,8 @@ namespace LunarConfig
         internal static readonly string TAG_INJECTION_FILE_NAME = "LunarConfigTagInjection.cfg";
         internal static readonly string TAG_INJECTION_FILE = Path.Combine(Paths.ConfigPath, TAG_INJECTION_FILE_NAME);
 
+        internal static bool LLLPresent {  get; private set; }
+
         public static LunarConfig Instance { get; private set; } = null!;
         internal new static ManualLogSource Logger { get; private set; } = null!;
         internal static Harmony? Harmony { get; set; }
@@ -67,6 +70,8 @@ namespace LunarConfig
 
             Harmony.PatchAll(typeof(RoundManagerPatch));
             Harmony.PatchAll(typeof(StartOfRoundPatch));
+
+            LLLPresent = BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("imabatby.lethallevelloader");
 
             LethalContent.Items.OnFreeze += central.InitItems;
             LethalContent.Enemies.OnFreeze += central.InitEnemies;
