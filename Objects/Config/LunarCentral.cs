@@ -1,29 +1,17 @@
-﻿using AsmResolver.PE.File;
-using BepInEx;
+﻿using BepInEx;
 using BepInEx.Configuration;
 using Dawn;
-using Dawn.Internal;
 using Dawn.Utils;
-using DunGen;
 using DunGen.Graph;
 using Dusk;
 using Dusk.Weights;
-using EasyTextEffects.Editor.MyBoxCopy.Extensions;
 using HarmonyLib;
-using Steamworks.Ugc;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using System.Threading;
 using UnityEngine;
-using UnityEngine.Rendering.HighDefinition;
-using UnityEngine.UIElements;
-using static ES3;
-using static IngamePlayerSettings;
-using static Unity.Properties.TypeUtility;
 
 namespace LunarConfig.Objects.Config
 {
@@ -86,6 +74,7 @@ namespace LunarConfig.Objects.Config
 
         public static bool useZeekScrap = true;
         public static bool useZeekWeight = false;
+        public static bool lockEverything = false;
 
         public static HashSet<string> enabledItemSettings = new HashSet<string>();
         public static HashSet<string> enabledEnemySettings = new HashSet<string>();
@@ -98,6 +87,8 @@ namespace LunarConfig.Objects.Config
         public static HashSet<string> enabledTagInjectionSettings = new HashSet<string>();
 
         public static HashSet<string> enabledLockingMoons = new HashSet<string>();
+
+        public static Dictionary<NamespacedKey, string> scrapSources = new Dictionary<NamespacedKey, string>();
 
         public static Dictionary<string, string> cachedSpawnableScrap = new Dictionary<string, string>();
         public static Dictionary<string, string> cachedDaytimeEnemies = new Dictionary<string, string>();
@@ -342,6 +333,7 @@ namespace LunarConfig.Objects.Config
             configEntry.AddField("Clear Orphaned Entries", "WARNING: Enabling this will delete any config entries that get disabled when the configuration is refreshed!", false);
             configEntry.AddField("Use Simple Scrap Value", "Checking this will make items have a scrap value that already anticipates the *0.4.", false);
             configEntry.AddField("Use Simple Weight", "Checking this will make items have their weight in pounds, already converting from Zeeker's formula.", false);
+            configEntry.AddField("Hide And Lock All Moons", "Checking this will automatically hide and lock every moon regardless of other options.", false);
             backCompat = configEntry.GetValue<bool>("Enable Backwards Compat");
             clearOrphans = configEntry.GetValue<bool>("Clear Orphaned Entries");
             configureItems = configEntry.GetValue<bool>("Configure Items");
@@ -355,6 +347,7 @@ namespace LunarConfig.Objects.Config
             configureTagInjection = configEntry.GetValue<bool>("Configure Tag Injection");
             useZeekScrap = !configEntry.GetValue<bool>("Use Simple Scrap Value");
             useZeekWeight = !configEntry.GetValue<bool>("Use Simple Weight");
+            lockEverything = configEntry.GetValue<bool>("Hide And Lock All Moons");
 
             if (configureItems)
             {
@@ -369,7 +362,9 @@ namespace LunarConfig.Objects.Config
                 configItems.AddField("Weight", "Disable this to disable configuring this property in item config entries.", true);
                 configItems.AddField("Conductivity", "Disable this to disable configuring this property in item config entries.", true);
                 configItems.AddField("Two-Handed", "Disable this to disable configuring this property in item config entries.", true);
-
+                configItems.AddField("Is Scrap?", "Disable this to disable configuring this property in item config entries.", true);
+                configItems.AddField("Battery Value", "Disable this to disable configuring this property in item config entries.", true);
+                configItems.AddField("Requires Battery", "Disable this to disable configuring this property in item config entries.", true);
                 configItems.AddField("Can Be Inspected", "Disable this to disable configuring this property in item config entries.", true);
                 configItems.AddField("Disable Hands On Wall", "Enable this to enable configuring this property in item config entries.", false);
                 configItems.AddField("Disallow Utility Slot", "Enable this to enable configuring this property in item config entries.", false);
@@ -717,6 +712,9 @@ namespace LunarConfig.Objects.Config
                         itemEntry.TryAddField(enabledItemSettings, "Weight", "Specifies the weight of an item.\nCalculated with: (x - 1) * 105 = weight in pounds.", useZeekWeight ? itemObj.weight : (itemObj.weight - 1) * 105);
                         itemEntry.TryAddField(enabledItemSettings, "Conductivity", "Specifies whether an item is conductive.", itemObj.isConductiveMetal);
                         itemEntry.TryAddField(enabledItemSettings, "Two-Handed", "Specifies whether an item is two-handed.", itemObj.twoHanded);
+                        itemEntry.TryAddField(enabledItemSettings, "Is Scrap?", "Affects several different aspects of an item to be scrap or not.", itemObj.isScrap);
+                        itemEntry.TryAddField(enabledItemSettings, "Battery Value", "Sets the battery life of the item.", itemObj.batteryUsage);
+                        itemEntry.TryAddField(enabledItemSettings, "Requires Battery", "Sets whether or not an item requires battery to use.", itemObj.requiresBattery);
                         itemEntry.TryAddField(enabledItemSettings, "Can Be Inspected", "Specifies whether an item can be inspected.", itemObj.canBeInspected);
                         itemEntry.TryAddField(enabledItemSettings, "Disable Hands On Wall", "Specifies whether holding the item against a wall will put the hands up.", itemObj.disableHandsOnWall);
                         itemEntry.TryAddField(enabledItemSettings, "Disallow Utility Slot", "Forces an item to not be allowed in the utility slot.", itemObj.disallowUtilitySlot);
@@ -725,7 +723,7 @@ namespace LunarConfig.Objects.Config
                         itemEntry.TryAddField(enabledItemSettings, "Floor Y Offset", "Specifies y-offset of the item when on the floor.", itemObj.floorYOffset);
                         itemEntry.TryAddField(enabledItemSettings, "Is Defensive Weapon", "Specifies whether an item is a weapon for certain interactions.", itemObj.isDefensiveWeapon);
                         itemEntry.TryAddField(enabledItemSettings, "Spawns On Ground", "Specifies whether an item spawns on the ground.", itemObj.itemSpawnsOnGround);
-                        itemEntry.TryAddField(enabledItemSettings, "Tooltips", "Specifies the tooltips of an item.\nA semi-colon denotes a new line.", string.Join(",", itemObj.toolTips));
+                        itemEntry.TryAddField(enabledItemSettings, "Tooltips", "Specifies the tooltips of an item.\nA semi-colon denotes a new line.", string.Join(";", itemObj.toolTips));
                         itemEntry.TryAddField(enabledItemSettings, "Vertical Offset", "Specifies the vertical offset of an item.", itemObj.verticalOffset);
 
                         string defaultInfoText = "This is probably an item.";
@@ -829,6 +827,9 @@ namespace LunarConfig.Objects.Config
 
                             itemEntry.TrySetValue(enabledItemSettings, "Conductivity", ref itemObj.isConductiveMetal);
                             itemEntry.TrySetValue(enabledItemSettings, "Two-Handed", ref itemObj.twoHanded);
+                            itemEntry.TrySetValue(enabledItemSettings, "Is Scrap?", ref itemObj.isScrap);
+                            itemEntry.TrySetValue(enabledItemSettings, "Battery Value", ref itemObj.batteryUsage);
+                            itemEntry.TrySetValue(enabledItemSettings, "Requires Battery", ref itemObj.requiresBattery);
                             itemEntry.TrySetValue(enabledItemSettings, "Can Be Inspected", ref itemObj.canBeInspected);
                             itemEntry.TrySetValue(enabledItemSettings, "Disable Hands On Wall", ref itemObj.disableHandsOnWall);
                             itemEntry.TrySetValue(enabledItemSettings, "Disallow Utility Slot", ref itemObj.disallowUtilitySlot);
@@ -950,7 +951,7 @@ namespace LunarConfig.Objects.Config
                         string id = splits[0];
 
                         string? dawnID = GetDawnUUID(items, id);
-                        if (dawnID == null) { continue; }
+                        if (dawnID == null || splits.Length != 2) { continue; }
 
                         itemWeightString[dawnID] = itemWeightString.GetValueOrDefault(dawnID, "") + cache.Key + ":" + CleanString(splits[1]) + ",";
                     }
@@ -965,7 +966,7 @@ namespace LunarConfig.Objects.Config
                         string id = splits[0];
 
                         string? dawnID = GetDawnUUID(items, id);
-                        if (dawnID == null) { continue; }
+                        if (dawnID == null || splits.Length != 2) { continue; }
 
                         itemWeatherString[dawnID] = itemWeatherString.GetValueOrDefault(dawnID, "") + cache.Key + ":" + CleanString(splits[1]) + ",";
                     }
@@ -980,7 +981,7 @@ namespace LunarConfig.Objects.Config
                         string id = splits[0];
 
                         string? dawnID = GetDawnUUID(items, id);
-                        if (dawnID == null) { continue; }
+                        if (dawnID == null || splits.Length != 2) { continue; }
 
                         itemDungeonString[dawnID] = itemDungeonString.GetValueOrDefault(dawnID, "") + cache.Key + ":" + CleanString(splits[1]) + ",";
                     }
@@ -995,7 +996,7 @@ namespace LunarConfig.Objects.Config
                         string id = splits[0];
 
                         string? dawnID = GetDawnUUID(items, id);
-                        if (dawnID == null) { continue; }
+                        if (dawnID == null || splits.Length != 2) { continue; }
 
                         itemWeightString[dawnID] = itemWeightString.GetValueOrDefault(dawnID, "") + cache.Key + ":" + CleanString(splits[1]) + ",";
                     }
@@ -1009,6 +1010,14 @@ namespace LunarConfig.Objects.Config
                     {
                         DawnItemInfo dawnItem = item.Value;
                         DawnScrapItemInfo scrapInfo = null;
+                        WeightProfile<int> profile = scrapInfo.Rarity.Profile;
+
+                        foreach (IWeightModifier<int> src in profile._compiled.ToArray())
+                        {
+                            if (sc)
+                        }
+
+                        profile._sources[0].Handle.
 
                         if (dawnItem.ScrapInfo != null)
                         {
@@ -1018,6 +1027,7 @@ namespace LunarConfig.Objects.Config
 
                             foreach (var moon in notConfiguredScrapMoons)
                             {
+                                scrapInfo.Rarity.Profile.Sou
                                 SpawnWeightContext ctx = new(moon, null, null);
                                 int? rarity = scrapInfo.Weights.GetFor(moon, ctx);
                                 if (rarity != null && rarity > 0) { itemWeightString[key] = itemWeightString.GetValueOrDefault(key, "") + moon.Key.ToString() + ":" + rarity + ","; }
@@ -1297,7 +1307,7 @@ namespace LunarConfig.Objects.Config
                             string id = splits[0];
 
                             string? dawnID = GetDawnUUID(enemies, id);
-                            if (dawnID == null) { continue; }
+                            if (dawnID == null || splits.Length != 2) { continue; }
 
                             daytimeEnemyWeightString[dawnID] = daytimeEnemyWeightString.GetValueOrDefault(dawnID, "") + cache.Key + ":" + CleanString(splits[1]) + ",";
                         }
@@ -1312,7 +1322,7 @@ namespace LunarConfig.Objects.Config
                             string id = splits[0];
 
                             string? dawnID = GetDawnUUID(enemies, id);
-                            if (dawnID == null) { continue; }
+                            if (dawnID == null || splits.Length != 2) { continue; }
 
                             daytimeEnemyWeatherString[dawnID] = daytimeEnemyWeatherString.GetValueOrDefault(dawnID, "") + cache.Key + ":" + CleanString(splits[1]) + ",";
                         }
@@ -1327,7 +1337,7 @@ namespace LunarConfig.Objects.Config
                             string id = splits[0];
 
                             string? dawnID = GetDawnUUID(enemies, id);
-                            if (dawnID == null) { continue; }
+                            if (dawnID == null || splits.Length != 2) { continue; }
 
                             daytimeEnemyDungeonString[dawnID] = daytimeEnemyDungeonString.GetValueOrDefault(dawnID, "") + cache.Key + ":" + CleanString(splits[1]) + ",";
                         }
@@ -1342,7 +1352,7 @@ namespace LunarConfig.Objects.Config
                             string id = splits[0];
 
                             string? dawnID = GetDawnUUID(enemies, id);
-                            if (dawnID == null) { continue; }
+                            if (dawnID == null || splits.Length != 2) { continue; }
 
                             daytimeEnemyWeightString[dawnID] = daytimeEnemyWeightString.GetValueOrDefault(dawnID, "") + cache.Key + ":" + CleanString(splits[1]) + ",";
                         }
@@ -1417,7 +1427,7 @@ namespace LunarConfig.Objects.Config
                             string id = splits[0];
 
                             string? dawnID = GetDawnUUID(enemies, id);
-                            if (dawnID == null) { continue; }
+                            if (dawnID == null || splits.Length != 2) { continue; }
 
                             interiorEnemyWeightString[dawnID] = interiorEnemyWeightString.GetValueOrDefault(dawnID, "") + cache.Key + ":" + CleanString(splits[1]) + ",";
                         }
@@ -1432,7 +1442,7 @@ namespace LunarConfig.Objects.Config
                             string id = splits[0];
 
                             string? dawnID = GetDawnUUID(enemies, id);
-                            if (dawnID == null) { continue; }
+                            if (dawnID == null || splits.Length != 2) { continue; }
 
                             interiorEnemyWeatherString[dawnID] = interiorEnemyWeatherString.GetValueOrDefault(dawnID, "") + cache.Key + ":" + CleanString(splits[1]) + ",";
                         }
@@ -1447,7 +1457,7 @@ namespace LunarConfig.Objects.Config
                             string id = splits[0];
 
                             string? dawnID = GetDawnUUID(enemies, id);
-                            if (dawnID == null) { continue; }
+                            if (dawnID == null || splits.Length != 2) { continue; }
 
                             interiorEnemyDungeonString[dawnID] = interiorEnemyDungeonString.GetValueOrDefault(dawnID, "") + cache.Key + ":" + CleanString(splits[1]) + ",";
                         }
@@ -1462,7 +1472,7 @@ namespace LunarConfig.Objects.Config
                             string id = splits[0];
 
                             string? dawnID = GetDawnUUID(enemies, id);
-                            if (dawnID == null) { continue; }
+                            if (dawnID == null || splits.Length != 2) { continue; }
 
                             interiorEnemyWeightString[dawnID] = interiorEnemyWeightString.GetValueOrDefault(dawnID, "") + cache.Key + ":" + CleanString(splits[1]) + ",";
                         }
@@ -1537,7 +1547,7 @@ namespace LunarConfig.Objects.Config
                             string id = splits[0];
 
                             string? dawnID = GetDawnUUID(enemies, id);
-                            if (dawnID == null) { continue; }
+                            if (dawnID == null || splits.Length != 2) { continue; }
 
                             outsideEnemyWeightString[dawnID] = outsideEnemyWeightString.GetValueOrDefault(dawnID, "") + cache.Key + ":" + CleanString(splits[1]) + ",";
                         }
@@ -1552,7 +1562,7 @@ namespace LunarConfig.Objects.Config
                             string id = splits[0];
 
                             string? dawnID = GetDawnUUID(enemies, id);
-                            if (dawnID == null) { continue; }
+                            if (dawnID == null || splits.Length != 2) { continue; }
 
                             outsideEnemyWeatherString[dawnID] = outsideEnemyWeatherString.GetValueOrDefault(dawnID, "") + cache.Key + ":" + CleanString(splits[1]) + ",";
                         }
@@ -1567,7 +1577,7 @@ namespace LunarConfig.Objects.Config
                             string id = splits[0];
 
                             string? dawnID = GetDawnUUID(enemies, id);
-                            if (dawnID == null) { continue; }
+                            if (dawnID == null || splits.Length != 2) { continue; }
 
                             outsideEnemyDungeonString[dawnID] = outsideEnemyDungeonString.GetValueOrDefault(dawnID, "") + cache.Key + ":" + CleanString(splits[1]) + ",";
                         }
@@ -1582,7 +1592,7 @@ namespace LunarConfig.Objects.Config
                             string id = splits[0];
 
                             string? dawnID = GetDawnUUID(enemies, id);
-                            if (dawnID == null) { continue; }
+                            if (dawnID == null || splits.Length != 2) { continue; }
 
                             outsideEnemyWeightString[dawnID] = outsideEnemyWeightString.GetValueOrDefault(dawnID, "") + cache.Key + ":" + CleanString(splits[1]) + ",";
                         }
@@ -1789,7 +1799,7 @@ namespace LunarConfig.Objects.Config
                         string id = splits[0];
                         
                         string? dawnID = GetDawnUUID(dungeons, id);
-                        if (dawnID == null) { continue; }
+                        if (dawnID == null || splits.Length != 2) { continue; }
 
                         dungeonWeightString[dawnID] = dungeonWeightString.GetValueOrDefault(dawnID, "") + cache.Key + ":" + CleanString(splits[1]) + ",";
                     }
@@ -1804,7 +1814,7 @@ namespace LunarConfig.Objects.Config
                         string id = splits[0];
 
                         string? dawnID = GetDawnUUID(dungeons, id);
-                        if (dawnID == null) { continue; }
+                        if (dawnID == null || splits.Length != 2) { continue; }
 
                         dungeonWeatherString[dawnID] = dungeonWeatherString.GetValueOrDefault(dawnID, "") + cache.Key + ":" + CleanString(splits[1]) + ",";
                     }
@@ -1819,7 +1829,7 @@ namespace LunarConfig.Objects.Config
                         string id = splits[0];
 
                         string? dawnID = GetDawnUUID(dungeons, id);
-                        if (dawnID == null) { continue; }
+                        if (dawnID == null || splits.Length != 2) { continue; }
 
                         dungeonWeightString[dawnID] = dungeonWeightString.GetValueOrDefault(dawnID, "") + cache.Key + ":" + CleanString(splits[1]) + ",";
                     }
@@ -2000,7 +2010,7 @@ namespace LunarConfig.Objects.Config
                             if (insideInfo == null)
                             {
                                 CurveTableBuilder<DawnMoonInfo, SpawnWeightContext> blankTable = new();
-                                dawnObj.InsideInfo = new DawnInsideMapObjectInfo(new IndoorMapHazardType(), blankTable.Build());
+                                dawnObj.InsideInfo = new DawnInsideMapObjectInfo(ScriptableObject.CreateInstance<IndoorMapHazardType>(), blankTable.Build());
                                 IndoorMapHazardType tempType = dawnObj.InsideInfo.IndoorMapHazardType;
 
                                 tempType.allowInMineshaft = true;
@@ -2028,7 +2038,7 @@ namespace LunarConfig.Objects.Config
                             {
                                 CurveTableBuilder<DawnMoonInfo, SpawnWeightContext> blankTable = new();
 
-                                dawnObj.OutsideInfo = new DawnOutsideMapObjectInfo(new SpawnableOutsideObject(), blankTable.Build(), true, 0);
+                                dawnObj.OutsideInfo = new DawnOutsideMapObjectInfo(ScriptableObject.CreateInstance<SpawnableOutsideObject>(), blankTable.Build(), true, 0);
                                 outsideInfo = dawnObj.OutsideInfo;
                                 outsideInfo.SpawnableOutsideObject.objectWidth = 1;
                                 outsideInfo.SpawnableOutsideObject.spawnableFloorTags = Array.Empty<string>();
@@ -2107,11 +2117,18 @@ namespace LunarConfig.Objects.Config
                         foreach (var kvp in pair.Value)
                         {
                             string id = kvp.Key;
-                            if (!kvp.Value.IsNullOrWhiteSpace())
+                            try
                             {
-                                AnimationCurve curve = StringToCurve(CleanString(kvp.Value));
+                                if (!kvp.Value.IsNullOrWhiteSpace())
+                                {
+                                    AnimationCurve curve = StringToCurve(CleanString(kvp.Value));
 
-                                TrySetInsideCurve(id, curve, dawnMoon);
+                                    TrySetInsideCurve(id, curve, dawnMoon);
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                MiniLogger.LogError($"Found issue while configuring {id} inside curve on {dawnMoon}, check your curves!\n{e}");
                             }
                         }
                     }
@@ -2160,7 +2177,7 @@ namespace LunarConfig.Objects.Config
                             }
                             else
                             {
-                                dawnObj.InsideInfo = new DawnInsideMapObjectInfo(new IndoorMapHazardType(), newTable);
+                                dawnObj.InsideInfo = new DawnInsideMapObjectInfo(ScriptableObject.CreateInstance<IndoorMapHazardType>(), newTable);
                                 IndoorMapHazardType tempType = dawnObj.InsideInfo.IndoorMapHazardType;
 
                                 tempType.allowInMineshaft = true;
@@ -2194,11 +2211,18 @@ namespace LunarConfig.Objects.Config
                         foreach (var kvp in pair.Value)
                         {
                             string id = kvp.Key;
-                            if (!kvp.Value.IsNullOrWhiteSpace())
+                            try
                             {
-                                AnimationCurve curve = StringToCurve(CleanString(kvp.Value));
+                                if (!kvp.Value.IsNullOrWhiteSpace())
+                                {
+                                    AnimationCurve curve = StringToCurve(CleanString(kvp.Value));
 
-                                TrySetOutsideCurve(id, curve, dawnMoon);
+                                    TrySetOutsideCurve(id, curve, dawnMoon);
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                MiniLogger.LogError($"Found issue while configuring {id} outside curve on {dawnMoon}, check your curves!\n{e}");
                             }
                         }
                     }
@@ -2247,7 +2271,7 @@ namespace LunarConfig.Objects.Config
                             }
                             else
                             {
-                                dawnObj.OutsideInfo = new DawnOutsideMapObjectInfo(new SpawnableOutsideObject(), newTable, true, 0);
+                                dawnObj.OutsideInfo = new DawnOutsideMapObjectInfo(ScriptableObject.CreateInstance<SpawnableOutsideObject>(), newTable, true, 0);
 
                                 DawnOutsideMapObjectInfo outsideInfo = dawnObj.OutsideInfo;
 
@@ -2275,13 +2299,43 @@ namespace LunarConfig.Objects.Config
             }
         }
 
-        public void InitMoonItems()
+        public void GrabMoonObjects()
         {
             MiniLogger.LogInfo("Initializing Moon Item Weights");
             if (configureMoons)
             {
                 LunarConfigFile moonFile = files[LunarConfig.MOON_FILE_NAME];
                 moonFile.file.SaveOnConfigSet = false;
+
+                foreach (var item in LethalContent.Items)
+                {
+                    DawnItemInfo dawnItem = item.Value;
+
+                    if (dawnItem.ScrapInfo == null) { continue; }
+
+                    WeightProfile<int> profile = dawnItem.ScrapInfo.Rarity.Profile;
+                    
+                    foreach (var modifier in profile._compiled)
+                    {
+                        if (modifier is MoonBaseIntModifier moonBaseInt)
+                        {
+                            moonBaseInt._moonKey;
+                        }
+                        else if (modifier is MoonIntWeightModifier moonIntWeight)
+                        {
+                            
+                            moonIntWeight._weight.Operation
+                        }
+                        else if (modifier is WeatherIntWeightModifier weatherIntWeight)
+                        {
+                            weatherIntWeight.
+                        }
+                        else if (modifier is DungeonIntWeightModifier dungeonIntWeight)
+                        {
+
+                        }
+                    }
+                }
 
                 foreach (var moon in LethalContent.Moons)
                 {
@@ -2291,41 +2345,17 @@ namespace LunarConfig.Objects.Config
                     {
                         string niceUUID = NiceifyDawnUUID(moon.Key.Key);
                         DawnMoonInfo dawnMoon = moon.Value;
-                        SpawnWeightContext ctx = new(dawnMoon, null, null);
                         LunarConfigEntry moonEntry = moonFile.AddEntry($"{niceUUID} - {uuid}");
                         string numberlessName = dawnMoon.GetNumberlessPlanetName();
 
-                        string defaultScrap = "";
-                        foreach (var item in LethalContent.Items)
-                        {
-                            DawnItemInfo ite = item.Value;
+                        
 
-                            try
-                            {
-                                if (ite.ScrapInfo == null) { continue; }
-
-                                int? rarity = ite.ScrapInfo.Weights.GetFor(dawnMoon, ctx);
-
-                                if (rarity != null && rarity > 0)
-                                {
-                                    if (defaultScrap != "")
-                                    {
-                                        defaultScrap += ", ";
-                                    }
-                                    defaultScrap += ite.Item.itemName + ":" + rarity;
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                MiniLogger.LogWarning($"Failed to grab weight for {ite.Key.ToString()} on {numberlessName}\n{e}");
-                            }
-                        }
 
                         moonEntry.TryAddField(enabledMoonSettings, "Spawnable Scrap", "The base scrap that can spawn on the moon.\nDenoted with NAME:RARITY, separated with commas.", defaultScrap);
 
                         if (moonEntry.GetValue<bool>("Configure Content"))
                         {
-                            if (enabledMoonSettings.Contains("Spawnable Scrap")) { cachedSpawnableScrap[uuid] = moonEntry.GetValue<string>("Spawnable Scrap"); }
+                            if (enabledMoonSettings.Contains("Spawnable Scrap")) { scrapSources[dawnMoon.TypedKey] = moonEntry.GetValue<string>("Spawnable Scrap"); }
                         }
                     }
                     catch (Exception e)
@@ -2940,9 +2970,11 @@ namespace LunarConfig.Objects.Config
                         LunarConfigEntry moonEntry = moonFile.AddEntry($"{niceUUID} - {uuid}");
 
                         moonEntry.AddField("Catalogue Index", "Changes the order in the moon catalogue in the terminal. A higher value means first/higher in the list.", originalCatalogueIndex.IndexOf(dawnMoon));
-                        
+
                         if (moonEntry.GetValue<bool>("Configure Content"))
                             newCatalogueIndex[dawnMoon] = moonEntry.GetValue<int>("Catalogue Index");
+                        else
+                            newCatalogueIndex[dawnMoon] = originalCatalogueIndex.IndexOf(dawnMoon);
                     }
 
                     MoonRegistrationHandler.MoonGroupAlgorithm.OrderingSteps = [

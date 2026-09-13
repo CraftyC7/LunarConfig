@@ -74,12 +74,12 @@
 		<PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.2" PrivateAssets="all" />
         <PackageReference Include="LethalCompany.GameLibs.Steam" Version="*-*" PrivateAssets="all" />
 		<PackageReference Include="UnityEngine.Modules" Version="2022.3.62" IncludeAssets="compile" PrivateAssets="all" />
-		<PackageReference Include="TeamXiaolan.DawnLib" Version="0.9.14" PrivateAssets="all" Publicize="true" />
-		<PackageReference Include="TeamXiaolan.DawnLib.DuskMod" Version="0.9.14" PrivateAssets="all" Publicize="true" />
+		<PackageReference Include="TeamXiaolan.DawnLib" Version="1.0.1" PrivateAssets="all" Publicize="true" />
+		<PackageReference Include="TeamXiaolan.DawnLib.DuskMod" Version="1.0.1" PrivateAssets="all" Publicize="true" />
     </ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="IAmBatby-LethalLevelLoader" Version="1.6.9" PrivateAssets="all" ExcludeAssets="runtime" Publicize="true" />
+		<PackageReference Include="IAmBatby-LethalLevelLoader" Version="1.7.11" PrivateAssets="all" ExcludeAssets="runtime" Publicize="true" />
 	</ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">

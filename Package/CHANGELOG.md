@@ -1,3 +1,26 @@
+## Version 0.4.3
+
+Fixes?
+- Added extra logging and protections for trying to set map object curves
+
+## Version 0.4.2
+
+Features
+- Added 'Battery Value' and 'Requires Battery' entries to item configs
+
+Fixes
+- Fixed me not creating hazards the right way
+- Fixed a discrepancy with how tooltips are read
+
+## Version 0.4.1
+
+Features
+- Readded 'Is Scrap?'
+
+Fixes
+- Fixed the catalogue index bug
+- Fixed changelog
+
 # Version 0.4.0 - The B.I.G. Update
 ## Bug fixes, Item features, and General additions
 
