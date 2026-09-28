@@ -17,6 +17,7 @@ namespace LunarConfig.Objects.Config
 {
     public class LunarCentral
     {
+
         public Dictionary<string, LunarConfigFile> files = new Dictionary<string, LunarConfigFile>();
 
         public static HashSet<String> everyMoonTag = new HashSet<String>();
@@ -38,6 +39,12 @@ namespace LunarConfig.Objects.Config
         public static bool backCompat = true;
         public static Dictionary<SelectableLevel, bool> definedChallengeMoons = new Dictionary<SelectableLevel, bool>();
         public static Dictionary<SelectableLevel, bool> definedChallengeMoonTimes = new Dictionary<SelectableLevel, bool>();
+
+
+
+        public static Dictionary<NamespacedKey<DawnItemInfo>, List<SpawnWeight>> baseItemWeights = new();
+
+
 
         public static bool centralInitialized = false;
         public static bool itemsInitialized = false;
@@ -158,7 +165,7 @@ namespace LunarConfig.Objects.Config
 
         public static string CleanNumber(string str)
         {
-            return RemoveWhitespace(str).Replace("=", "").Replace("+", "").Replace("*", "").Replace("/", "");
+            return RemoveWhitespace(str).Replace("=", "").Replace("+", "").Replace("-", "").Replace("*", "").Replace("/", "").Replace("<", "").Replace(">", "").Replace("!", "");
         }
 
         public static string NiceifyDawnUUID(string uuid)
@@ -307,6 +314,33 @@ namespace LunarConfig.Objects.Config
             }
         }
 
+        public string ParseComparison(ComparisonOperation op)
+        {
+            switch (op)
+            {
+                case ComparisonOperation.Equal: return "==";
+                case ComparisonOperation.Less: return "<";
+                case ComparisonOperation.LessOrEqual: return "<=";
+                case ComparisonOperation.Greater: return ">";
+                case ComparisonOperation.GreaterOrEqual: return ">=";
+                case ComparisonOperation.NotEqual: return "!=";
+            }
+
+            return "";
+        }
+
+        public string ParseMath(MathOperation op)
+        {
+            switch (op)
+            {
+                case MathOperation.Additive: return "+";
+                case MathOperation.Subtractive: return "-";
+                case MathOperation.Multiplicative: return "*";
+                case MathOperation.Divisive: return "/";
+            }
+            return "";
+        }
+
         // LUNAR
         public void InitConfig()
         {
@@ -382,6 +416,8 @@ namespace LunarConfig.Objects.Config
                 configItems.AddField("Receipt Node Text", "Enable this to enable configuring this property in item config entries.", false);
                 configItems.AddField("Cost", "Disable this to disable configuring this property in item config entries.", true);
                 configItems.AddField("Tags", "Disable this to disable configuring this property in item config entries.", true);
+
+                configItems.AddFields("Route Price Injections", "Disable this to disable configuring this property in item config entries.", true);
 
                 foreach (var setting in configItems.fields.Keys)
                 {
@@ -2301,67 +2337,522 @@ namespace LunarConfig.Objects.Config
 
         public void GrabMoonObjects()
         {
-            MiniLogger.LogInfo("Initializing Moon Item Weights");
-            if (configureMoons)
+            if (configureMoons || configureDungeonInjection || configureWeatherInjection || configureTagInjection || (configureItems && enabledItemSettings.Contains("Route Price Injection")))
             {
                 LunarConfigFile moonFile = files[LunarConfig.MOON_FILE_NAME];
                 moonFile.file.SaveOnConfigSet = false;
 
+                LunarConfigFile dungeonFile = files[LunarConfig.DUNGEON_INJECTION_FILE_NAME];
+                dungeonFile.file.SaveOnConfigSet = false;
+
+                LunarConfigFile weatherFile = files[LunarConfig.WEATHER_INJECTION_FILE_NAME];
+                weatherFile.file.SaveOnConfigSet = false;
+
+                LunarConfigFile tagFile = files[LunarConfig.TAG_INJECTION_FILE_NAME];
+                tagFile.file.SaveOnConfigSet = false;
+
+                LunarConfigFile itemFile = files[LunarConfig.ITEM_FILE_NAME];
+                itemFile.file.SaveOnConfigSet = false;
+
+                // Loop through items, grab og weights
                 foreach (var item in LethalContent.Items)
                 {
                     DawnItemInfo dawnItem = item.Value;
+                    List<SpawnWeight> weights = baseItemWeights.GetValueOrDefault(item.Key);
 
                     if (dawnItem.ScrapInfo == null) { continue; }
 
-                    WeightProfile<int> profile = dawnItem.ScrapInfo.Rarity.Profile;
-                    
-                    foreach (var modifier in profile._compiled)
+                    foreach (var modifier in dawnItem.ScrapInfo.Rarity.Profile._compiled)
                     {
                         if (modifier is MoonBaseIntModifier moonBaseInt)
                         {
-                            moonBaseInt._moonKey;
+                            weights.Add(new SpawnWeight(moonBaseInt._moonKey, MathOperation.Additive, moonBaseInt._value));
                         }
                         else if (modifier is MoonIntWeightModifier moonIntWeight)
                         {
-                            
-                            moonIntWeight._weight.Operation
+                            ResolvedNamespacedWeight<DawnMoonInfo> w = moonIntWeight._weight;
+                            weights.Add(new SpawnWeight(w.Key, w.Operation, w.Value));
                         }
                         else if (modifier is WeatherIntWeightModifier weatherIntWeight)
                         {
-                            weatherIntWeight.
+                            ResolvedNamespacedWeight<DawnWeatherEffectInfo> w = weatherIntWeight._weight;
+                            weights.Add(new SpawnWeight(w.Key, w.Operation, w.Value));
                         }
                         else if (modifier is DungeonIntWeightModifier dungeonIntWeight)
                         {
-
+                            ResolvedNamespacedWeight<DawnDungeonInfo> w = dungeonIntWeight._weight;
+                            weights.Add(new SpawnWeight(w.Key, w.Operation, w.Value));
+                        }
+                        else if (modifier is RoutePriceIntWeightModifier routeIntWeight)
+                        {
+                            weights.Add(new SpawnWeight(WeightCondition.Price, routeIntWeight._config.IntComparison, routeIntWeight._config.Operation, routeIntWeight._config.Value));
+                        }
+                        else if (modifier is GlobalBaseIntModifier globalIntWeight)
+                        {
+                            weights.Add(new SpawnWeight(NamespacedKey<DawnMoonInfo>.Parse("lethal_company:all"), MathOperation.Additive, globalIntWeight._value));
                         }
                     }
                 }
 
-                foreach (var moon in LethalContent.Moons)
+                // Loop through moons, modify lists in accordance with configs
+                if (configureMoons && (enabledMoonSettings.Contains("Spawnable Scrap") ))
                 {
-                    string uuid = UUIDify(moon.Key.ToString());
-
-                    try
+                    foreach (var moon in LethalContent.Moons)
                     {
-                        string niceUUID = NiceifyDawnUUID(moon.Key.Key);
-                        DawnMoonInfo dawnMoon = moon.Value;
-                        LunarConfigEntry moonEntry = moonFile.AddEntry($"{niceUUID} - {uuid}");
-                        string numberlessName = dawnMoon.GetNumberlessPlanetName();
+                        string uuid = UUIDify(moon.Key.ToString());
 
-                        
-
-
-                        moonEntry.TryAddField(enabledMoonSettings, "Spawnable Scrap", "The base scrap that can spawn on the moon.\nDenoted with NAME:RARITY, separated with commas.", defaultScrap);
-
-                        if (moonEntry.GetValue<bool>("Configure Content"))
+                        try
                         {
-                            if (enabledMoonSettings.Contains("Spawnable Scrap")) { scrapSources[dawnMoon.TypedKey] = moonEntry.GetValue<string>("Spawnable Scrap"); }
+                            string niceUUID = NiceifyDawnUUID(moon.Key.Key);
+                            DawnMoonInfo dawnMoon = moon.Value;
+                            NamespacedKey<DawnMoonInfo> id = moon.Key;
+                            LunarConfigEntry moonEntry = moonFile.AddEntry($"{niceUUID} - {uuid}");
+                            string numberlessName = dawnMoon.GetNumberlessPlanetName();
+
+                            bool configMoon = moonEntry.GetValue<bool>("Configure Content");
+                            bool configScrap = enabledMoonSettings.Contains("Spawnable Scrap");
+
+                            string originalScrap = "";
+                            Dictionary<NamespacedKey<DawnItemInfo>, List<SpawnWeight>> newItemWeights = new();
+
+                            // Remove original weights from this moon
+                            foreach (var (k, v) in baseItemWeights)
+                            {
+                                var groups = v.ToLookup(s => s.source == null || !s.source.Equals(id));
+                                if (configMoon && configScrap) newItemWeights[k] = groups[true].ToList();
+
+                                string itemString = items.FirstOrDefault(i => i.Value.Equals(k.ToString())).Key;
+
+                                if (itemString.IsNullOrWhiteSpace())
+                                {
+                                    MiniLogger.LogWarning($"Could not add {k} to scrap list on {moon.Key}, are you missing appropriate aliases?");
+                                    continue;
+                                }
+
+                                foreach (var item in groups[false].ToList())
+                                {
+                                    if (!originalScrap.IsNullOrWhiteSpace()) { originalScrap += ","; }
+                                    originalScrap += itemString + item.ToString();
+                                }
+                            }
+
+                            moonEntry.TryAddField(enabledMoonSettings, "Spawnable Scrap", "The base scrap that can spawn on the moon.\nDenoted with NAME:RARITY, separated with commas.", originalScrap);
+
+                            if (configMoon && configScrap)
+                            {
+                                baseItemWeights = newItemWeights;
+
+                                string scrapList = moonEntry.GetValue<string>("Spawnable Scrap");
+
+                                foreach (var entry in scrapList.Split(','))
+                                {
+                                    if (!entry.IsNullOrWhiteSpace())
+                                    {
+                                        try
+                                        {
+                                            string[] s = entry.Replace(" ", "").Split(":");
+                                            if (s.Length != 2)
+                                            {
+                                                MiniLogger.LogWarning($"Found issue in scrap string for {id}");
+                                                continue;
+                                            }
+
+                                            MathOperation o = MathOperation.Additive;
+
+                                            if (s[1].Contains("-"))
+                                                o = MathOperation.Subtractive;
+                                            else if (s[1].Contains("*"))
+                                                o = MathOperation.Multiplicative;
+                                            else if (s[1].Contains("/"))
+                                                o = MathOperation.Divisive;
+
+                                            baseItemWeights[NamespacedKey<DawnItemInfo>.Parse(items[s[0].ToLower()])].Add(new SpawnWeight(id, o, float.Parse(CleanNumber(s[1]))));
+                                        }
+                                        catch
+                                        {
+                                            MiniLogger.LogWarning($"Found issue in scrap string for {id}");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            MiniLogger.LogError($"LunarConfig encountered an issue while grabbing configured weights on {uuid}, please report this!\n{e}");
                         }
                     }
-                    catch (Exception e)
+                }
+
+                // Loop through dungeons, modify lists in accordance with configs
+                if (configureDungeonInjection && (enabledDungeonInjectionSettings.Contains("Spawnable Scrap")))
+                {
+                    foreach (var dun in LethalContent.Dungeons)
                     {
-                        MiniLogger.LogError($"LunarConfig encountered an issue while configuring {uuid}, please report this!\n{e}");
+                        string uuid = UUIDify(dun.Key.ToString());
+
+                        try
+                        {
+                            string niceUUID = NiceifyDawnUUID(dun.Key.Key);
+                            DawnDungeonInfo dawnDungeon = dun.Value;
+                            NamespacedKey<DawnDungeonInfo> id = dun.Key;
+                            LunarConfigEntry dungeonEntry = dungeonFile.AddEntry($"{niceUUID} - {uuid}");
+
+                            bool configDungeon = dungeonEntry.GetValue<bool>("Configure Content");
+                            bool configScrap = enabledDungeonInjectionSettings.Contains("Spawnable Scrap");
+
+                            string originalScrap = "";
+                            Dictionary<NamespacedKey<DawnItemInfo>, List<SpawnWeight>> newItemWeights = new();
+
+                            // Remove original weights from this moon
+                            foreach (var (k, v) in baseItemWeights)
+                            {
+                                var groups = v.ToLookup(s => s.source == null || !s.source.Equals(id));
+                                if (configDungeon && configScrap) newItemWeights[k] = groups[true].ToList();
+
+                                string itemString = items.FirstOrDefault(i => i.Value.Equals(k.ToString())).Key;
+
+                                if (itemString.IsNullOrWhiteSpace())
+                                {
+                                    MiniLogger.LogWarning($"Could not add {k} to scrap list on {dun.Key}, are you missing appropriate aliases?");
+                                    continue;
+                                }
+
+                                foreach (var item in groups[false].ToList())
+                                {
+                                    if (!originalScrap.IsNullOrWhiteSpace()) { originalScrap += ","; }
+                                    originalScrap += itemString + item.ToString();
+                                }
+                            }
+
+                            dungeonEntry.TryAddField(enabledDungeonInjectionSettings, "Spawnable Scrap", "The base scrap that can spawn on the dungeon.\nDenoted with NAME:RARITY, separated with commas.", originalScrap);
+
+                            if (configDungeon && configScrap)
+                            {
+                                baseItemWeights = newItemWeights;
+
+                                string scrapList = dungeonEntry.GetValue<string>("Spawnable Scrap");
+
+                                foreach (var entry in scrapList.Split(','))
+                                {
+                                    if (!entry.IsNullOrWhiteSpace())
+                                    {
+                                        try
+                                        {
+                                            string[] s = entry.Replace(" ", "").Split(":");
+                                            if (s.Length != 2)
+                                            {
+                                                MiniLogger.LogWarning($"Found issue in scrap string for {id}");
+                                                continue;
+                                            }
+
+                                            MathOperation o = MathOperation.Additive;
+
+                                            if (s[1].Contains("-"))
+                                                o = MathOperation.Subtractive;
+                                            else if (s[1].Contains("*"))
+                                                o = MathOperation.Multiplicative;
+                                            else if (s[1].Contains("/"))
+                                                o = MathOperation.Divisive;
+
+                                            baseItemWeights[NamespacedKey<DawnItemInfo>.Parse(items[s[0].ToLower()])].Add(new SpawnWeight(id, o, float.Parse(CleanNumber(s[1]))));
+                                        }
+                                        catch
+                                        {
+                                            MiniLogger.LogWarning($"Found issue in scrap string for {id}");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            MiniLogger.LogError($"LunarConfig encountered an issue while grabbing configured weights on {uuid}, please report this!\n{e}");
+                        }
                     }
+                }
+
+                // Loop through weathers, modify lists in accordance with configs
+                if (configureWeatherInjection && (enabledWeatherInjectionSettings.Contains("Spawnable Scrap")))
+                {
+                    foreach (var wea in LethalContent.Weathers)
+                    {
+                        string uuid = UUIDify(wea.Key.ToString());
+
+                        try
+                        {
+                            string niceUUID = NiceifyDawnUUID(wea.Key.Key);
+                            DawnWeatherEffectInfo dawnWeather = wea.Value;
+                            NamespacedKey<DawnWeatherEffectInfo> id = wea.Key;
+                            LunarConfigEntry weatherEntry = weatherFile.AddEntry($"{niceUUID} - {uuid}");
+
+                            bool configWeather = weatherEntry.GetValue<bool>("Configure Content");
+                            bool configScrap = enabledWeatherInjectionSettings.Contains("Spawnable Scrap");
+
+                            string originalScrap = "";
+                            Dictionary<NamespacedKey<DawnItemInfo>, List<SpawnWeight>> newItemWeights = new();
+
+                            // Remove original weights from this moon
+                            foreach (var (k, v) in baseItemWeights)
+                            {
+                                var groups = v.ToLookup(s => s.source == null || !s.source.Equals(id));
+                                if (configWeather && configScrap) newItemWeights[k] = groups[true].ToList();
+
+                                string itemString = items.FirstOrDefault(i => i.Value.Equals(k.ToString())).Key;
+
+                                if (itemString.IsNullOrWhiteSpace())
+                                {
+                                    MiniLogger.LogWarning($"Could not add {k} to scrap list on {wea.Key}, are you missing appropriate aliases?");
+                                    continue;
+                                }
+
+                                foreach (var item in groups[false].ToList())
+                                {
+                                    if (!originalScrap.IsNullOrWhiteSpace()) { originalScrap += ","; }
+                                    originalScrap += itemString + item.ToString();
+                                }
+                            }
+
+                            weatherEntry.TryAddField(enabledWeatherInjectionSettings, "Spawnable Scrap", "The base scrap that can spawn during the weather.\nDenoted with NAME:RARITY, separated with commas.", originalScrap);
+
+                            if (configWeather && configScrap)
+                            {
+                                baseItemWeights = newItemWeights;
+
+                                string scrapList = weatherEntry.GetValue<string>("Spawnable Scrap");
+
+                                foreach (var entry in scrapList.Split(','))
+                                {
+                                    if (!entry.IsNullOrWhiteSpace())
+                                    {
+                                        try
+                                        {
+                                            string[] s = entry.Replace(" ", "").Split(":");
+                                            if (s.Length != 2)
+                                            {
+                                                MiniLogger.LogWarning($"Found issue in scrap string for {id}");
+                                                continue;
+                                            }
+
+                                            MathOperation o = MathOperation.Additive;
+
+                                            if (s[1].Contains("-"))
+                                                o = MathOperation.Subtractive;
+                                            else if (s[1].Contains("*"))
+                                                o = MathOperation.Multiplicative;
+                                            else if (s[1].Contains("/"))
+                                                o = MathOperation.Divisive;
+
+                                            baseItemWeights[NamespacedKey<DawnItemInfo>.Parse(items[s[0].ToLower()])].Add(new SpawnWeight(id, o, float.Parse(CleanNumber(s[1]))));
+                                        }
+                                        catch
+                                        {
+                                            MiniLogger.LogWarning($"Found issue in scrap string for {id}");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            MiniLogger.LogError($"LunarConfig encountered an issue while grabbing configured weights on {uuid}, please report this!\n{e}");
+                        }
+                    }
+                }
+
+                // Loop through tags, modify lists in accordance with configs
+                if (configureTagInjection && (enabledTagInjectionSettings.Contains("Spawnable Scrap")))
+                {
+                    foreach (string tag in everyMoonTag)
+                    {
+                        try
+                        {
+                            LunarConfigEntry tagEntry = tagFile.AddEntry(tag);
+
+                            bool configTag = tagEntry.GetValue<bool>("Configure Content");
+                            bool configScrap = enabledTagInjectionSettings.Contains("Spawnable Scrap");
+
+                            string originalScrap = "";
+                            Dictionary<NamespacedKey<DawnItemInfo>, List<SpawnWeight>> newItemWeights = new();
+
+                            // Remove original weights from this moon
+                            foreach (var (k, v) in baseItemWeights)
+                            {
+                                var groups = v.ToLookup(s => s.source == null || !s.source.Key.Equals(tag));
+                                if (configTag && configScrap) newItemWeights[k] = groups[true].ToList();
+
+                                string itemString = items.FirstOrDefault(i => i.Value.Equals(k.ToString())).Key;
+
+                                if (itemString.IsNullOrWhiteSpace())
+                                {
+                                    MiniLogger.LogWarning($"Could not add {k} to scrap list on {tag} tag, are you missing appropriate aliases?");
+                                    continue;
+                                }
+
+                                foreach (var item in groups[false].ToList())
+                                {
+                                    if (!originalScrap.IsNullOrWhiteSpace()) { originalScrap += ","; }
+                                    originalScrap += itemString + item.ToString();
+                                }
+                            }
+
+                            tagEntry.TryAddField(enabledMoonSettings, "Spawnable Scrap", "The base scrap that can spawn on the tag.\nDenoted with NAME:RARITY, separated with commas.", originalScrap);
+
+                            if (configTag && configScrap)
+                            {
+                                baseItemWeights = newItemWeights;
+
+                                string scrapList = tagEntry.GetValue<string>("Spawnable Scrap");
+
+                                foreach (var entry in scrapList.Split(','))
+                                {
+                                    if (!entry.IsNullOrWhiteSpace())
+                                    {
+                                        try
+                                        {
+                                            string[] s = entry.Replace(" ", "").Split(":");
+                                            if (s.Length != 2)
+                                            {
+                                                MiniLogger.LogWarning($"Found issue in scrap string for {tag} tag");
+                                                continue;
+                                            }
+
+                                            MathOperation o = MathOperation.Additive;
+
+                                            if (s[1].Contains("-"))
+                                                o = MathOperation.Subtractive;
+                                            else if (s[1].Contains("*"))
+                                                o = MathOperation.Multiplicative;
+                                            else if (s[1].Contains("/"))
+                                                o = MathOperation.Divisive;
+
+                                            baseItemWeights[NamespacedKey<DawnItemInfo>.Parse(items[s[0].ToLower()])].Add(new SpawnWeight(NamespacedKey.From("lunarcontenttag", tag), o, float.Parse(CleanNumber(s[1]))));
+                                        }
+                                        catch
+                                        {
+                                            MiniLogger.LogWarning($"Found issue in scrap string for {tag} tag");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            MiniLogger.LogError($"LunarConfig encountered an issue while grabbing configured weights on {tag} tag, please report this!\n{e}");
+                        }
+                    }
+                }
+
+                // Loop through items, modify lists in accordance with configs
+                if (configureItems && (enabledItemSettings.Contains("Route Price Injections")))
+                {
+                    foreach (var item in LethalContent.Items)
+                    {
+                        string uuid = UUIDify(item.Key.ToString());
+
+                        try
+                        {
+                            string niceUUID = NiceifyDawnUUID(item.Key.Key);
+                            DawnItemInfo dawnItem = item.Value;
+                            NamespacedKey<DawnItemInfo> id = item.Key;
+                            LunarConfigEntry itemEntry = itemFile.AddEntry($"{niceUUID} - {uuid}");
+
+                            bool configItem = itemEntry.GetValue<bool>("Configure Content");
+                            bool configScrap = enabledItemSettings.Contains("Route Price Injections");
+
+                            string originalRoutes = "";
+                            var groups = baseItemWeights[id].ToLookup(s => s.type == WeightCondition.Basic);
+
+                            List<SpawnWeight> newItemWeights = new();
+
+                            if (configItem && configScrap) newItemWeights = groups[true].ToList();
+
+                            foreach (var i in groups[false].ToList())
+                            {
+                                if (!originalRoutes.IsNullOrWhiteSpace()) { originalRoutes += ","; }
+                                originalRoutes += item.ToString();
+                            }
+
+                            itemEntry.TryAddField(enabledMoonSettings, "Route Price Injections", "The route prices at which this item will be injected.\nDenoted with [COMPARISON]PRICE:RARITY, separated with commas. i.e. <=100:+10", originalRoutes);
+
+                            if (configItem && configScrap)
+                            {
+                                baseItemWeights[id] = newItemWeights;
+
+                                string routeList = itemEntry.GetValue<string>("Route Price Injections");
+
+                                foreach (var entry in routeList.Split(','))
+                                {
+                                    if (!entry.IsNullOrWhiteSpace())
+                                    {
+                                        try
+                                        {
+                                            string[] s = entry.Replace(" ", "").Split(":");
+                                            if (s.Length != 2)
+                                            {
+                                                MiniLogger.LogWarning($"Found issue in scrap string for {id}");
+                                                continue;
+                                            }
+
+                                            MathOperation o = MathOperation.Additive;
+
+                                            if (s[1].Contains("-"))
+                                                o = MathOperation.Subtractive;
+                                            else if (s[1].Contains("*"))
+                                                o = MathOperation.Multiplicative;
+                                            else if (s[1].Contains("/"))
+                                                o = MathOperation.Divisive;
+
+                                            ComparisonOperation c = ComparisonOperation.Equal;
+
+                                            if (s[0].Contains("<="))
+                                                c = ComparisonOperation.LessOrEqual;
+                                            else if (s[0].Contains(">="))
+                                                c = ComparisonOperation.GreaterOrEqual;
+                                            else if (s[0].Contains("!="))
+                                                c = ComparisonOperation.NotEqual;
+                                            else if (s[0].Contains("<"))
+                                                c = ComparisonOperation.Less;
+                                            else if (s[0].Contains(">"))
+                                                c = ComparisonOperation.Greater;
+
+                                            IntComparison ic = new IntComparison();
+                                            ic.ComparisonOperation = c;
+                                            ic.Value = int.Parse(CleanNumber(s[0]));
+
+                                            baseItemWeights[id].Add(new SpawnWeight(WeightCondition.Price, ic, o, float.Parse(CleanNumber(s[1]))));
+                                        }
+                                        catch
+                                        {
+                                            MiniLogger.LogWarning($"Found issue in route string for {id}");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            MiniLogger.LogError($"LunarConfig encountered an issue while grabbing configured weights on {uuid}, please report this!\n{e}");
+                        }
+                    }
+                }
+
+                // Apply changes
+                foreach (var item in LethalContent.Items)
+                {
+                    DawnItemInfo dawnItem = item.Value;
+                    List<SpawnWeight> weights = baseItemWeights.GetValueOrDefault(item.Key);
+
+                    if (dawnItem.ScrapInfo == null) { continue; }
+
+                    CompositeIntWeightSource src = new();
+
+                    src.Add(new MoonIntWeightSource(() => baseItemWeights[item.Key].Where(s => s.type == WeightCondition.Basic && s.source is NamespacedKey<DawnMoonInfo>).Select(s => new UnresolvedNamespacedWeight(s.source.ToString(), s.operation, s.weight))));
+                    src.Add(new DungeonIntWeightSource(() => baseItemWeights[item.Key].Where(s => s.type == WeightCondition.Basic && s.source is NamespacedKey<DawnDungeonInfo>).Select(s => new UnresolvedNamespacedWeight(s.source.ToString(), s.operation, s.weight))));
+                    src.Add(new WeatherIntWeightSource(() => baseItemWeights[item.Key].Where(s => s.type == WeightCondition.Basic && s.source is NamespacedKey<DawnWeatherEffectInfo>).Select(s => new UnresolvedNamespacedWeight(s.source.ToString(), s.operation, s.weight))));
+                    src.Add(new RoutePriceIntWeightSource(() => baseItemWeights[item.Key].Where(s => s.type == WeightCondition.Price).Select(s => IntComparisonConfigWeight.ConvertFromString( ParseComparison(s.intComp.ComparisonOperation) + s.intComp.Value + "=" + ParseMath(s.operation) + (int)s.weight)));
+
+                    dawnItem.ScrapInfo.Rarity.Profile.RemoveAllSources();
+                    dawnItem.ScrapInfo.Rarity.Profile.AddSource(src);
                 }
 
                 moonFile.file.Save();
